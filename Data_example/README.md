@@ -6,7 +6,7 @@ Several open-source segmented volumes are available directly from this repositor
 - nmc-1-cal-blackisporepluscbd.tif, a Nickel Manganese Cobalt oxide positive electrode (2-phase domain).
 - graphite-5-cal-blackisporepluscbd, a graphite negative electrode (2-phase domain).
 
-![3D view of computed tomography segmented microstructures](https://github.nrel.gov/fussegli/MATBOX_Microstructure_analysis_toolbox/blob/master/Data_example/From%20computed%20tomography/Image.png)
+![3D view of computed tomography segmented microstructures](https://github.com/NREL/MATBOX_Microstructure_analysis_toolbox/blob/master/Data_example/From%20computed%20tomography/Image.png)
 
 Source: https://www.nrel.gov/transportation/microstructure.html \
 **More volumes are available from the above link, as well as gray level data set.**
