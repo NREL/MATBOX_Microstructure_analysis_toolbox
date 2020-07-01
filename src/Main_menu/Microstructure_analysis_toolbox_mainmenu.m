@@ -207,15 +207,15 @@ function Callback_about(~,~)
     web('https://www.nrel.gov/transportation/data-tools.html');
 end
 function Callback_openrepo(~,~)
-    web('https://github.nrel.gov/fussegli/Microstructure_characterization');
+    web('https://github.com/NREL/MATBOX_Microstructure_analysis_toolbox');
 end
 function Callback_documentation(~,~)
     path = matlab.desktop.editor.getActiveFilename; % Path of active file
-    higherlevelfolder = extractBetween(path,path(1:5),'Microstructure_analysis_toolbox\','Boundaries','inclusive');
+    higherlevelfolder = extractBetween(path,path(1:5),'MATBOX_Microstructure_analysis_toolbox\','Boundaries','inclusive');
     if ispc
-        documentation_path = [char(higherlevelfolder) 'Documentation\NREL_Microstructure_analysis_toolbox_documentation.pdf'];
+        documentation_path = [char(higherlevelfolder) 'Documentation\MATBOX_Microstructure_analysis_toolbox_documentation.pdf'];
     else
-        documentation_path = [char(higherlevelfolder) 'Documentation/NREL_Microstructure_analysis_toolbox_documentation.pdf'];
+        documentation_path = [char(higherlevelfolder) 'Documentation/MATBOX_Microstructure_analysis_toolbox_documentation.pdf'];
     end
     if exist(documentation_path,'file')
         open(documentation_path);
