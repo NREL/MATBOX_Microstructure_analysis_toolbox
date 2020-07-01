@@ -10,7 +10,7 @@ The toolbox provides a user-friendly experience thanks to a **Graphic-User Inter
 Installation and instructions are detailed in the pdf documentation. \
 Run src/Main_menu/Microstructure_analysis_toolbox_mainmenu.m to start the toolbox.
 
-![Main menu and module illustrations](https://github.nrel.gov/fussegli/MATBOX_Microstructure_analysis_toolbox/blob/master/Image.png)
+![Main menu and module illustrations](https://github.com/NREL/MATBOX_Microstructure_analysis_toolbox/blob/master/Image.png)
 
 ## Authors
 Contributions (excluding third-party software):
