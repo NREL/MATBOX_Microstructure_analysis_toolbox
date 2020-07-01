@@ -23,7 +23,7 @@ Source: https://www.nrel.gov/transportation/microstructure.html \
 - Bi_layer_poreformer.tif, a bi-layer material with pore former in one layer.
 - Two_particle_size.tif, tri-domain material: pore (background), small and large spherical particles.
 
-![3D view of numerically generated microstructures](https://github.nrel.gov/fussegli/MATBOX_Microstructure_analysis_toolbox/blob/master/Data_example/Numerically%20generated/Image.png)
+![3D view of numerically generated microstructures](https://github.com/NREL/MATBOX_Microstructure_analysis_toolbox/blob/master/Data_example/Numerically%20generated/Image.png)
 
 *You can visualize these tif files using the Microstructure and results visualizatrion module.*
 *Alternatively, you can use open source software ImageJ (or Fiji): https://imagej.net/Welcome*
