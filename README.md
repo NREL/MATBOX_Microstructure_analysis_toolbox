@@ -2,6 +2,8 @@
 **MATLAB open source microstructure analysis code embedded with a graphic user interface**\
 *v0.9 06/29/2020*
 
+** New version soon to be finished: expect to see a major update on meshing and generation. Release likely to be late February or March. F. Usseglio-Viretta.
+
 MATBOX is a MATLAB application for performing various microstructure-related tasks including **microstructure numerical generation**, **image filtering** and **microstructure segmentation**, **microstructure characterization**, result **three-dimensional visualization** and **result correlation**, and **microstructure meshing**. \
 MATBOX was originally developed to analyse electrode microstructures for lithium ion batteries; however, the algorithms provided by the toolbox are widely applicable to other heterogeneous materials.
 
