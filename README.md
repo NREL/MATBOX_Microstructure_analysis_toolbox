@@ -1,22 +1,21 @@
 # MATBOX: Microstructure Analysis Toolbox documentation
 **MATLAB open source microstructure analysis code embedded with a graphic user interface**\
-*v0.91 March 18, 2021*
+*v0.91 March 18, 2021*\
  See release_notes.txt for a change log.
 
 MATBOX is a MATLAB application for performing various microstructure-related tasks including **microstructure numerical generation**, **image filtering** and **microstructure segmentation**, **microstructure characterization**, result **three-dimensional visualization** and **result correlation**, and **microstructure meshing**. \
 MATBOX was originally developed to analyse electrode microstructures for lithium ion batteries; however, the algorithms provided by the toolbox are widely applicable to other heterogeneous materials.
-
-The inputs for most modules are stack tiff files, which are for MATLAB a 3D array.
 
 The toolbox provides a user-friendly experience thanks to a **Graphic-User Interface** and requires no coding to be used.
 
 Installation and instructions are detailed in the pdf documentation. \
 Run src/Main_menu/Main_menu.mlapp to start the toolbox (mlapp extension corresponds to MATLAB app created with app designer).
 
-*MATBOX main menu and illustration of each module:
+* MATBOX main menu and illustration of each module:
 ![Main menu and module illustrations](https://github.com/NREL/MATBOX_Microstructure_analysis_toolbox/blob/master/MATBOX.png)
 
 * MATBOX modules inputs/outputs:
+The inputs for most modules are stack tiff files (which once imported in MATLAB a 3D array).
 ![Main menu and module illustrations](https://github.com/NREL/MATBOX_Microstructure_analysis_toolbox/blob/master/IO.png)
 
 ## Authors
