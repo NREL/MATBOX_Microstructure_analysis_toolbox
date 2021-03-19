@@ -142,6 +142,10 @@ PSD_results = zeros(number_phase,5); % min, mean, max, std, std%
 density_fct_parameters.round_value = 3;
 density_fct_parameters.smooth_cumulative_fct = true;
 
+% Edge detection
+background = 0;
+edgewithbackground = false;
+
 for current_phase=1:1:number_phase % Loop over all phases
     fprintf ('Current phase calculated: %s\n',INFO.phase(current_phase).name)
     code_tmp = INFO.phase(current_phase).code;
@@ -153,7 +157,7 @@ for current_phase=1:1:number_phase % Loop over all phases
     
     % Edge, watershed
     [index_border_phase,~,~,~] = Function_identify_edges(binary_phase);
-    [index_border_label,~,~,~] = Function_identify_labelsedges(Particle_label_tmp, 0); 
+    [index_border_label,~,~,~] = Function_identify_labelsedges(Particle_label_tmp, background, edgewithbackground); 
     index_(current_phase).border_phase = index_border_phase;
     index_(current_phase).border_label = index_border_label;
         

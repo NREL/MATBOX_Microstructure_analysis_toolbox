@@ -27,32 +27,39 @@ for current_phase=1:1:p.number_phase
             for k=1:1:length(p.ignore_value)
                 different_values(different_values==p.ignore_value(k)) = [];
             end
-                     
-            % Minimum
-            Alongdirection.phase(current_phase).direction(current_direction).val(position,2) = min(different_values);
-                        
-            % Maximum
-            Alongdirection.phase(current_phase).direction(current_direction).val(position,4) = max(different_values);
             
-            % Weighed values
-            % Initialisation
-            values=zeros(length(different_values),2);
-            for current_val=1:1:length(different_values)
-                values(current_val,1)=different_values(current_val);
-                values(current_val,2)=sum(sum( slice_== different_values(current_val)));
+            if ~isempty(different_values)
+                % Minimum
+                Alongdirection.phase(current_phase).direction(current_direction).val(position,2) = min(different_values);
+                
+                % Maximum
+                Alongdirection.phase(current_phase).direction(current_direction).val(position,4) = max(different_values);
+                
+                % Weighed values
+                % Initialisation
+                values=zeros(length(different_values),2);
+                for current_val=1:1:length(different_values)
+                    values(current_val,1)=different_values(current_val);
+                    values(current_val,2)=sum(sum( slice_== different_values(current_val)));
+                end
+                % Mean
+                Alongdirection.phase(current_phase).direction(current_direction).val(position,3) = sum(values(:,1).*values(:,2))/sum(values(:,2));
+                
+                % Standard deviation
+                % The weighted starndard deviation formula is
+                % sqrt( sum(wi((xi-<x>)^2)  / ( (n-1)/n * sum wi ) )
+                % With wi the weight of the xi, and <x> the weighted mean (mean_size)
+                wi = values(:,2);
+                xi = values(:,1);
+                n = length(xi);
+                mean_ = Alongdirection.phase(current_phase).direction(current_direction).val(position,3);
+                Alongdirection.phase(current_phase).direction(current_direction).val(position,5) = sqrt( sum( wi.*((xi-mean_).^2)) / ( (n-1)/n * sum(wi)  ));
+            else
+                Alongdirection.phase(current_phase).direction(current_direction).val(position,2) = NaN;
+                Alongdirection.phase(current_phase).direction(current_direction).val(position,3) = NaN;
+                Alongdirection.phase(current_phase).direction(current_direction).val(position,4) = NaN;
+                Alongdirection.phase(current_phase).direction(current_direction).val(position,5) = NaN;
             end
-            % Mean
-            Alongdirection.phase(current_phase).direction(current_direction).val(position,3) = sum(values(:,1).*values(:,2))/sum(values(:,2));             
-            
-            % Standard deviation
-            % The weighted starndard deviation formula is
-            % sqrt( sum(wi((xi-<x>)^2)  / ( (n-1)/n * sum wi ) )
-            % With wi the weight of the xi, and <x> the weighted mean (mean_size)
-            wi = values(:,2);
-            xi = values(:,1);
-            n = length(xi);
-            mean_ = Alongdirection.phase(current_phase).direction(current_direction).val(position,3);
-            Alongdirection.phase(current_phase).direction(current_direction).val(position,5) = sqrt( sum( wi.*((xi-mean_).^2)) / ( (n-1)/n * sum(wi)  ));
             
         end
     end

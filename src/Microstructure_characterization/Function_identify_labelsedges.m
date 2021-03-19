@@ -1,4 +1,4 @@
-function [index_border_label,B1,B2,B3] = Function_identify_labelsedges(label_map, background)
+function [index_border_label,B1,B2,B3] = Function_identify_labelsedges(label_map, background, edgewithbackground)
 
 
 labels = unique(label_map);
@@ -16,40 +16,79 @@ for k=1:1:length(labels)
     for current_voxel=1:1:n
         % Get back voxel coordinate
         x_=C1(current_voxel); y_=C2(current_voxel); z_=C3(current_voxel);
-        % Check x-
-        if x_>1
-            if label_map(x_-1,y_,z_)~=label_map(x_,y_,z_) && label_map(x_-1,y_,z_)~=background
-                edge_map(x_,y_,z_)=1;
+        if edgewithbackground
+            % Check x-
+            if x_>1
+                if label_map(x_-1,y_,z_)~=label_map(x_,y_,z_)
+                    edge_map(x_,y_,z_)=1;
+                end
             end
-        end
-        % Check y-
-        if y_>1
-            if label_map(x_,y_-1,z_)~=label_map(x_,y_,z_) && label_map(x_,y_-1,z_)~=background
-                edge_map(x_,y_,z_)=1;
+            % Check y-
+            if y_>1
+                if label_map(x_,y_-1,z_)~=label_map(x_,y_,z_)
+                    edge_map(x_,y_,z_)=1;
+                end
             end
-        end
-        % Check z-
-        if z_>1
-            if label_map(x_,y_,z_-1)~=label_map(x_,y_,z_) && label_map(x_,y_,z_-1)~=background
-                edge_map(x_,y_,z_)=1;
+            % Check z-
+            if z_>1
+                if label_map(x_,y_,z_-1)~=label_map(x_,y_,z_)
+                    edge_map(x_,y_,z_)=1;
+                end
             end
-        end
-        % Check x+
-        if x_<Domain_size(1)
-            if label_map(x_+1,y_,z_)~=label_map(x_,y_,z_) && label_map(x_+1,y_,z_)~=background
-                edge_map(x_,y_,z_)=1;
+            % Check x+
+            if x_<Domain_size(1)
+                if label_map(x_+1,y_,z_)~=label_map(x_,y_,z_)
+                    edge_map(x_,y_,z_)=1;
+                end
             end
-        end
-        % Check y+
-        if y_<Domain_size(2)
-            if label_map(x_,y_+1,z_)~=label_map(x_,y_,z_) && label_map(x_,y_+1,z_)~=background
-                edge_map(x_,y_,z_)=1;
+            % Check y+
+            if y_<Domain_size(2)
+                if label_map(x_,y_+1,z_)~=label_map(x_,y_,z_)
+                    edge_map(x_,y_,z_)=1;
+                end
             end
-        end
-        % Check z+
-        if z_<Domain_size(3)
-            if label_map(x_,y_,z_+1)~=label_map(x_,y_,z_) && label_map(x_,y_,z_+1)~=background
-                edge_map(x_,y_,z_)=1;
+            % Check z+
+            if z_<Domain_size(3)
+                if label_map(x_,y_,z_+1)~=label_map(x_,y_,z_)
+                    edge_map(x_,y_,z_)=1;
+                end
+            end
+        else
+            % Check x-
+            if x_>1
+                if label_map(x_-1,y_,z_)~=label_map(x_,y_,z_) && label_map(x_-1,y_,z_)~=background
+                    edge_map(x_,y_,z_)=1;
+                end
+            end
+            % Check y-
+            if y_>1
+                if label_map(x_,y_-1,z_)~=label_map(x_,y_,z_) && label_map(x_,y_-1,z_)~=background
+                    edge_map(x_,y_,z_)=1;
+                end
+            end
+            % Check z-
+            if z_>1
+                if label_map(x_,y_,z_-1)~=label_map(x_,y_,z_) && label_map(x_,y_,z_-1)~=background
+                    edge_map(x_,y_,z_)=1;
+                end
+            end
+            % Check x+
+            if x_<Domain_size(1)
+                if label_map(x_+1,y_,z_)~=label_map(x_,y_,z_) && label_map(x_+1,y_,z_)~=background
+                    edge_map(x_,y_,z_)=1;
+                end
+            end
+            % Check y+
+            if y_<Domain_size(2)
+                if label_map(x_,y_+1,z_)~=label_map(x_,y_,z_) && label_map(x_,y_+1,z_)~=background
+                    edge_map(x_,y_,z_)=1;
+                end
+            end
+            % Check z+
+            if z_<Domain_size(3)
+                if label_map(x_,y_,z_+1)~=label_map(x_,y_,z_) && label_map(x_,y_,z_+1)~=background
+                    edge_map(x_,y_,z_)=1;
+                end
             end
         end
     end

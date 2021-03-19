@@ -89,7 +89,10 @@ end
 slice_r(index_border_phase) = 0; slice_g(index_border_phase) = 0; slice_b(index_border_phase) = 0;
 slice_grey(index_border_phase) = 0;
 % Watershed lines
-[index_border_label,~,~,~] = Function_identify_labelsedges(Label_lake, 0);
+% Edge detection
+background = 0;
+edgewithbackground = false;
+[index_border_label,~,~,~] = Function_identify_labelsedges(Label_lake, background, edgewithbackgroundpaint);
 tmp = slice_grey; tmp(index_border_label) = 1;
 slice_color(:,:,1)=tmp; % Attribute RGB color
 tmp = slice_grey; tmp(index_border_label) = 0;

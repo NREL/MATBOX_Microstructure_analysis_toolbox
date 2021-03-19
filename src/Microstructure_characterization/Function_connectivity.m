@@ -131,6 +131,9 @@ unknown_id = 3;
 connectivity_illdefined = zeros(number_phase,2); % number voxels, volume fraction
 connectivity_LargestIsolatedUnknown = zeros(number_phase,3); % largest, isolated, unknown
 connectivity_TransportFace2Face = zeros(number_phase,9); % Connected, isolated, unknown for each direction
+connectivity_TransportFromFace1 = zeros(number_phase,9); % Connected, isolated, unknown for each direction
+connectivity_TransportFromFace2 = zeros(number_phase,9); % Connected, isolated, unknown for each direction
+
 
 Time_measure=[];
 for current_phase=1:1:number_phase % Loop over all phases
@@ -162,6 +165,14 @@ for current_phase=1:1:number_phase % Loop over all phases
         connectivity_TransportFace2Face(current_phase,(direction-1)*3+1) = Connectivity_structure.Clusters_TransportFace2Face.direction(direction).connected_cluster_phasefraction;
         connectivity_TransportFace2Face(current_phase,(direction-1)*3+2) = Connectivity_structure.Clusters_TransportFace2Face.direction(direction).isolated_cluster_phasefraction;
         connectivity_TransportFace2Face(current_phase,(direction-1)*3+3) = Connectivity_structure.Clusters_TransportFace2Face.direction(direction).unknown_cluster_phasefraction;
+
+        connectivity_TransportFromFace1(current_phase,(direction-1)*3+1) = Connectivity_structure.Clusters_TransportFromFace1.direction(direction).connected_cluster_phasefraction;
+        connectivity_TransportFromFace1(current_phase,(direction-1)*3+2) = Connectivity_structure.Clusters_TransportFromFace1.direction(direction).isolated_cluster_phasefraction;
+        connectivity_TransportFromFace1(current_phase,(direction-1)*3+3) = Connectivity_structure.Clusters_TransportFromFace1.direction(direction).unknown_cluster_phasefraction;
+
+        connectivity_TransportFromFace2(current_phase,(direction-1)*3+1) = Connectivity_structure.Clusters_TransportFromFace2.direction(direction).connected_cluster_phasefraction;
+        connectivity_TransportFromFace2(current_phase,(direction-1)*3+2) = Connectivity_structure.Clusters_TransportFromFace2.direction(direction).isolated_cluster_phasefraction;
+        connectivity_TransportFromFace2(current_phase,(direction-1)*3+3) = Connectivity_structure.Clusters_TransportFromFace2.direction(direction).unknown_cluster_phasefraction;
     end
     
     % Save (correlation, visualization)
@@ -170,21 +181,46 @@ for current_phase=1:1:number_phase % Loop over all phases
     results_correlation(current_phase).unknown_cluster_phasefraction = connectivity_LargestIsolatedUnknown(current_phase,3);
     
     results_correlation(current_phase).Cluster_phasefraction_connected_along_direction_1 =  connectivity_TransportFace2Face(current_phase,1);
-    results_correlation(current_phase).Cluster_phasefraction_isolated_along_direction_1 = connectivity_TransportFace2Face(current_phase,2);
-    results_correlation(current_phase).Cluster_phasefraction_unknown_along_direction_1 = connectivity_TransportFace2Face(current_phase,3); 
+    %results_correlation(current_phase).Cluster_phasefraction_isolated_along_direction_1 = connectivity_TransportFace2Face(current_phase,2);
+    %results_correlation(current_phase).Cluster_phasefraction_unknown_along_direction_1 = connectivity_TransportFace2Face(current_phase,3); 
     results_correlation(current_phase).Cluster_phasefraction_connected_along_direction_2 =  connectivity_TransportFace2Face(current_phase,4);
-    results_correlation(current_phase).Cluster_phasefraction_isolated_along_direction_2 = connectivity_TransportFace2Face(current_phase,5);
-    results_correlation(current_phase).Cluster_phasefraction_unknown_along_direction_2 = connectivity_TransportFace2Face(current_phase,6);  
+    %results_correlation(current_phase).Cluster_phasefraction_isolated_along_direction_2 = connectivity_TransportFace2Face(current_phase,5);
+    %results_correlation(current_phase).Cluster_phasefraction_unknown_along_direction_2 = connectivity_TransportFace2Face(current_phase,6);  
     results_correlation(current_phase).Cluster_phasefraction_connected_along_direction_3 =  connectivity_TransportFace2Face(current_phase,7);
-    results_correlation(current_phase).Cluster_phasefraction_isolated_along_direction_3 = connectivity_TransportFace2Face(current_phase,8);
-    results_correlation(current_phase).Cluster_phasefraction_unknown_along_direction_3 = connectivity_TransportFace2Face(current_phase,9);      
+    %results_correlation(current_phase).Cluster_phasefraction_isolated_along_direction_3 = connectivity_TransportFace2Face(current_phase,8);
+    %results_correlation(current_phase).Cluster_phasefraction_unknown_along_direction_3 = connectivity_TransportFace2Face(current_phase,9);      
+
+    results_correlation(current_phase).Cluster_phasefraction_connected_along_direction_1_fromface1 =  connectivity_TransportFromFace1(current_phase,1);
+    %results_correlation(current_phase).Cluster_phasefraction_isolated_along_direction_1_face1 = connectivity_TransportFromFace1(current_phase,2);
+    %results_correlation(current_phase).Cluster_phasefraction_unknown_along_direction_1_face1 = connectivity_TransportFromFace1(current_phase,3); 
+    results_correlation(current_phase).Cluster_phasefraction_connected_along_direction_2_fromface1 =  connectivity_TransportFromFace1(current_phase,4);
+    %results_correlation(current_phase).Cluster_phasefraction_isolated_along_direction_2_face1 = connectivity_TransportFromFace1(current_phase,5);
+    %results_correlation(current_phase).Cluster_phasefraction_unknown_along_direction_2_face1 = connectivity_TransportFromFace1(current_phase,6);  
+    results_correlation(current_phase).Cluster_phasefraction_connected_along_direction_3_fromface1 =  connectivity_TransportFromFace1(current_phase,7);
+    %results_correlation(current_phase).Cluster_phasefraction_isolated_along_direction_3_face1 = connectivity_TransportFromFace1(current_phase,8);
+    %results_correlation(current_phase).Cluster_phasefraction_unknown_along_direction_3_face1 = connectivity_TransportFromFace1(current_phase,9);  
+
+    results_correlation(current_phase).Cluster_phasefraction_connected_along_direction_1_fromface2 =  connectivity_TransportFromFace2(current_phase,1);
+    %results_correlation(current_phase).Cluster_phasefraction_isolated_along_direction_1_face2 = connectivity_TransportFromFace2(current_phase,2);
+    %results_correlation(current_phase).Cluster_phasefraction_unknown_along_direction_1_face2 = connectivity_TransportFromFace2(current_phase,3); 
+    results_correlation(current_phase).Cluster_phasefraction_connected_along_direction_2_fromface2 =  connectivity_TransportFromFace2(current_phase,4);
+    %results_correlation(current_phase).Cluster_phasefraction_isolated_along_direction_2_face2 = connectivity_TransportFromFace2(current_phase,5);
+    %results_correlation(current_phase).Cluster_phasefraction_unknown_along_direction_2_face2 = connectivity_TransportFromFace2(current_phase,6);  
+    results_correlation(current_phase).Cluster_phasefraction_connected_along_direction_3_fromface2 =  connectivity_TransportFromFace2(current_phase,7);
+    %results_correlation(current_phase).Cluster_phasefraction_isolated_along_direction_3_face2 = connectivity_TransportFromFace2(current_phase,8);
+    %results_correlation(current_phase).Cluster_phasefraction_unknown_along_direction_3_face2 = connectivity_TransportFromFace2(current_phase,9);  
     
     results_visualization(current_phase).Clusters_sortedpersize = Connectivity_structure.Clusters_sortedpersize_3Darray;
     results_visualization(current_phase).Clusters_LargestIsolatedUnknown = Connectivity_structure.Clusters_LargestIsolatedUnknown.array;    
     results_visualization(current_phase).Clusters_ConnectedFace2Face_along_direction_1 = Connectivity_structure.Clusters_TransportFace2Face.direction(1).array;        
     results_visualization(current_phase).Clusters_ConnectedFace2Face_along_direction_2 = Connectivity_structure.Clusters_TransportFace2Face.direction(2).array;        
-    results_visualization(current_phase).Clusters_ConnectedFace2Face_along_direction_3 = Connectivity_structure.Clusters_TransportFace2Face.direction(3).array;        
-        
+    results_visualization(current_phase).Clusters_ConnectedFace2Face_along_direction_3 = Connectivity_structure.Clusters_TransportFace2Face.direction(3).array;      
+    results_visualization(current_phase).Clusters_ConnectedFromFace1_along_direction_1 = Connectivity_structure.Clusters_TransportFromFace1.direction(1).array;        
+    results_visualization(current_phase).Clusters_ConnectedFromFace1_along_direction_2 = Connectivity_structure.Clusters_TransportFromFace1.direction(2).array;        
+    results_visualization(current_phase).Clusters_ConnectedFromFace1_along_direction_3 = Connectivity_structure.Clusters_TransportFromFace1.direction(3).array;     
+    results_visualization(current_phase).Clusters_ConnectedFromFace2_along_direction_1 = Connectivity_structure.Clusters_TransportFromFace2.direction(1).array;        
+    results_visualization(current_phase).Clusters_ConnectedFromFace2_along_direction_2 = Connectivity_structure.Clusters_TransportFromFace2.direction(2).array;        
+    results_visualization(current_phase).Clusters_ConnectedFromFace2_along_direction_3 = Connectivity_structure.Clusters_TransportFromFace2.direction(3).array;   
 end
 
 
@@ -199,10 +235,16 @@ Table_connectivity = table(INFO.phasename,connectivity_LargestIsolatedUnknown(:,
     'VariableNames',{'Name' 'Main_cluster' 'Isolated_clusters' 'Unknown_clusters'});
 Table_face2face = table(INFO.phasename,connectivity_TransportFace2Face(:,1),connectivity_TransportFace2Face(:,2),connectivity_TransportFace2Face(:,3),connectivity_TransportFace2Face(:,4),connectivity_TransportFace2Face(:,5),connectivity_TransportFace2Face(:,6),connectivity_TransportFace2Face(:,7),connectivity_TransportFace2Face(:,8),connectivity_TransportFace2Face(:,9),...
     'VariableNames',{'Name' 'Dir1_connected' 'Dir1_isolated' 'Dir1_unknown' 'Dir2_connected' 'Dir2_isolated' 'Dir2_unknown' 'Dir3_connected' 'Dir3_isolated' 'Dir3_unknown'});
+Table_fromface1 = table(INFO.phasename,connectivity_TransportFromFace1(:,1),connectivity_TransportFromFace1(:,2),connectivity_TransportFromFace1(:,3),connectivity_TransportFromFace1(:,4),connectivity_TransportFromFace1(:,5),connectivity_TransportFromFace1(:,6),connectivity_TransportFromFace1(:,7),connectivity_TransportFromFace1(:,8),connectivity_TransportFromFace1(:,9),...
+    'VariableNames',{'Name' 'Dir1_connected' 'Dir1_isolated' 'Dir1_unknown' 'Dir2_connected' 'Dir2_isolated' 'Dir2_unknown' 'Dir3_connected' 'Dir3_isolated' 'Dir3_unknown'});
+Table_fromface2 = table(INFO.phasename,connectivity_TransportFromFace2(:,1),connectivity_TransportFromFace2(:,2),connectivity_TransportFromFace2(:,3),connectivity_TransportFromFace2(:,4),connectivity_TransportFromFace2(:,5),connectivity_TransportFromFace2(:,6),connectivity_TransportFromFace2(:,7),connectivity_TransportFromFace2(:,8),connectivity_TransportFromFace2(:,9),...
+    'VariableNames',{'Name' 'Dir1_connected' 'Dir1_isolated' 'Dir1_unknown' 'Dir2_connected' 'Dir2_isolated' 'Dir2_unknown' 'Dir3_connected' 'Dir3_isolated' 'Dir3_unknown'});
 Table_illdefinedclusters = table(INFO.phasename,connectivity_illdefined(:,1),connectivity_illdefined(:,2),...
     'VariableNames',{'Name' 'Number_1_voxel_size_cluster' 'Phase_volume_fraction'});
 Results_connectivity.Table_connectivity = Table_connectivity; % Save in main table result
 Results_connectivity.Table_face2face = Table_face2face;
+Results_connectivity.Table_fromface1 = Table_fromface1;
+Results_connectivity.Table_fromface2 = Table_fromface2;
 Results_connectivity.Table_illdefinedclusters = Table_illdefinedclusters;
 
 %% SAVE TABLES
@@ -213,9 +255,13 @@ if OPTIONS.save_xls==true
     DATA_writetable.sheet(1).name='Results';
     DATA_writetable.sheet(1).table=Table_connectivity;
     DATA_writetable.sheet(2).name='Face2Face';
-    DATA_writetable.sheet(2).table=Table_face2face;        
-    DATA_writetable.sheet(3).name='Illdefinedclusters';
-    DATA_writetable.sheet(3).table=Table_illdefinedclusters;       
+    DATA_writetable.sheet(2).table=Table_face2face;  
+    DATA_writetable.sheet(3).name='FromFaceStart';
+    DATA_writetable.sheet(3).table=Table_fromface1;  
+    DATA_writetable.sheet(4).name='FromFaceEnd';
+    DATA_writetable.sheet(4).table=Table_fromface2;        
+    DATA_writetable.sheet(5).name='Illdefinedclusters';
+    DATA_writetable.sheet(5).table=Table_illdefinedclusters;       
     % Save function
     Function_Writetable(Current_folder,filename,DATA_writetable)
 end
@@ -227,6 +273,10 @@ if OPTIONS.displaytext==true
     disp(Table_connectivity)
     disp 'Connectivity from extremes faces, % of phase';
     disp(Table_face2face)
+    disp 'Connectivity from first face, % of phase';
+    disp(Table_fromface1)
+    disp 'Connectivity from last face, % of phase';
+    disp(Table_fromface2)
     disp 'Ill defined cluster (one-voxel size)';
     disp(Table_illdefinedclusters)    
     fprintf('Computation time, in seconds:\n\n');

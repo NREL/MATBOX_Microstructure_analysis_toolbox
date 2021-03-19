@@ -16,7 +16,7 @@ Clusters_tmp = bwlabeln(binary_array,6);
 unique_cluster = unique(Clusters_tmp); % Unique cluster
 unique_cluster(unique_cluster==0)=[]; % Remove background (0) if any      
 number_cluster = length(unique_cluster); % Number of cluster
-cluster_size = zeros(number_cluster,12); % Initialise
+cluster_size = zeros(number_cluster,17); % Initialise
 % Column
 % 1 : cluster number of voxel
 % 2 : cluster volume in um3
@@ -29,6 +29,13 @@ cluster_size = zeros(number_cluster,12); % Initialise
 % 9 : 1= connected cluster, 2=unknown cluster, 3=isolated cluster (face2face connection direction 1)
 % 10: 1= connected cluster, 2=unknown cluster, 3=isolated cluster (face2face connection direction 2)
 % 11: 1= connected cluster, 2=unknown cluster, 3=isolated cluster (face2face connection direction 3)
+% 12 : 1= connected cluster, 2=unknown cluster, 3=isolated cluster (face connection 1)
+% 13: 1= connected cluster, 2=unknown cluster, 3=isolated cluster (face connection 1)
+% 14: 1= connected cluster, 2=unknown cluster, 3=isolated cluster (face connection 1)
+% 15 : 1= connected cluster, 2=unknown cluster, 3=isolated cluster (face2face connection direction 1)
+% 16: 1= connected cluster, 2=unknown cluster, 3=isolated cluster (face2face connection direction 2)
+% 17: 1= connected cluster, 2=unknown cluster, 3=isolated cluster (face2face connection direction 3)
+
 Connectivity_structure.connected_id=connected_id;
 Connectivity_structure.unknown_id=unknown_id;
 Connectivity_structure.isolated_id=isolated_id;
@@ -79,6 +86,8 @@ Clusters_LargestIsolatedUnknown.array = zeros(Domain_size,'uint8'); % Initialise
 % Cluster does not connect the faces, and do not touch the domain's boundaryies: =3
 for current_direction=1:1:3 % Loop on every direction
     Clusters_TransportFace2Face.direction(current_direction).array = zeros(Domain_size,'uint8'); % Initialise
+    Clusters_TransportFromFace1.direction(current_direction).array = zeros(Domain_size,'uint8'); % Initialise
+    Clusters_TransportFromFace2.direction(current_direction).array = zeros(Domain_size,'uint8'); % Initialise
 end
 
 Clusters_LargestIsolatedUnknown.array(Clusters_==1)=connected_id; % Main (largest) cluster
@@ -139,6 +148,77 @@ for k=1:1:number_cluster % Loop over all clusters
     end
     Clusters_TransportFace2Face.direction(3).array(I) = connectivity_id_3;
     cluster_size(k,11)=connectivity_id_3;
+
+
+    % % Check if cluster connect to one face
+    % Along direction 1
+    if x_min==1
+        connectivity_id_1 = connected_id; % Connect
+    elseif y_min==1 || z_min==1 || y_max==Domain_size(2) || z_max==Domain_size(3)
+        connectivity_id_1 = unknown_id; % Does not connect, but connection actually unknown due to limited field of view
+    else
+        connectivity_id_1 = isolated_id; % Does not connect (true isolated cluster)
+    end
+    Clusters_TransportFromFace1.direction(1).array(I) = connectivity_id_1;
+    cluster_size(k,12)=connectivity_id_1;
+    
+    % Along direction 2
+    if y_min==1
+        connectivity_id_2 = 1; % Connect
+    elseif x_min==1 || z_min==1 || x_max==Domain_size(1) || z_max==Domain_size(3)
+        connectivity_id_2 = unknown_id; % Does not connect, but connection actually unknown due to limited field of view
+    else
+        connectivity_id_2 = isolated_id; % Does not connect (true isolated cluster)
+    end
+    Clusters_TransportFromFace1.direction(2).array(I) = connectivity_id_2;
+    cluster_size(k,13)=connectivity_id_2;
+    
+    % Along direction 3
+    if z_min==1
+        connectivity_id_3 = 1; % Does not connect (true isolated cluster)
+    elseif y_min==1 || x_min==1 || y_max==Domain_size(2) || x_max==Domain_size(1)
+        connectivity_id_3 = unknown_id; % Does not connect (true isolated cluster)
+    else
+        connectivity_id_3 = isolated_id; % Does not connect (true isolated cluster)
+    end
+    Clusters_TransportFromFace1.direction(3).array(I) = connectivity_id_3;
+    cluster_size(k,14)=connectivity_id_3;
+
+    % % Check if cluster connect to one face
+    % Along direction 1
+    if x_max==Domain_size(1)
+        connectivity_id_1 = connected_id; % Connect
+    elseif y_min==1 || z_min==1 || y_max==Domain_size(2) || z_max==Domain_size(3)
+        connectivity_id_1 = unknown_id; % Does not connect, but connection actually unknown due to limited field of view
+    else
+        connectivity_id_1 = isolated_id; % Does not connect (true isolated cluster)
+    end
+    Clusters_TransportFromFace2.direction(1).array(I) = connectivity_id_1;
+    cluster_size(k,15)=connectivity_id_1;
+    
+    % Along direction 2
+    if y_max==Domain_size(2)
+        connectivity_id_2 = 1; % Connect
+    elseif x_min==1 || z_min==1 || x_max==Domain_size(1) || z_max==Domain_size(3)
+        connectivity_id_2 = unknown_id; % Does not connect, but connection actually unknown due to limited field of view
+    else
+        connectivity_id_2 = isolated_id; % Does not connect (true isolated cluster)
+    end
+    Clusters_TransportFromFace2.direction(2).array(I) = connectivity_id_2;
+    cluster_size(k,16)=connectivity_id_2;
+    
+    % Along direction 3
+    if z_max==Domain_size(3)
+        connectivity_id_3 = 1; % Does not connect (true isolated cluster)
+    elseif y_min==1 || x_min==1 || y_max==Domain_size(2) || x_max==Domain_size(1)
+        connectivity_id_3 = unknown_id; % Does not connect (true isolated cluster)
+    else
+        connectivity_id_3 = isolated_id; % Does not connect (true isolated cluster)
+    end
+    Clusters_TransportFromFace2.direction(3).array(I) = connectivity_id_3;
+    cluster_size(k,17)=connectivity_id_3;
+
+
 end
 
 % Save results in structure
@@ -156,10 +236,20 @@ for current_direction=1:1:3
     Clusters_TransportFace2Face.direction(current_direction).connected_cluster_phasefraction = 100 * sum(sum(sum( Clusters_TransportFace2Face.direction(current_direction).array==connected_id))) / Numbervoxel_phase; 
     Clusters_TransportFace2Face.direction(current_direction).unknown_cluster_phasefraction   = 100 * sum(sum(sum( Clusters_TransportFace2Face.direction(current_direction).array==unknown_id))) / Numbervoxel_phase; 
     Clusters_TransportFace2Face.direction(current_direction).isolated_cluster_phasefraction  = 100 * sum(sum(sum( Clusters_TransportFace2Face.direction(current_direction).array==isolated_id))) / Numbervoxel_phase; 
+
+    Clusters_TransportFromFace1.direction(current_direction).connected_cluster_phasefraction = 100 * sum(sum(sum( Clusters_TransportFromFace1.direction(current_direction).array==connected_id))) / Numbervoxel_phase; 
+    Clusters_TransportFromFace1.direction(current_direction).unknown_cluster_phasefraction   = 100 * sum(sum(sum( Clusters_TransportFromFace1.direction(current_direction).array==unknown_id))) / Numbervoxel_phase; 
+    Clusters_TransportFromFace1.direction(current_direction).isolated_cluster_phasefraction  = 100 * sum(sum(sum( Clusters_TransportFromFace1.direction(current_direction).array==isolated_id))) / Numbervoxel_phase; 
+
+    Clusters_TransportFromFace2.direction(current_direction).connected_cluster_phasefraction = 100 * sum(sum(sum( Clusters_TransportFromFace2.direction(current_direction).array==connected_id))) / Numbervoxel_phase; 
+    Clusters_TransportFromFace2.direction(current_direction).unknown_cluster_phasefraction   = 100 * sum(sum(sum( Clusters_TransportFromFace2.direction(current_direction).array==unknown_id))) / Numbervoxel_phase; 
+    Clusters_TransportFromFace2.direction(current_direction).isolated_cluster_phasefraction  = 100 * sum(sum(sum( Clusters_TransportFromFace2.direction(current_direction).array==isolated_id))) / Numbervoxel_phase; 
+
 end
 % Save results in structure
 Connectivity_structure.Clusters_LargestIsolatedUnknown = Clusters_LargestIsolatedUnknown;
 Connectivity_structure.Clusters_TransportFace2Face = Clusters_TransportFace2Face;
-
+Connectivity_structure.Clusters_TransportFromFace1 = Clusters_TransportFromFace1;
+Connectivity_structure.Clusters_TransportFromFace2 = Clusters_TransportFromFace2;
 
 end

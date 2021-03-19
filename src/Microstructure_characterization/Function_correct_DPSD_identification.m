@@ -96,6 +96,10 @@ while number_change~=0
     if visualize_2D && cpsd_refining
         set(hsg,'String',{'Animation of two-dimensional particle identification correction',['Iteration ' num2str(iteration_,'%i')]});
         
+        % Edge detection
+        background = 0;
+        edgewithbackground = false;
+        
         slice_color = zeros(Domain_size(1),Domain_size(2),3); % RGB color map
         slice_r = zeros(Domain_size(1),Domain_size(2)); % Red color map
         slice_g = zeros(Domain_size(1),Domain_size(2)); % Green color map
@@ -117,7 +121,7 @@ while number_change~=0
         slice_r(index_border_phase) = 0; slice_g(index_border_phase) = 0; slice_b(index_border_phase) = 0;
         slice_grey(index_border_phase) = 0;
         % Watershed lines
-        [index_border_label,~,~,~] = Function_identify_labelsedges(Label_lake, 0);
+        [index_border_label,~,~,~] = Function_identify_labelsedges(Label_lake, background, edgewithbackground);
         tmp = slice_grey; tmp(index_border_label) = 1;
         slice_color(:,:,1)=tmp; % Attribute RGB color
         tmp = slice_grey; tmp(index_border_label) = 0;
@@ -1216,7 +1220,10 @@ while number_change~=0
             slice_r(index_border_phase) = 0; slice_g(index_border_phase) = 0; slice_b(index_border_phase) = 0;
             slice_grey(index_border_phase) = 0;
             % Watershed lines
-            [index_border_label,~,~,~] = Function_identify_labelsedges(Label_lake, 0);
+            % Edge detection
+            background = 0;
+            edgewithbackground = false;
+            [index_border_label,~,~,~] = Function_identify_labelsedges(Label_lake, background, edgewithbackground);
             tmp = slice_grey; tmp(index_border_label) = 1;
             slice_color(:,:,1)=tmp; % Attribute RGB color
             tmp = slice_grey; tmp(index_border_label) = 0;

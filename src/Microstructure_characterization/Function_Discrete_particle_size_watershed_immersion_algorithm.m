@@ -329,6 +329,9 @@ end
 if visualize_2D
     close(video_handle) % Close video   
     
+    background = 0;
+    edgewithbackground = false;
+    
     sub_axes_illustration(3).s=subplot(2,2,3,'Parent',Fig_illustration); % Create axes  
     hold(sub_axes_illustration(3).s,'on'); % Active subplot
     slice_image = image(slice_color,'parent',sub_axes_illustration(3).s); % Display the slice
@@ -343,7 +346,7 @@ if visualize_2D
     hold(sub_axes_illustration(3).s,'off'); % Active subplot    
     
     % Find watershedlines
-    [index_border_label,~,~,~] = Function_identify_labelsedges(Label_lake, 0);
+    [index_border_label,~,~,~] = Function_identify_labelsedges(Label_lake, background, edgewithbackground);
     sub_axes_illustration(4).s=subplot(2,2,4,'Parent',Fig_illustration); % Create axes  
     hold(sub_axes_illustration(4).s,'on'); % Active subplot
     tmp = slice_grey; tmp(index_border_label) = 1;    

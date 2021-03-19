@@ -264,6 +264,34 @@ if number_results>=1
                 PropertyUnit(line_table,current_phase) = {'[%]'}; % Unit
                 PropertyStdpercent(line_table,current_phase) = {'n/a'}; % Standard deviation in percents of the mean
             end
+            line_table=line_table+1;
+            Propertyname(line_table) = {'From 1st face connectivity 1/2/3'}; % Name
+            Propertymethod(line_table) = {'6-connected'}; % Name
+            T = datamat.Results_connectivity.Table_fromface1; % Table
+            for current_phase=1:1:number_phase
+                array = T{current_phase,2:end};
+                str_mean=[num2str(array(1),string_precision) ' / ' num2str(array(4),string_precision) ' / ' num2str(array(7),string_precision)];
+                PropertyMin(line_table,current_phase) = {'n/a'}; % Min
+                PropertyMean(line_table,current_phase) = {str_mean}; % Mean
+                PropertyMax(line_table,current_phase) = {'n/a'}; % Max
+                PropertyStd(line_table,current_phase) = {'n/a'}; % Standard deviation
+                PropertyUnit(line_table,current_phase) = {'[%]'}; % Unit
+                PropertyStdpercent(line_table,current_phase) = {'n/a'}; % Standard deviation in percents of the mean
+            end
+            line_table=line_table+1;
+            Propertyname(line_table) = {'From last face connectivity 1/2/3'}; % Name
+            Propertymethod(line_table) = {'6-connected'}; % Name
+            T = datamat.Results_connectivity.Table_fromface2; % Table
+            for current_phase=1:1:number_phase
+                array = T{current_phase,2:end};
+                str_mean=[num2str(array(1),string_precision) ' / ' num2str(array(4),string_precision) ' / ' num2str(array(7),string_precision)];
+                PropertyMin(line_table,current_phase) = {'n/a'}; % Min
+                PropertyMean(line_table,current_phase) = {str_mean}; % Mean
+                PropertyMax(line_table,current_phase) = {'n/a'}; % Max
+                PropertyStd(line_table,current_phase) = {'n/a'}; % Standard deviation
+                PropertyUnit(line_table,current_phase) = {'[%]'}; % Unit
+                PropertyStdpercent(line_table,current_phase) = {'n/a'}; % Standard deviation in percents of the mean
+            end
         end
 
     end
