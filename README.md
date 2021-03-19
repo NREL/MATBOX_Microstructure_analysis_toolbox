@@ -40,7 +40,7 @@ If you have suggestions, please submit them in the discussion section of this re
 
 ## How to contribute?
 MATBOX already includes third-party open source algorithms (full list in documentation). If you wish to add algorithm(s) in MATBOX, please contact the author at francois.usseglioviretta@nrel.gov or let a message in the discussion section of this repository.
-All the same if you have suggestions ,feedbacks, or want to report a bug.
+All the same if you have suggestions, feedbacks, or want to report a bug.
 
 ## License
 This toolbox uses BSD license. NREL Software Record number SWR-20-76. License file is in this folder. Third-party licenses are available in the third-party licences folder.
