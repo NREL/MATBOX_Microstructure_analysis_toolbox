@@ -1,0 +1,29 @@
+Release version notes:
+•	v0.91 (03/18/2021)
+Generation module
+- Added additive phase generation algorithm from Dr. Aashutosh N. Mistry, with documentation updated.
+- Re-worked microstructure generation module (additive phase) GUI.
+- Add new submodule: deterministic generation. Allow generating fractals (Menger sponge).
+- bug fixed: phase generation module dx, dy, dz diameters were assigned to wrong diameters.
+Meshing module
+- Mesh a unique microstructure, an half-cell, a full-cell (including the two current collectors, the two electrodes and the separator), or a polycrhistalline architecture.
+- Meshes generated with Iso2mesh are post-processed so that their boundaries are perfectly planes for easier boundary conditions later implementation.
+- Add regular mesh generation option.
+- GUI overhaul. Switched from programmatic GUI to MATLAB app design GUI.
+Characterization module
+- Connectivity calculation now also determine directional and oriented connectivity instead of only considering the largest cluster.
+Visualization module
+- Added checkerboard choice for comparison of segmented and grey level volumes.
+- Switched from programmatic GUI to MATLAB app design GUI.
+- Replace nanmax, nanmin with max, min to avoid need of Statistics and Machine Learning Toolbox in src\Microstrucrure_and_results_visualisation\microstructure_visualization_GUI.m
+Filtering and segmentation module
+- Added arguments for adapthisteq in the GUI, with updated documentation and examples.
+Miscellaneous
+- Updated main menu.
+- New function: Microstructure_basic_visualization_interface.m and Microstructure_comparison_visualization_interface.m in src\Miscellaneous, used to avoid recoding visualization each time only simple 2D slice view is required.
+Documentation
+- Added analytical expression of the corrective factor used in specific surface area (§VII-5di).
+- Added section XI USEFUL STANDALONE FUNCTIONS to present some functions that can be used independently for some very common task (such as loading a tif file, saving MATLAB tables in csv files, etc.).
+- Added short introduction text for the ‘About the National Renewable Energy Laboratory’ section.
+- Added references for the ‘Getting started with microstructure analysis’ section.
+•	v0.9. First public release (06/29/2020)
