@@ -9,7 +9,7 @@ MATBOX was originally developed to analyse electrode microstructures for lithium
 
 ![MATBOX](https://github.com/NREL/MATBOX_Microstructure_analysis_toolbox/blob/master/MATBOX.png)
 
-## HOW TO?
+## How to?
 The toolbox provides a user-friendly experience thanks to a **Graphic-User Interface** and requires no coding to be used.
 Installation and instructions are detailed in the documentation. Run src/Main_menu/Main_menu.mlapp to start the toolbox (mlapp extension corresponds to MATLAB app created with app designer) and choose the module relevant for your activity.
 
@@ -36,10 +36,14 @@ If you produce results using the toolbox, or use some or parts of the algorithms
 ## What's next?
 - Publish in a journal article is next priority.
 - Next release will focus on properly finish the generation module, dust off the the characterization module, and add a template to the correlation module to make it faster for the user.
-If you have suggestions, please go to the discussion section of this repo.
+If you have suggestions, please submit them in the discussion section of this repo.
+
+## How to contribute?
+MATBOX already includes third-party open source algorithms (full list in documentation). If you wish to add algorithm(s) in MATBOX, please contact the author at francois.usseglioviretta@nrel.gov or let a message in the discussion section of this repository.
+All the same if you have suggestions ,feedbacks, or want to report a bug.
 
 ## License
-This toolbox uses BSD license. NREL Software Record number SWR-20-76. License file is in this folder. Third-party license are available in the third-party licences folder.
+This toolbox uses BSD license. NREL Software Record number SWR-20-76. License file is in this folder. Third-party licenses are available in the third-party licences folder.
 
 ## Acknowledgments
 This software was authored by the **National Renewable Energy Laboratory**, operated by **Alliance for Sustainable Energy, LLC**, for the **U.S. Department of Energy (DOE)** under Contract No. DE-AC36-08GO28308. Funding for algorithm development was pro-vided by the U.S. DOE Vehicle Technologies Office’s Computer-Aided Engineering of Batteries (CAEBAT) program (program manager Brian Cunningham). Application of the algorithm for fast-charge analysis was provided by the eXtreme Fast Charge Cell Evaluation of Lithium-Ion Batteries (XCEL) program (program manager Samuel Gillard).
