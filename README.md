@@ -14,7 +14,7 @@ Installation and instructions are detailed in the pdf documentation. Run src/Mai
 * MATBOX main menu and illustration of each module:
 ![Main menu and module illustrations](https://github.com/NREL/MATBOX_Microstructure_analysis_toolbox/blob/master/MATBOX.png)
 
-* The inputs for most modules are stack tiff files (which once imported in MATLAB a 3D array). MATBOX modules inputs/outputs are illustrated below:
+* The inputs for most modules are stack tiff files (which once imported in MATLAB are 3D arrays). MATBOX modules connectivity is illustrated below:
 ![Main menu and module illustrations](https://github.com/NREL/MATBOX_Microstructure_analysis_toolbox/blob/master/IO.png)
 
 ## Authors
