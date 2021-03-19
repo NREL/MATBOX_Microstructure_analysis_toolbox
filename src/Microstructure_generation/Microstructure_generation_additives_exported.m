@@ -130,6 +130,16 @@ classdef Microstructure_generation_additives_exported < matlab.apps.AppBase
             app.Turn_on_off('on',app.OutcomeTab)
             app.TabGroup.SelectedTab = app.OutcomeTab; % Go to outcome tab
         end
+        
+        function currentDir = getcurrentdir(app)
+            if isdeployed % Stand-alone mode.
+                [status, result] = system('path');
+                currentDir = char(regexpi(result, 'Path=(.*?);', 'tokens', 'once'));
+            else % MATLAB mode.
+                currentDir = pwd;
+            end
+        end            
+                    
     end
     
 
@@ -625,19 +635,21 @@ classdef Microstructure_generation_additives_exported < matlab.apps.AppBase
 
         % Button pushed function: OpendocumentationButton
         function OpendocumentationButtonPushed(app, event)
-            path = matlab.desktop.editor.getActiveFilename; % Path of active file
-            higherlevelfolder = extractBetween(path,path(1:5),'MATBOX_Microstructure_analysis_toolbox_dev\','Boundaries','inclusive');
+            % path = matlab.desktop.editor.getActiveFilename; % Path of active file (but does not work for app file)
+            path = app.getcurrentdir;
             if ispc
-                documentation_path = [char(higherlevelfolder) 'Documentation\MATBOX_Microstructure_analysis_toolbox_documentation.pdf'];
+                separation_folder = '\';
             else
-                documentation_path = [char(higherlevelfolder) 'Documentation/MATBOX_Microstructure_analysis_toolbox_documentation.pdf'];
+                separation_folder = '/';
             end
+            higherlevelfolder = extractBetween(path,path(1:5),['MATBOX_Microstructure_analysis_toolbox' separation_folder],'Boundaries','inclusive');
+            documentation_path = [char(higherlevelfolder) 'Documentation' separation_folder 'NREL_MATBOX_Microstructure_analysis_toolbox_documentation.pdf'];
             if exist(documentation_path,'file')
                 open(documentation_path);
             else
-                disp 'MATLAB did not find the file MATBOX_Microstructure_analysis_toolbox_documentation.pdf'.
-                disp 'Default location is \Microstructure_analysis_toolbox\Documentation\';
-            end
+                disp 'MATLAB did not find the file NREL_MATBOX_Microstructure_analysis_toolbox_documentation.pdf'.
+                disp 'Default location is \MATBOX_Microstructure_analysis_toolbox\Documentation\';
+            end 
         end
 
         % Image clicked function: About_Logo_NREL

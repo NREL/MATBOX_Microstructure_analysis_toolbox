@@ -9,6 +9,7 @@ classdef Microstructure_generation_deterministic_exported < matlab.apps.AppBase
         Save_Label                     matlab.ui.control.Label
         ClicktoselectsavefolderButton  matlab.ui.control.Button
         Save_folder_text               matlab.ui.control.Label
+        Label                          matlab.ui.control.Label
         PeriodicspheresTab             matlab.ui.container.Tab
         Spheres_title                  matlab.ui.control.Label
         Sphere_GenerateButton          matlab.ui.control.Button
@@ -393,6 +394,12 @@ classdef Microstructure_generation_deterministic_exported < matlab.apps.AppBase
             app.Save_folder_text.FontColor = [1 0 0];
             app.Save_folder_text.Position = [184 474 533 22];
             app.Save_folder_text.Text = 'Save folder location: NOT DEFINED';
+
+            % Create Label
+            app.Label = uilabel(app.InstructionsTab);
+            app.Label.FontColor = [1 0 0];
+            app.Label.Position = [8 45 417 22];
+            app.Label.Text = 'This submodule is not yet completed (all functionnality are not implemented)';
 
             % Create PeriodicspheresTab
             app.PeriodicspheresTab = uitab(app.TabGroup);

@@ -1029,7 +1029,14 @@ classdef Segmentation_exported < matlab.apps.AppBase
             set(app.Scaling_UIAxes_after,'YDir','normal');            
         end        
 
-        
+        function currentDir = getcurrentdir(app)
+            if isdeployed % Stand-alone mode.
+                [status, result] = system('path');
+                currentDir = char(regexpi(result, 'Path=(.*?);', 'tokens', 'once'));
+            else % MATLAB mode.
+                currentDir = pwd;
+            end
+        end
         
     end
     
@@ -4558,18 +4565,20 @@ classdef Segmentation_exported < matlab.apps.AppBase
 
         % Menu selected function: DocumentationMenu
         function DocumentationMenuSelected(app, event)
-            path = matlab.desktop.editor.getActiveFilename; % Path of active file
-            higherlevelfolder = extractBetween(path,path(1:5),'Microstructure_analysis_toolbox\','Boundaries','inclusive');
+            % path = matlab.desktop.editor.getActiveFilename; % Path of active file (but does not work for app file)
+            path = app.getcurrentdir;
             if ispc
-                documentation_path = [char(higherlevelfolder) 'Documentation\NREL_Microstructure_analysis_toolbox_documentation.pdf'];
+                separation_folder = '\';
             else
-                documentation_path = [char(higherlevelfolder) 'Documentation/NREL_Microstructure_analysis_toolbox_documentation.pdf'];
+                separation_folder = '/';
             end
+            higherlevelfolder = extractBetween(path,path(1:5),['MATBOX_Microstructure_analysis_toolbox' separation_folder],'Boundaries','inclusive');
+            documentation_path = [char(higherlevelfolder) 'Documentation' separation_folder 'NREL_MATBOX_Microstructure_analysis_toolbox_documentation.pdf'];
             if exist(documentation_path,'file')
                 open(documentation_path);
             else
-                disp 'MATLAB did not find the file NREL_Microstructure_analysis_toolbox_documentation.pdf'.
-                disp 'Default location is \Microstructure_analysis_toolbox\Documentation\';
+                disp 'MATLAB did not find the file NREL_MATBOX_Microstructure_analysis_toolbox_documentation.pdf'.
+                disp 'Default location is \MATBOX_Microstructure_analysis_toolbox\Documentation\';
             end
         end
     end
@@ -4584,6 +4593,7 @@ classdef Segmentation_exported < matlab.apps.AppBase
             app.ROIfilteringandsegmentationmoduleUIFigure = uifigure('Visible', 'off');
             app.ROIfilteringandsegmentationmoduleUIFigure.Position = [100 100 998 776];
             app.ROIfilteringandsegmentationmoduleUIFigure.Name = 'ROI, filtering and segmentation module';
+            app.ROIfilteringandsegmentationmoduleUIFigure.Icon = 'Icon_ROI.png';
 
             % Create VolumeMenu
             app.VolumeMenu = uimenu(app.ROIfilteringandsegmentationmoduleUIFigure);
