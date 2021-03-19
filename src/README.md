@@ -1,2 +1,2 @@
 # src
-Run Main_menu/Microstructure_analysis_toolbox_mainmenu.m to start the toolbox.
+Run src/Main_menu/Main_menu.mlapp to start the toolbox. Once you will have added Iso2mesh (see documentation), you can also package the app (MATLAB 'APPS' ribbon / Package App / select Main_menu.mlapp) and then install it (MATLAB 'APPS' ribbon / Install App / select the app you just have created).
