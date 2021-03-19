@@ -3,7 +3,11 @@ function [microstructure3D, phase] = function_generate_ellipsoid_microstructure(
 % Francois Usseglio-Viretta, NREL
 
 tic
-                        
+
+%% PARAMETERS
+simulate_calendering = false; % Useful to set it true to achieve high density
+check_contiguity = true; % Default, true. Fasle useful for very elongated particles
+
 
 %% DEDUCE MICROSTRUCTURE INFORMATION
 %% VOLUME FRACTIONS
@@ -105,7 +109,6 @@ for current_phase=1:1:number_phase
     for k=1:1:length(phase(current_phase).unique_dx_diameter)
         phase(current_phase).unique_dy_diameter = [phase(current_phase).unique_dy_diameter phase(current_phase).unique_dx_diameter(k)*1./phase(current_phase).unique_dxdy_elongation];
         phase(current_phase).unique_dz_diameter = [phase(current_phase).unique_dz_diameter phase(current_phase).unique_dx_diameter(k)*1./phase(current_phase).unique_dxdz_elongation];
-        
     end
 end
 
@@ -247,7 +250,6 @@ particle_index(1:preallocating_particle) = struct('Index',0);
 % loop pass (each new pass phase_volume_target is larger: one value per pass)
 %   loop phase
 % Then, distance map to fill the remaining, with competition between phase for zone attibuted to multiple phase
-
 update_waitbar_step=0.05;
 phase_volume_filled = zeros(number_phase,1); % Number of voxel assigned to each phase
 for current_pass=1:1:number_pass
@@ -341,8 +343,14 @@ for current_pass=1:1:number_pass
             z_center = Coordinates_all_voxels(idx_center,3);
             
             remaining_volume_fraction_currentphase_z = phase(current_phase).volumefraction.along_3rd_axis_allslices(z_center) - phase(current_phase).current_volumefraction.along_3rd_axis_allslices(z_center); % volume fraction of the current phase at z_center
+            
+            normalized_term = 0;
+            for kk=1:1:number_phase
+                normalized_term = normalized_term + phase(kk).volumefraction.along_3rd_axis_allslices(z_center) - phase(kk).current_volumefraction.along_3rd_axis_allslices(z_center);
+            end
+            
             rn = rand; % Pick a random number from 0 to 1
-            if rn < remaining_volume_fraction_currentphase_z % Check volume fraction
+            if rn < remaining_volume_fraction_currentphase_z/normalized_term % Check volume fraction
                 % Particle diameter
                 new_probability = update_probability(phase(current_phase).size_histogram.along_3rd_axis_allslices(z_center+1,:), phase(current_phase).current_diameter_dx.along_3rd_axis_allslices(z_center,:));
                 idx = choose_randomly_from_histogramprobability( new_probability ); % Diameter histogram (y) of the current phase at z_center
@@ -403,6 +411,11 @@ for current_pass=1:1:number_pass
                     % Insertion of the ellipsoid differ depending on the subdomain is empty or contains already other particles
                     unique_subdomain = unique(subdomain);
                     if length(unique_subdomain)==1 && unique_subdomain==unassigned_id % Subdomain is empty
+                        if simulate_calendering==true && particle_id>1
+                            new_particle_hasbeen_generated = false;  % Not necessary. For clarification sake.
+                            continue_whileloop_and_go_to_next_randcenter = true;
+                            continue
+                        end
                         number_voxel_assigned = sum(sum(sum(subdomain_ellipsoid == 1))); % Number of new voxel for the current phase
                         number_voxel_idealshape = number_voxel_assigned;
                         microstructure3D.phase(x_min:x_max, y_min:y_max, z_min:z_max) = subdomain_ellipsoid * phase(current_phase).code; % Insert ellipsoid within the domain.
@@ -419,7 +432,12 @@ for current_pass=1:1:number_pass
                         subdomain_binary(subdomain_binary~=unassigned_id)=1;
                         union_subdomain_ellipsoid = subdomain_binary + subdomain_ellipsoid;
                         idx_interpenetration = find(union_subdomain_ellipsoid==2);
-                        if isempty(idx_interpenetration) % There is no interpenetration
+                        if isempty(idx_interpenetration) % There is no overlapping
+                            if simulate_calendering==true && particle_id>1
+                                new_particle_hasbeen_generated = false;  % Not necessary. For clarification sake.
+                                continue_whileloop_and_go_to_next_randcenter = true;
+                                continue
+                            end
                             number_voxel_assigned = sum(sum(sum(subdomain_ellipsoid == 1))); % Number of new voxel for the current phase
                             number_voxel_idealshape = number_voxel_assigned;
                             microstructure3D.phase(x_min:x_max, y_min:y_max, z_min:z_max) = subdomain + (subdomain_ellipsoid * phase(current_phase).code); % Insert ellipsoid within the domain.
@@ -545,12 +563,15 @@ for current_pass=1:1:number_pass
                                 all_particles_subdomain(k_particle).id = id_;
                                 all_particles_subdomain(k_particle).idx = find(new_subdomain_id==id_);
                                 binary_particle(all_particles_subdomain(k_particle).idx)=1;
-                                L = bwlabeln(binary_particle,6); % Check face-to-face connectivity
-                                if length(unique(L))>2 % It should be 2: background + one unique particle cluster
-                                    new_particle_hasbeen_generated = false;  % Not necessary. For clarification sake.
-                                    continue_whileloop_and_go_to_next_randcenter = true;
-                                    break
+                                if check_contiguity
+                                    L = bwlabeln(binary_particle,6); % Check face-to-face connectivity
+                                    if length(unique(L))>2 % It should be 2: background + one unique particle cluster
+                                        new_particle_hasbeen_generated = false;  % Not necessary. For clarification sake.
+                                        continue_whileloop_and_go_to_next_randcenter = true;
+                                        break
+                                    end
                                 end
+                                
                             end
                             if continue_whileloop_and_go_to_next_randcenter
                                 continue
@@ -605,6 +626,9 @@ for current_pass=1:1:number_pass
                             % Update
                             new_particle_hasbeen_generated = true;
                         end
+%                         if continue_whileloop_and_go_to_next_randcenter
+%                             continue
+%                         end
                     end
                 end
             else

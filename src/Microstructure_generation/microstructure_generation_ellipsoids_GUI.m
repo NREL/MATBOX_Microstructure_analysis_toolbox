@@ -234,7 +234,7 @@ popupmenu_phase_selection_tab2 = uicontrol('Parent',tab_particlesize,'Style','po
 parameter_table_position_tab2 = [0.01 0.74 0.54 0.13];
 parameter_table_tab2 = uitable('Parent',tab_particlesize,'Units','normalized','Position',parameter_table_position_tab2,'Visible','off','Enable','off','CellEditCallBack',@parameters_callback);
 
-Diameter_Dz_along_3rd_axis = uicontrol('Parent',tab_particlesize,'Style','text','String','Diameter Dz along 3rd axis','Units','normalized','Position',[0.01 0.55 0.25 0.15],'Visible','off');
+Diameter_Dz_along_3rd_axis = uicontrol('Parent',tab_particlesize,'Style','text','String','Diameter Dx along 3rd axis','Units','normalized','Position',[0.01 0.55 0.25 0.15],'Visible','off');
 Diameter_Dz_3rdaxis_table = uitable('Parent',tab_particlesize,'Units','normalized','Position',[0.01 0.53 0.25 0.15],'Visible','off','Enable','off','CellEditCallBack',@Dia_Dz_3rdaxis_table);
 Diameter_Dz_3rdaxis_table.RowName = [];
 
@@ -1854,6 +1854,7 @@ table_output.ColumnWidth = {ltable*0.15, ltable*0.2, ltable*0.2, ltable*0.15};
         for k = 1:1:num_of_run
             % Generatinig Microstructure
             tic;
+
             [microstructure3D, phase] = function_generate_ellipsoid_microstructure(domain_size,phase,Maximum_interpenetration,Minimum_particle_volume_conservated);
             t = toc; % Wall clock time
             
@@ -1871,20 +1872,19 @@ table_output.ColumnWidth = {ltable*0.15, ltable*0.2, ltable*0.2, ltable*0.15};
             column_4(k,1)= {num2str(t)};
             table_output.Data = [column_1 column_2 column_3 column_4];
             
-            function_check_generatedmicrostructure(microstructure3D,phase,voxel_size_nm,OPTIONS);
+            % function_check_generatedmicrostructure(microstructure3D,phase,voxel_size_nm,OPTIONS);
             
             str_filename = [Text_savefolder.String 'Volume_' num2str(k)];
             function_save_tif( uint8(microstructure3D.phase),[str_filename '_phase.tif']);
             function_save_tif( uint16(microstructure3D.particle_id),[str_filename '_particle.tif']);
             
-            % Rescale
-            parameters_scaling.scaling_factor = 1/(str2double(Edit_Scalingfactor.String)); % Get scaling factor
-            parameters_scaling.label_or_greylevel = 'Label';
-            parameters_scaling.background = 0;            
-            [Microstructure_resized] = uint8(function_scaling(uint8(microstructure3D.phase),parameters_scaling));
-            str_filename = [Text_savefolder.String 'Volume_' num2str(k) '_phase_rescaled.tif'];
-            function_save_tif(Microstructure_resized,str_filename);           
-            
+%             % Rescale
+%             parameters_scaling.scaling_factor = 1/(str2double(Edit_Scalingfactor.String)); % Get scaling factor
+%             parameters_scaling.label_or_greylevel = 'Label';
+%             parameters_scaling.background = 0;            
+%             [Microstructure_resized] = uint8(function_scaling(uint8(microstructure3D.phase),parameters_scaling));
+%             str_filename = [Text_savefolder.String 'Volume_' num2str(k) '_phase_rescaled.tif'];
+%             function_save_tif(Microstructure_resized,str_filename);          
         end
         
         
