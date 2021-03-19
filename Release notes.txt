@@ -7,7 +7,6 @@ Generation module
 - bug fixed: phase generation module dx, dy, dz diameters were assigned to wrong diameters.
 Meshing module
 - Mesh a unique microstructure, an half-cell, a full-cell (including the two current collectors, the two electrodes and the separator), or a polycrhistalline architecture.
-- Meshes generated with Iso2mesh are post-processed so that their boundaries are perfectly planes for easier boundary conditions later implementation.
 - Add regular mesh generation option.
 - GUI overhaul. Switched from programmatic GUI to MATLAB app design GUI.
 Characterization module
