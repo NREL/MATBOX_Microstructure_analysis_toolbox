@@ -11,7 +11,7 @@ MATBOX was originally developed to analyse electrode microstructures for lithium
 
 ## HOW TO?
 The toolbox provides a user-friendly experience thanks to a **Graphic-User Interface** and requires no coding to be used.
-Installation and instructions are detailed in the documentation. Run src/Main_menu/Main_menu.mlapp to start the toolbox (mlapp extension corresponds to MATLAB app created with app designer).
+Installation and instructions are detailed in the documentation. Run src/Main_menu/Main_menu.mlapp to start the toolbox (mlapp extension corresponds to MATLAB app created with app designer) and choose the module relevant for your activity.
 
 * MATBOX main menu and illustration of each module:
 ![Main menu and module illustrations](https://github.com/NREL/MATBOX_Microstructure_analysis_toolbox/blob/master/Menu_and_modules.png)
