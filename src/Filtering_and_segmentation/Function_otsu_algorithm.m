@@ -12,7 +12,7 @@ new_histogram(:,1)=1:1:x_max;
 %n_=length(unique_histogram);
 [n_,~] = size(histogram);
 for k=1:1:n_
-    kk=histogram(k,1);
+    kk=round(histogram(k,1));
     new_histogram(kk,2)=histogram(k,2);
 end
 histogram=new_histogram;
