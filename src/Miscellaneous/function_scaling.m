@@ -60,10 +60,17 @@ if p.scaling_factor~=1
         Microstructure_resized = imresize3(Microstructure,p.scaling_factor,'linear');
         %Microstructure_resized = imresize3(Microstructure,p.scaling_factor,'nearest');
     end
-        
+    
+    % Data type
+    if strcmp(class(Microstructure),'uint8')
+        Microstructure_resized = uint8(Microstructure_resized);
+    elseif strcmp(class(Microstructure),'uint16')
+        Microstructure_resized = uint16(Microstructure_resized);
+    end
+    
+else
+    Microstructure_resized=Microstructure;
 end
-
-
 
 end
 

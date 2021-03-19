@@ -35,7 +35,7 @@ if ispc
     
     %% CREATE THE XLS FILE
     warning('off','MATLAB:xlswrite:AddSheet'); % Suppress warning when the requested worksheet does not exist and is created
-    full_path_xls=[Current_folder filename '.xls']; % Path of the xls file
+    full_path_xls=[Current_folder filename '.xls']; % Path of the xlsx file
     if exist(full_path_xls, 'file') % If the Excel file exits, it is deleted
         delete(full_path_xls);
     end

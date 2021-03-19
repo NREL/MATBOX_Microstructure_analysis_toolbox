@@ -96,6 +96,9 @@ end
 parameters_figure.save=true;
 if parameters_figure.save
     function_savefig(Fig_, parameters_figure.fullpath, parameters_figure.filename);
+end
+parameters_figure.closefig = true;
+if parameters_figure.closefig
     close(Fig_)
 end
 

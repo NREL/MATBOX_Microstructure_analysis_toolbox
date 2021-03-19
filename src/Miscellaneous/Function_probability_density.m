@@ -97,7 +97,16 @@ if smooth_cumulative_fct
     end
     if outcome_smoothing
         results.smoothed_cumulative_fct = [smoothed_x smoothed_y];
-        results.smoothed_x50 = interp1(results.smoothed_cumulative_fct(:,2),results.smoothed_cumulative_fct(:,1),0.5);
+        try
+            results.smoothed_x50 = interp1(results.smoothed_cumulative_fct(:,2),results.smoothed_cumulative_fct(:,1),0.5);
+        catch ME
+            strcmp(ME.message,'Sample points must be unique and sorted in ascending order.')
+            if strcmp(ME.message,'Sample points must be unique and sorted in ascending order.')
+                idx = find( abs(results.smoothed_cumulative_fct(:,2)-0.5) == min(abs(results.smoothed_cumulative_fct(:,2)-0.5)) );
+                results.smoothed_x50 = results.smoothed_cumulative_fct(idx(1),1);
+            end
+        end        
+        % results.smoothed_x50 = interp1(results.smoothed_cumulative_fct(:,2),results.smoothed_cumulative_fct(:,1),0.5);
     end
 end
 
@@ -148,7 +157,17 @@ warning(s_warning) % Restore the saved warning state structure
             cumulative_fct(current_value,2)=cumulative_fct(current_value+1,2)+pdi_(current_value,2);
         end
         % Find x50.
-        x50 = interp1(cumulative_fct(:,2),cumulative_fct(:,1),0.5);
+        try
+            x50 = interp1(cumulative_fct(:,2),cumulative_fct(:,1),0.5);
+        catch ME
+            if strcmp(ME.message,'Sample points must be unique and sorted in ascending order.')
+                idx = find( abs(cumulative_fct(:,2)-0.5) == min(abs(cumulative_fct(:,2)-0.5)) );
+                x50 = cumulative_fct(idx(1),1);
+            elseif strcmp(ME.message,'Interpolation requires at least two sample points for each grid dimension.')
+                x50 = cumulative_fct(1,1);
+            end
+        end
+        %x50 = interp1(cumulative_fct(:,2),cumulative_fct(:,1),0.5);
     end
 
     function [probability_density_fct, integral_pdf] = function_calculate_probability_density_fct (x, cumulative_fct)
