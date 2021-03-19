@@ -31,5 +31,5 @@ NMC electrode with additive (Carbon-binder domain) numerically generated.
 
 ![3D view of numerically generated microstructures](https://github.com/NREL/MATBOX_Microstructure_analysis_toolbox/blob/master/Data_example/Numerically%20generated/Image.png)
 
-*You can visualize these tif files using the Microstructure and results visualizatrion module.*
+*You can visualize these tif files using the Microstructure visualizatrion module.*
 *Alternatively, you can use open source software ImageJ (or Fiji): https://imagej.net/Welcome*
