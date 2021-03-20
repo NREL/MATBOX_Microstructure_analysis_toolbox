@@ -6,7 +6,7 @@ tic
 
 %% PARAMETERS
 simulate_calendering = false; % Useful to set it true to achieve high density
-check_contiguity = true; % Default, true. Fasle useful for very elongated particles
+check_contiguity = true; % Default, true. False useful for very elongated particles
 
 
 %% DEDUCE MICROSTRUCTURE INFORMATION
