@@ -4,10 +4,9 @@ Release version notes:
 Generation module
 - Added additive phase generation algorithm from Dr. Aashutosh N. Mistry, with documentation updated.
 - Re-worked microstructure generation module (additive phase) GUI.
-- Add new submodule: deterministic generation. Allow generating fractals (Menger sponge).
+- Add new submodule: deterministic generation (incomplete).
 - bug fixed: phase generation module dx, dy, dz diameters were assigned to wrong diameters.
 - Volume fraction actualization fixed
-- Added submodule 'Deterministic geometries' (incomplete)
 Meshing module
 - Mesh a unique microstructure, an half-cell, a full-cell (including the two current collectors, the two electrodes and the separator), or a polycrhistalline architecture.
 - Add regular mesh generation option.
