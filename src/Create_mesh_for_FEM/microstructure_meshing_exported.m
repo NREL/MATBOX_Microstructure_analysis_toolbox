@@ -732,9 +732,6 @@ classdef microstructure_meshing_exported < matlab.apps.AppBase
             app.datatype_array = 'uint16';
             [array, outcome] = app.function_import_microstructure;
             if outcome
-                
-                array = array(30:80,30:80,30:80);
-                
                 background_code = 0; % By default
                 % Add one layer of background (so that background connectivity will be correctly calculated later)
                 tmp = zeros(size(array)+2)+background_code;
