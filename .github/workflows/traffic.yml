@@ -1,0 +1,24 @@
+# This is a basic workflow to help you get started with Actions
+
+name: traffic
+
+# Controls when the action will run. 
+on:
+  schedule:
+    - cron: "* 23 * * *"
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  j1:
+    name: GitHitJob
+    runs-on: ubuntu-latest
+    steps:
+      - name: GitHits-Action
+        id: gh
+        uses: kausko/GitHits@v1
+        with:
+          pat: ${{ secrets.PAT }}
+      - name: Output
+        run: echo ${{ steps.gh.outputs.status }}
