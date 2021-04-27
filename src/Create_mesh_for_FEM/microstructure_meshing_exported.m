@@ -25,7 +25,7 @@ classdef microstructure_meshing_exported < matlab.apps.AppBase
         SelectMicrostructure_Title      matlab.ui.control.Label
         OneuniquemicrostructureLabel    matlab.ui.control.Label
         Halfcellorfullcellselectatleast2volumesLabel  matlab.ui.control.Label
-        PolycrystallinearchitectureLabel  matlab.ui.control.Label
+        PolycrystallinearchitectureBetaLabel  matlab.ui.control.Label
         ImporttifButton_Unique          matlab.ui.control.Button
         ImporttifButton_Cell            matlab.ui.control.Button
         ImporttifButton_Poly            matlab.ui.control.Button
@@ -314,7 +314,7 @@ classdef microstructure_meshing_exported < matlab.apps.AppBase
             app.SeparatorLabel.BackgroundColor = [0.90 0.90 0.90];
             app.RightelectrodeLabel.BackgroundColor = [0.90 0.90 0.90];
             app.CC_right.BackgroundColor = [0.90 0.90 0.90];
-            app.PolycrystallinearchitectureLabel.BackgroundColor = [0.90 0.90 0.90];
+            app.PolycrystallinearchitectureBetaLabel.BackgroundColor = [0.90 0.90 0.90];
             app.micro_unique = false; app.micro_cell = false; app.micro_poly = false;
             app.imported_domain = [0 0 0 0 0];
             app.Select_Lamp.Color = 'r'; app.ActualizeresetdimensionsButton.Enable = 'off';
@@ -699,7 +699,7 @@ classdef microstructure_meshing_exported < matlab.apps.AppBase
                 app.SeparatorLabel.BackgroundColor = [0.9 0.9 0.9];
                 app.RightelectrodeLabel.BackgroundColor = [0.9 0.9 0.9];
                 app.CC_right.BackgroundColor = [0.9 0.9 0.9];
-                app.PolycrystallinearchitectureLabel.BackgroundColor = [0.9 0.9 0.9];
+                app.PolycrystallinearchitectureBetaLabel.BackgroundColor = [0.9 0.9 0.9];
                 app.Microstructure_information('on');
             else
                 app.loaded_array = []; app.current_array = []; app.beforescaling_array = [];         
@@ -716,7 +716,7 @@ classdef microstructure_meshing_exported < matlab.apps.AppBase
                 app.micro_unique = false; app.micro_cell = true; app.micro_poly = false;
                 app.SavemicrostructureButton.Enable = 'on';
                 app.OneuniquemicrostructureLabel.BackgroundColor = [0.9 0.9 0.9];
-                app.PolycrystallinearchitectureLabel.BackgroundColor = [0.9 0.9 0.9];
+                app.PolycrystallinearchitectureBetaLabel.BackgroundColor = [0.9 0.9 0.9];
                 app.Microstructure_information('on');
             else
                 app.loaded_array = []; app.current_array = []; app.beforescaling_array = [];           
@@ -777,7 +777,7 @@ classdef microstructure_meshing_exported < matlab.apps.AppBase
             app.micro_unique = false; app.micro_cell = true; app.micro_poly = false;
             app.SavemicrostructureButton.Enable = 'on';
             app.OneuniquemicrostructureLabel.BackgroundColor = [0.9 0.9 0.9];
-            app.PolycrystallinearchitectureLabel.BackgroundColor = [0.9 0.9 0.9];
+            app.PolycrystallinearchitectureBetaLabel.BackgroundColor = [0.9 0.9 0.9];
             app.Choosedomain = app.ChoosedomainDropDown.Value;
             app.ChoosedomainDropDown.Value = '';
             app.ImporttifButton_Cell.Enable = 'off'; app.HomogenousButton_Cell.Enable = 'off';
@@ -792,7 +792,7 @@ classdef microstructure_meshing_exported < matlab.apps.AppBase
                 app.domainbound(1).x0 = 1; app.domainbound(1).x1 = sz(1); 
                 app.OneuniquemicrostructureLabel.BackgroundColor = [0.93 0.69 0.13];
                 app.Halfcellorfullcellselectatleast2volumesLabel.BackgroundColor = [0.9 0.9 0.9];
-                app.PolycrystallinearchitectureLabel.BackgroundColor = [0.9 0.9 0.9];
+                app.PolycrystallinearchitectureBetaLabel.BackgroundColor = [0.9 0.9 0.9];
                 app.SavemicrostructureButton.Enable = 'off';
                 app.Select_Lamp.Color = 'g'; app.ActualizeresetdimensionsButton.Enable = 'on';
                 app.TabisNOTsetupcorrectlyLabel_2.Text = 'Tab is setup correctly';
@@ -913,7 +913,7 @@ classdef microstructure_meshing_exported < matlab.apps.AppBase
                 app.domainbound(1).x0 = 1; app.domainbound(1).x1 = sz(1);                 
                 app.OneuniquemicrostructureLabel.BackgroundColor = [0.9 0.9 0.9];
                 app.Halfcellorfullcellselectatleast2volumesLabel.BackgroundColor = [0.9 0.9 0.9];
-                app.PolycrystallinearchitectureLabel.BackgroundColor = [0.93 0.69 0.13];
+                app.PolycrystallinearchitectureBetaLabel.BackgroundColor = [0.93 0.69 0.13];
                 app.SavemicrostructureButton.Enable = 'off';
                 app.Select_Lamp.Color = 'g'; app.ActualizeresetdimensionsButton.Enable = 'on';
                 app.TabisNOTsetupcorrectlyLabel_2.Text = 'Tab is setup correctly';
@@ -1741,7 +1741,7 @@ classdef microstructure_meshing_exported < matlab.apps.AppBase
                 % Clean connection 
                 if operation_choice(2)
                     app.MO_statut_Label.Text = 'Clean connection...'; pause(0.1);
-                    opt.todo_clean_connection = false; opt.todo_convert_to_uniquecluster = false;
+                    opt.todo_clean_connection = true; opt.todo_convert_to_uniquecluster = false;
                     [app.MO_Microstructure] = Function_correct_microstructure(app.MO_Microstructure,opt);
                 end
                 % Grain connectivity
@@ -1754,6 +1754,11 @@ classdef microstructure_meshing_exported < matlab.apps.AppBase
                     app.MO_statut_Label.Text = 'Apply grain size filter (2/2)...'; pause(0.1);
                     [app.MO_Microstructure] = Function_grain_sizefilter(app.MO_Microstructure,background_code,grainsizefilter);
                 end 
+                if remove_isolatedpore && operation_choice(3)
+                    app.MO_statut_Label.Text = 'Remove isolated pore/cracks...'; pause(0.1);
+                    [app.MO_Microstructure] = Function_convert_to_unique_cluster(app.MO_Microstructure,background_code, true, false, true);
+                end                
+                
                 % Re-order grain
                 ids = unique(app.MO_Microstructure);
                 ids(ids==background_code)=[];
@@ -2694,13 +2699,13 @@ classdef microstructure_meshing_exported < matlab.apps.AppBase
             app.Halfcellorfullcellselectatleast2volumesLabel.Position = [325 598 315 22];
             app.Halfcellorfullcellselectatleast2volumesLabel.Text = 'Half-cell or full-cell (select at least 2 volumes)';
 
-            % Create PolycrystallinearchitectureLabel
-            app.PolycrystallinearchitectureLabel = uilabel(app.SelectmicrostructuresTab);
-            app.PolycrystallinearchitectureLabel.BackgroundColor = [0.902 0.902 0.902];
-            app.PolycrystallinearchitectureLabel.HorizontalAlignment = 'center';
-            app.PolycrystallinearchitectureLabel.FontWeight = 'bold';
-            app.PolycrystallinearchitectureLabel.Position = [666 575 288 45];
-            app.PolycrystallinearchitectureLabel.Text = 'Polycrystalline architecture';
+            % Create PolycrystallinearchitectureBetaLabel
+            app.PolycrystallinearchitectureBetaLabel = uilabel(app.SelectmicrostructuresTab);
+            app.PolycrystallinearchitectureBetaLabel.BackgroundColor = [0.902 0.902 0.902];
+            app.PolycrystallinearchitectureBetaLabel.HorizontalAlignment = 'center';
+            app.PolycrystallinearchitectureBetaLabel.FontWeight = 'bold';
+            app.PolycrystallinearchitectureBetaLabel.Position = [666 575 288 45];
+            app.PolycrystallinearchitectureBetaLabel.Text = 'Polycrystalline architecture (Beta)';
 
             % Create ImporttifButton_Unique
             app.ImporttifButton_Unique = uibutton(app.SelectmicrostructuresTab, 'push');
@@ -2810,7 +2815,7 @@ classdef microstructure_meshing_exported < matlab.apps.AppBase
 
             % Create Microstructure_vf_UITable
             app.Microstructure_vf_UITable = uitable(app.SelectmicrostructuresTab);
-            app.Microstructure_vf_UITable.ColumnName = {'Id'; 'Initial'; 'ROI'; 'Voxel size'};
+            app.Microstructure_vf_UITable.ColumnName = {'Id'; 'Initial'; 'ROI'; 'Scaling'};
             app.Microstructure_vf_UITable.ColumnWidth = {50, 'auto', 'auto', 'auto'};
             app.Microstructure_vf_UITable.RowName = {};
             app.Microstructure_vf_UITable.Position = [11 72 288 355];
@@ -3578,12 +3583,12 @@ classdef microstructure_meshing_exported < matlab.apps.AppBase
             % Create Label_5
             app.Label_5 = uilabel(app.Meshgenerationchoice);
             app.Label_5.Position = [307 566 645 51];
-            app.Label_5.Text = {'Tetrahedron-based unstructrured mesh with mesh density control and smooth surface. Time and RAM expensive and'; 'may fail is volume too large and/or too complex.'};
+            app.Label_5.Text = {'Tetrahedron-based unstructured mesh with mesh density control and smooth surface. Time and RAM expensive and'; 'may fail is volume too large and/or too complex.'};
 
             % Create Label_6
             app.Label_6 = uilabel(app.Meshgenerationchoice);
             app.Label_6.Position = [307 495 644 51];
-            app.Label_6.Text = {'Tetrahedron-based structrured mesh with cuboid representation. Fast and robust but vertices expensive method and'; 'no surface smoothing and no mesh density control.'};
+            app.Label_6.Text = {'Tetrahedron-based structured mesh with cuboid representation. Fast and robust but vertices expensive method and'; 'no surface smoothing and no mesh density control.'};
 
             % Create Label_7
             app.Label_7 = uilabel(app.Meshgenerationchoice);

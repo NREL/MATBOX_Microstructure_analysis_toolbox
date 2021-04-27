@@ -1,12 +1,6 @@
 function [node_,face_, elem_, subdomain_] = function_regularmesh_from_array(M,ids,cellchoice,do_face)
 
-% Need to save RAM and/or do not need to visualize mesh ? Then set options
-% below to false
-do_face = true;
 check_facedoublons = do_face; % % false to save RAM as optional step
-if ~do_face
-    check_facedoublons = false;
-end
 
 number_phase = length(ids);
 for kphase = 1:1:number_phase % Loop over phase

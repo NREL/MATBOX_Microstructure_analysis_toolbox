@@ -40,7 +40,7 @@ if strcmp(options.coloris,'Phase Id')
     
     % Assign face color based on subdomain id
     unique_id = unique(subdomain_);
-    n_id = length(unique_id)
+    n_id = length(unique_id);
     if n_id>10 % Likely polychristalline
         c = rand(n_id,1);
     else

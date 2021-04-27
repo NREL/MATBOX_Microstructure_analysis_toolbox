@@ -4,7 +4,6 @@ function [node, face, elem, subdomain] = function_iso2mesh_from_array(array_, op
 method_surfacemesh = 'cgalmesh';
 opt.radbound = options.radbound;
 opt.distbound = options.distbound;
-isovalues_ = unique(array_);
 
 smooth_method = options.method_surfacemesh;
 iteration_smoothing = options.iteration_smoothing;
@@ -15,6 +14,68 @@ end
 
 keepratio = options.keepratio;
 maxvol = options.maxvol;
+
+%% RENUMEROTATION ?
+isovalues_ = unique(array_);
+n_label = length(isovalues_);
+renumerotation = false;
+if n_label>255 % Iso2mesh can not mesh it
+    new_id=2;
+    renumerotation = true;
+    sav_array_ = array_;
+    sav_isovalues_ = isovalues_;
+    % Assign grains with a value between 2 and 256 while making sure
+    % adjacent grains do not use same value
+    background = 1;
+    interface_complemetaryvolume = 1; % not used
+    interface_anotherlabel = 2; % not used
+    [Connectivity_matrix, ~] = Function_connectivitymatrix(array_, background, interface_complemetaryvolume, interface_anotherlabel);
+    label_oldnew = zeros(n_label-1,2);
+    row = Connectivity_matrix(1,:);
+    centroids=zeros(n_label-1,3);
+    for k=1:1:n_label
+        old_label = isovalues_(k);
+        if old_label~=background
+            label_oldnew(k,1) = old_label;
+            [IX,IY,IZ]=find(array_==old_label);
+            centroids(k,1) = mean(IX); centroids(k,2) = mean(IY); centroids(k,3) = mean(IZ);
+            idx = find(row==old_label);
+            col = Connectivity_matrix(:,idx);
+            idx = find(col>0); idx(idx==1)=[];
+            adjacent_labels = row(idx);
+            adjacent_labels(adjacent_labels==old_label)=[];
+            forbidden_values = [];
+            if ~isempty(adjacent_labels)
+                for p=1:1:length(adjacent_labels)
+                    idy = find(label_oldnew(:,1)==adjacent_labels(p));
+                    if ~isempty(idy)
+                        forbidden_values = [forbidden_values label_oldnew(idy,2)];
+                    end
+                end
+            end
+            %new_id = randi(254)+1;
+            if ~isempty(forbidden_values)
+                while sum(forbidden_values==new_id)>0
+                    %new_id = randi(254)+1;
+                    new_id=new_id+1;
+                end
+            end
+            label_oldnew(k,2)=new_id;
+        end
+    end
+    [n,~]=size(label_oldnew);
+    tmp = zeros(size(array_));
+    for k=1:1:n
+        tmp(array_==label_oldnew(k,1))=label_oldnew(k,2);
+    end
+    tmp(array_==background)=background;
+    array_=tmp; clear tmp;
+    isovalues_ = unique(array_);
+    %label_oldnew
+end
+if min(isovalues_)<=0
+    warning('Phase id should be >=1, Iso2mesh is likely to misbehave. Please fix phase id in the assmemble tab.');
+end
 
 %% SURFACE MESH
 tmp=uint8(array_); % Convert in unsigned integer 8bits
@@ -49,11 +110,42 @@ subdomain = elem(:,5);
 elem = elem(:,1:4);
 face = face(:,1:3);
 
+%% RENUMEROTATION ?
+if renumerotation
+    sav_subdomain = subdomain;
+    
+    n = length(subdomain);
+    centroid_cell = zeros(n,3);
+    % Cell centroid coordinate
+    centroid_cell(:,1) = ( node(elem(:,1),1) + node(elem(:,2),1) + node(elem(:,3),1) + node(elem(:,4),1) )/4;
+    centroid_cell(:,2) = ( node(elem(:,1),2) + node(elem(:,2),2) + node(elem(:,3),2) + node(elem(:,4),2) )/4;
+    centroid_cell(:,3) = ( node(elem(:,1),3) + node(elem(:,2),3) + node(elem(:,3),3) + node(elem(:,4),3) )/4;
+    % Cell centroid array index
+    centroid_cell = floor(centroid_cell)+1;
+    % Evalue array
+    ida = sub2ind(size(sav_array_), centroid_cell(:,1), centroid_cell(:,2), centroid_cell(:,3));
+    val = sav_array_(ida);
+    subdomain = val;
+    
+%   Do not reassign cell in contact with facet?    
+%   Lia = ismember(elem,face);
+%   idx = find(sum(Lia,2)>=1);
+%   length(idx)
+%   subdomain(idx) = sav_subdomain(idx);
+
+end
+
+
 %% MESH CORRECTION
 % Iso2mesh tends to lost the correct cell assignment for large volume
 % This section needs more work
 options.correction_misassigned_region = false;
 options.correction_isolated_voxel = true;
+
+if renumerotation
+    options.correction_misassigned_region = false;
+    options.correction_isolated_voxel = false;
+end
 
 number_region_expected = length(unique(array_));
 allregion = unique(subdomain);
@@ -94,9 +186,13 @@ if number_region_obtained>number_region_expected
     end
     
     if options.correction_isolated_voxel
-        count_region = histc(subdomain, allregion);
-        id = find(count_region==min(count_region));
-        incorrect_region = allregion(id(1));
+        if renumerotation
+            incorrect_region=0;
+        else
+            count_region = histc(subdomain, allregion);
+            id = find(count_region==min(count_region));
+            incorrect_region = allregion(id(1));
+        end
         incorrect_region
         %incorrect_region = 0; % Unassigned cells are set to 0 by Iso2mesh by default
         tmp = unique(subdomain);
