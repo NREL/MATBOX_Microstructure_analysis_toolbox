@@ -635,21 +635,7 @@ classdef Microstructure_generation_additives_exported < matlab.apps.AppBase
 
         % Button pushed function: OpendocumentationButton
         function OpendocumentationButtonPushed(app, event)
-            % path = matlab.desktop.editor.getActiveFilename; % Path of active file (but does not work for app file)
-            path = app.getcurrentdir;
-            if ispc
-                separation_folder = '\';
-            else
-                separation_folder = '/';
-            end
-            higherlevelfolder = extractBetween(path,path(1:5),['MATBOX_Microstructure_analysis_toolbox' separation_folder],'Boundaries','inclusive');
-            documentation_path = [char(higherlevelfolder) 'Documentation' separation_folder 'NREL_MATBOX_Microstructure_analysis_toolbox_documentation.pdf'];
-            if exist(documentation_path,'file')
-                open(documentation_path);
-            else
-                disp 'MATLAB did not find the file NREL_MATBOX_Microstructure_analysis_toolbox_documentation.pdf'.
-                disp 'Default location is \MATBOX_Microstructure_analysis_toolbox\Documentation\';
-            end 
+            Find_file('NREL_MATBOX_Microstructure_analysis_toolbox_documentation.pdf','MATBOX_Microstructure_analysis_toolbox','Default location is \MATBOX_Microstructure_analysis_toolbox\Documentation\');
         end
 
         % Image clicked function: About_Logo_NREL
