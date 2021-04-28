@@ -234,7 +234,7 @@ popupmenu_phase_selection_tab2 = uicontrol('Parent',tab_particlesize,'Style','po
 parameter_table_position_tab2 = [0.01 0.74 0.54 0.13];
 parameter_table_tab2 = uitable('Parent',tab_particlesize,'Units','normalized','Position',parameter_table_position_tab2,'Visible','off','Enable','off','CellEditCallBack',@parameters_callback);
 
-Diameter_Dz_along_3rd_axis = uicontrol('Parent',tab_particlesize,'Style','text','String','Diameter Dx along 3rd axis','Units','normalized','Position',[0.01 0.55 0.25 0.15],'Visible','off');
+Diameter_Dz_along_3rd_axis = uicontrol('Parent',tab_particlesize,'Style','text','String','Diameter Dz along 3rd axis','Units','normalized','Position',[0.01 0.55 0.25 0.15],'Visible','off');
 Diameter_Dz_3rdaxis_table = uitable('Parent',tab_particlesize,'Units','normalized','Position',[0.01 0.53 0.25 0.15],'Visible','off','Enable','off','CellEditCallBack',@Dia_Dz_3rdaxis_table);
 Diameter_Dz_3rdaxis_table.RowName = [];
 
@@ -465,6 +465,11 @@ Post_processing_table.Data = Post_processing_input_data;
 Post_processing_table.ColumnEditable = [false true];
 
 %% Run Code tab 6
+Title_tab6 = uicontrol('Parent',tab_run,'Style','text','String','Numerical generation','FontName',font_name_GUI,'FontSize',font_size_large_GUI,...
+    'BackgroundColor',background_description_tab,'ForegroundColor',ForegroundColor_description_tab,'Units','normalized','Position',[0,0.96,1,0.04]); % Heading
+
+Display_run_text = uicontrol('Parent',tab_run,'Style','text','String','How many times do you want to generate the microstructure with the same parameters?','FontSize',font_size_medium_GUI,'FontName',font_name_GUI,'FontWeight','bold',...
+    'HorizontalAlignment','left','Units','normalized','Position', [0.01 0.9 0.9 0.04]);
 
 Num_of_run_text = uicontrol('Parent',tab_run,'Style','text','String','Number of Runs','FontSize',font_size_medium_GUI,'FontName',font_name_GUI,'Units','normalized','Position',[0.01,0.8,0.1,0.025],'Visible','on','Enable','on');
 Num_of_run_box = uicontrol('Parent',tab_run,'Style','edit','String',[],'FontSize',font_size_medium_GUI,'FontName',font_name_GUI,'Units','normalized','Position',[0.11,0.8,0.05,0.03],'Visible','on','Enable','on','CallBack',@callback_num_of_runs);
@@ -482,13 +487,18 @@ Test_error_tab5 = uicontrol('Parent',tab_run, 'Style', 'text','Units','normalize
     'String','Error message','Visible','off');
 
 %% Generate Microstructure tab 7
+Title_tab7 = uicontrol('Parent',tab_Generated_micro,'Style','text','String','Results','FontName',font_name_GUI,'FontSize',font_size_large_GUI,...
+    'BackgroundColor',background_description_tab,'ForegroundColor',ForegroundColor_description_tab,'Units','normalized','Position',[0,0.96,1,0.04]); % Heading
+
+Display_results_text = uicontrol('Parent',tab_Generated_micro,'Style','text','String','Table will be updated for each finished run','FontSize',font_size_medium_GUI,'FontName',font_name_GUI,'FontWeight','bold',...
+    'HorizontalAlignment','left','Units','normalized','Position', [0.01 0.9 0.9 0.04]);
 
 % Table 1 
-ltable_direction = [0.3 0.5 0.35 0.15];
+ltable_direction = [0.1 0.25 0.8 0.65];
 table_output = uitable('Parent',tab_Generated_micro,'Units','normalized','Position',ltable_direction,'FontName',font_name_GUI,'FontSize',font_size_small_GUI,'CellEditCallBack',@edit_table_output,'Visible','off','Enable','off');
 table_output.ColumnName = {'Attempt','Volume fraction','Tortuosity factor','Elapsed time'};
 table_output.RowName = [];
-table_output.ColumnWidth = {ltable*0.15, ltable*0.2, ltable*0.2, ltable*0.15};
+table_output.ColumnWidth = {ltable*0.4, ltable*0.4, ltable*0.4, ltable*0.4};
 %% CALLBACK FUNCTIONS for Phase and Volume Fraction Calculation tab1
 
 % Callback function for voxel size and scaling factor
@@ -1878,13 +1888,13 @@ table_output.ColumnWidth = {ltable*0.15, ltable*0.2, ltable*0.2, ltable*0.15};
             function_save_tif( uint8(microstructure3D.phase),[str_filename '_phase.tif']);
             function_save_tif( uint16(microstructure3D.particle_id),[str_filename '_particle.tif']);
             
-%             % Rescale
-%             parameters_scaling.scaling_factor = 1/(str2double(Edit_Scalingfactor.String)); % Get scaling factor
-%             parameters_scaling.label_or_greylevel = 'Label';
-%             parameters_scaling.background = 0;            
-%             [Microstructure_resized] = uint8(function_scaling(uint8(microstructure3D.phase),parameters_scaling));
-%             str_filename = [Text_savefolder.String 'Volume_' num2str(k) '_phase_rescaled.tif'];
-%             function_save_tif(Microstructure_resized,str_filename);          
+            % Rescale
+            parameters_scaling.scaling_factor = 1/(str2double(Edit_Scalingfactor.String)); % Get scaling factor
+            parameters_scaling.label_or_greylevel = 'Label';
+            parameters_scaling.background = 0;            
+            [Microstructure_resized] = uint8(function_scaling(uint8(microstructure3D.phase),parameters_scaling));
+            str_filename = [Text_savefolder.String 'Volume_' num2str(k) '_phase_rescaled.tif'];
+            function_save_tif(Microstructure_resized,str_filename);          
         end
         
         
