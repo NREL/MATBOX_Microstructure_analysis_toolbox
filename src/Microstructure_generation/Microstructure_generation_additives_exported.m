@@ -156,7 +156,7 @@ classdef Microstructure_generation_additives_exported < matlab.apps.AppBase
         % Button pushed function: Load_LoadvolumeButton
         function Load_LoadvolumeButtonPushed(app, event)
             % Open dialog box to choose file path
-            [FileName,PathName,~] = uigetfile({'*.tif','Tif image (*.tif)'},'Select a .tif file');
+            [FileName,PathName,~] = uigetfile({'*.tif;*.tiff','Tif image (*.tif, *.tiff)'},'Select a .tif file');
             if FileName==0
                 % User clicked cancel button or closed the dialog box
                 app.Load_VolumeloaedLabel.Text ='No volume loaded. Please load a volume with pre-existing phase(s).';

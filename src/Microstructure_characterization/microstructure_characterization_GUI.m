@@ -550,7 +550,7 @@ align([Text_voxelsize Text_directiontable Text_phasetable Text_save_volume],'Hor
         % Set string of the dialog box
         str_dialogbox = ['Select volume numero ' num2str(number_volume_to_analyse+1)]; 
         % Open dialog box to choose file path
-        [FileName,PathName,~] = uigetfile({'*.tif','Tif image (*.tif)';'*.m;*.mat','MATLAB File (*.m,*.mat)'},str_dialogbox);
+        [FileName,PathName,~] = uigetfile({'*.tif;*.tiff','Tif image (*.tif, *.tiff)';'*.m;*.mat','MATLAB File (*.m,*.mat)'},str_dialogbox);
         if FileName==0
             % User clicked cancel button or closed the dialog box
         else

@@ -287,7 +287,7 @@ classdef microstructure_meshing_exported < matlab.apps.AppBase
         
         function [array, outcome] = function_import_microstructure(app)
             app.LengthinvoxelEditField.Visible = 'off'; app.LengthinvoxelEditFieldLabel.Visible = 'off';
-            [FileName,PathName,~] = uigetfile({'*.tif','Tif image (*.tif)'},'Select volume');
+            [FileName,PathName,~] = uigetfile({'*.tif;*.tiff','Tif image (*.tif, *.tiff)'},'Select volume');
             app.Select_Lamp.Color = 'r'; app.ActualizeresetdimensionsButton.Enable = 'off';
             app.TabisNOTsetupcorrectlyLabel_2.Text = 'Tab is NOT setup correctly';            
             if FileName==0

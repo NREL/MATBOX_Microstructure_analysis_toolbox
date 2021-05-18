@@ -2,7 +2,7 @@ classdef Microstructure_generation_deterministic_exported < matlab.apps.AppBase
 
     % Properties that correspond to app components
     properties (Access = public)
-        DeterministicgenerationUIFigure  matlab.ui.Figure
+        DeterministicgenerationnotyetcompletedUIFigure  matlab.ui.Figure
         TabGroup                       matlab.ui.container.TabGroup
         InstructionsTab                matlab.ui.container.Tab
         Instructions_title             matlab.ui.control.Label
@@ -355,13 +355,13 @@ classdef Microstructure_generation_deterministic_exported < matlab.apps.AppBase
         % Create UIFigure and components
         function createComponents(app)
 
-            % Create DeterministicgenerationUIFigure and hide until all components are created
-            app.DeterministicgenerationUIFigure = uifigure('Visible', 'off');
-            app.DeterministicgenerationUIFigure.Position = [100 100 850 591];
-            app.DeterministicgenerationUIFigure.Name = 'Deterministic generation';
+            % Create DeterministicgenerationnotyetcompletedUIFigure and hide until all components are created
+            app.DeterministicgenerationnotyetcompletedUIFigure = uifigure('Visible', 'off');
+            app.DeterministicgenerationnotyetcompletedUIFigure.Position = [100 100 850 591];
+            app.DeterministicgenerationnotyetcompletedUIFigure.Name = 'Deterministic generation (not yet completed)';
 
             % Create TabGroup
-            app.TabGroup = uitabgroup(app.DeterministicgenerationUIFigure);
+            app.TabGroup = uitabgroup(app.DeterministicgenerationnotyetcompletedUIFigure);
             app.TabGroup.TabLocation = 'left';
             app.TabGroup.Position = [1 1 850 591];
 
@@ -508,7 +508,7 @@ classdef Microstructure_generation_deterministic_exported < matlab.apps.AppBase
             app.Coil_Label = uilabel(app.CoilserpentineTab);
             app.Coil_Label.FontAngle = 'italic';
             app.Coil_Label.Position = [8 524 709 28];
-            app.Coil_Label.Text = {'Serpentine geometies are very sinous - thus with high tortuosity. They are interesting to test depletion scenario in electrochemical model'; 'for electrolytem while having a small geometry then being relevant for debugging.'};
+            app.Coil_Label.Text = {'Serpentine geometies are very sinous - thus with high tortuosity. They are interesting to test depletion scenario in electrochemical'; 'model while having a small geometry.'};
 
             % Create Coil_GenerateButton
             app.Coil_GenerateButton = uibutton(app.CoilserpentineTab, 'push');
@@ -770,7 +770,7 @@ classdef Microstructure_generation_deterministic_exported < matlab.apps.AppBase
             app.ApplyChannel_UITable.Position = [8 66 506 110];
 
             % Show the figure after all components are created
-            app.DeterministicgenerationUIFigure.Visible = 'on';
+            app.DeterministicgenerationnotyetcompletedUIFigure.Visible = 'on';
         end
     end
 
@@ -784,7 +784,7 @@ classdef Microstructure_generation_deterministic_exported < matlab.apps.AppBase
             createComponents(app)
 
             % Register the app with App Designer
-            registerApp(app, app.DeterministicgenerationUIFigure)
+            registerApp(app, app.DeterministicgenerationnotyetcompletedUIFigure)
 
             % Execute the startup function
             runStartupFcn(app, @startupFcn)
@@ -798,7 +798,7 @@ classdef Microstructure_generation_deterministic_exported < matlab.apps.AppBase
         function delete(app)
 
             % Delete UIFigure when app is deleted
-            delete(app.DeterministicgenerationUIFigure)
+            delete(app.DeterministicgenerationnotyetcompletedUIFigure)
         end
     end
 end

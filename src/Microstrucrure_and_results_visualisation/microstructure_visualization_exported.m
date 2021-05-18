@@ -96,7 +96,7 @@ classdef microstructure_visualization_exported < matlab.apps.AppBase
         function Checkseg_Importtif_grey_ButtonPushed(app, event)
             % Open dialog box to choose file path
             str_dialogbox = 'Select grey-level volume';
-            [FileName,PathName,~] = uigetfile({'*.tif','Tif image (*.tif)'},str_dialogbox);
+            [FileName,PathName,~] = uigetfile({'*.tif;*.tiff','Tif image (*.tif, *.tiff)'},str_dialogbox);
             if FileName==0
                 % User clicked cancel button or closed the dialog box
                 set(app.Checkseg_Greyvolumename,'FontColor','k','Text','No grey-level volume loaded');
@@ -138,7 +138,7 @@ classdef microstructure_visualization_exported < matlab.apps.AppBase
         function Checkseg_Importtif_segmented_ButtonPushed(app, event)
             % Open dialog box to choose file path
             str_dialogbox = 'Select segmented volume';
-            [FileName,PathName,~] = uigetfile({'*.tif','Tif image (*.tif)'},str_dialogbox);
+            [FileName,PathName,~] = uigetfile({'*.tif;*.tiff','Tif image (*.tif, *.tiff)'},str_dialogbox);
             if FileName==0
                 % User clicked cancel button or closed the dialog box
                 set(app.Checkseg_Segmentedvolumename,'FontColor','k','Text','No segmented volume loaded');

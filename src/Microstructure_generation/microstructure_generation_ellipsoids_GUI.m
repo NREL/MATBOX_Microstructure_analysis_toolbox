@@ -234,7 +234,7 @@ popupmenu_phase_selection_tab2 = uicontrol('Parent',tab_particlesize,'Style','po
 parameter_table_position_tab2 = [0.01 0.74 0.54 0.13];
 parameter_table_tab2 = uitable('Parent',tab_particlesize,'Units','normalized','Position',parameter_table_position_tab2,'Visible','off','Enable','off','CellEditCallBack',@parameters_callback);
 
-Diameter_Dz_along_3rd_axis = uicontrol('Parent',tab_particlesize,'Style','text','String','Diameter Dz along 3rd axis','Units','normalized','Position',[0.01 0.55 0.25 0.15],'Visible','off');
+Diameter_Dz_along_3rd_axis = uicontrol('Parent',tab_particlesize,'Style','text','String','Diameter Dx along 3rd axis','Units','normalized','Position',[0.01 0.55 0.25 0.15],'Visible','off');
 Diameter_Dz_3rdaxis_table = uitable('Parent',tab_particlesize,'Units','normalized','Position',[0.01 0.53 0.25 0.15],'Visible','off','Enable','off','CellEditCallBack',@Dia_Dz_3rdaxis_table);
 Diameter_Dz_3rdaxis_table.RowName = [];
 
@@ -648,12 +648,11 @@ table_output.ColumnWidth = {ltable*0.4, ltable*0.4, ltable*0.4, ltable*0.4};
         tmp2(:,end) = round(1 - sum(table_position_input1,2),2);
         table_position.Data=tmp2;
         error_position = tmp2(:,1);
-        tmp2(:,end);
-        if min(min(tmp2(:,2:end) > 0))==0 || min(min(tmp2(:,2:end) < 1))==0
+        %tmp2(:,end);
+        if min(min(tmp2(:,2:end) >= 0))==0 || min(min(tmp2(:,2:end) <= 1))==0
             error_tab1_table3_porosity = true;
             set(Test_error_tab1,'String','Error: Porosity and/or Phase value cannot be less than 0 or more than 1' ,'Visible','on')
             set(Volumefraction_Plot_View_button, 'Enable','off')
-            
         else
             error_tab1_table3_porosity = false;
             check_all_error_tab1
@@ -770,7 +769,7 @@ table_output.ColumnWidth = {ltable*0.4, ltable*0.4, ltable*0.4, ltable*0.4};
 %Callback function for the popupmenu
     function Callback_popupmenu(~,~)
         parameter_table_tab2.ColumnName = {'Parameters', 'Number of Slices', 'Number of Diameter/Elongation/Orientation'};
-        Row(1).name='Direction Dz along 3rd Axis';
+        Row(1).name='Direction Dx along 3rd Axis';
         Row(2).name='Direction Elongation Dx/Dy along 3rd Axis';
         Row(3).name='Direction Elongation Dx/Dz along 3rd Axis';
         
@@ -834,7 +833,7 @@ table_output.ColumnWidth = {ltable*0.4, ltable*0.4, ltable*0.4, ltable*0.4};
             Col_name = {'Position along 3rd axis'};
             Col_edit = true;
             for k = 1:1:Dir_3rdaxis_diameter
-                Col_name(1,k+1) = {['Dz ' num2str(k)]};
+                Col_name(1,k+1) = {['Dx ' num2str(k)]};
                 Col_edit(1,k+1) = true;
             end
             Col_name(1,k+2) = {'Total'};
@@ -1046,9 +1045,9 @@ table_output.ColumnWidth = {ltable*0.4, ltable*0.4, ltable*0.4, ltable*0.4};
     function Visual_Plot_button_callback_tab2(~,~)
         tmp1 = visual_check_table_tab2.Data;
         tmp = cell2mat(tmp1(:,2));
-        dz = tmp(1,:);
-        dx = tmp(3,:)*dz; 
-        dy = (1/tmp(2,:))*dx; 
+        dx = tmp(1,:);
+        dy = dx/tmp(2,:); 
+        dz = dx/tmp(3,:); 
         mincheck = [dx,dy,dx];
         linelength = (1/3)*min(mincheck);       
         [binary_ellipsoid] = create_ellipsoid(dx,dy,dz);
@@ -1087,7 +1086,7 @@ table_output.ColumnWidth = {ltable*0.4, ltable*0.4, ltable*0.4, ltable*0.4};
         Dir_3rdaxis_diameter = cell2mat(tmp_1(1,3));
         clear legend_D
         for k = 1:1: Dir_3rdaxis_diameter
-            legend_D(k) = {['Dz' num2str(k)]};
+            legend_D(k) = {['Dx' num2str(k)]};
         end
         a1 = legend(plot_area_view_button_diameter_plot_1,legend_D,'Location','best','FontName',font_type_plot);
         xlabel(plot_area_view_button_diameter_plot_1,'Distance along 3rd axis','FontSize',font_size_plot_label_small,'FontName',font_type_plot)
@@ -1890,11 +1889,13 @@ table_output.ColumnWidth = {ltable*0.4, ltable*0.4, ltable*0.4, ltable*0.4};
             
             % Rescale
             parameters_scaling.scaling_factor = 1/(str2double(Edit_Scalingfactor.String)); % Get scaling factor
-            parameters_scaling.label_or_greylevel = 'Label';
-            parameters_scaling.background = 0;            
-            [Microstructure_resized] = uint8(function_scaling(uint8(microstructure3D.phase),parameters_scaling));
-            str_filename = [Text_savefolder.String 'Volume_' num2str(k) '_phase_rescaled.tif'];
-            function_save_tif(Microstructure_resized,str_filename);          
+            if parameters_scaling.scaling_factor~=1
+                parameters_scaling.label_or_greylevel = 'Label';
+                parameters_scaling.background = 0;
+                [Microstructure_resized] = uint8(function_scaling(uint8(microstructure3D.phase),parameters_scaling));
+                str_filename = [Text_savefolder.String 'Volume_' num2str(k) '_phase_rescaled.tif'];
+                function_save_tif(Microstructure_resized,str_filename);
+            end
         end
         
         

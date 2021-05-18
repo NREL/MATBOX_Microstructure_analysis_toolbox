@@ -293,7 +293,7 @@ if strcmp(RVEparameters.type,'D') % 'One subvolume + growing from volume center 
     if strcmp(RVEparameters.firstuniquevolume_unit,'% of total volume')
         vinitial = RVEparameters.firstuniquevolume_size * Domain_size / 100;
     elseif strcmp(RVEparameters.firstuniquevolume_unit,'micrometers')
-        vinitial = RVEparameters.firstuniquevolume_size * Domain_size / (Domain_size*voxel_size/1000);
+        vinitial = RVEparameters.firstuniquevolume_size * Domain_size / (Domain_size*voxel_size);
     end    
     linitial_AR1 = (prod(vinitial))^(1/3); % Aspect ratio 1 1 1, correct initial size
     linitial = linitial_AR1 * RVEparameters.Aspectratio; % Desired aspect ratio, but wrong initial size
@@ -307,7 +307,7 @@ if strcmp(RVEparameters.type,'D') % 'One subvolume + growing from volume center 
         if strcmp(RVEparameters.Growthrelativeto,'% of total volume')
             dstep = (RVEparameters.Growthperstep * Domain_size / 100) /2;
         elseif strcmp(RVEparameters.Growthrelativeto,'micrometers')
-            dstep = (RVEparameters.Growthperstep * Domain_size / (Domain_size*voxel_size/1000)) /2;
+            dstep = (RVEparameters.Growthperstep * Domain_size / (Domain_size*voxel_size)) /2;
         end
         dstep_AR1 = (prod(dstep))^(1/3); % Aspect ratio 1 1 1, correct initial size
         dstep = dstep_AR1 * RVEparameters.Aspectratio; % Desired aspect ratio, but wrong initial size
@@ -365,55 +365,61 @@ if strcmp(RVEparameters.type,'E') % 'One subvolume + growing from volume edge (E
     if strcmp(RVEparameters.firstuniquevolume_unit,'% of total volume')
         dinitial = round(RVEparameters.firstuniquevolume_size * Domain_size / 100);
     elseif strcmp(RVEparameters.firstuniquevolume_unit,'micrometers')
-        dinitial = round(RVEparameters.firstuniquevolume_size * Domain_size / (Domain_size*voxel_size/1000));
+        dinitial = round(RVEparameters.firstuniquevolume_size .* Domain_size ./ (Domain_size*voxel_size));
     end
     
     if strcmp(RVEparameters.Growthrelativeto,'% of total volume')
         dstep = round(RVEparameters.Growthperstep * Domain_size / 100);
     elseif strcmp(RVEparameters.Growthrelativeto,'micrometers')
-        dstep = round(RVEparameters.Growthperstep * Domain_size / (Domain_size*voxel_size/1000));
+        dstep = round(RVEparameters.Growthperstep .* Domain_size ./ (Domain_size*voxel_size));
     end
     
     if strcmp(RVEparameters.Growthdirection, 'Direction 1, from x min to x max')
         z=[1 Domain_size(3)]; kz=[0 0]; kzz=0;
         y=[1 Domain_size(2)]; ky=[0 0]; kyy=0;
-        x(1)=1;
-        x(2)=x(1)+dinitial(1)-1; kx=[0 1]; kxx=1;   
+        x=[1 dinitial(1)]; kx=[0 1]; kxx=1; 
+        %x(1)=1;
+        %x(2)=x(1)+dinitial(1)-1; kx=[0 1]; kxx=1;   
         Wholevolume(2) = Domain_size(1);
         
     elseif strcmp(RVEparameters.Growthdirection,'Direction 1, from x max to x min')
         z=[1 Domain_size(3)]; kz=[0 0]; kzz=0;
         y=[1 Domain_size(2)]; ky=[0 0]; kyy=0;
-        x(2)=Domain_size(1);
-        x(1)=x(2)-dinitial(1)+1; kx=[-1 0]; kxx=1;     
+        x=[Domain_size(1)-dinitial(1)+1 Domain_size(1)]; kx=[-1 0]; kxx=1;
+        %x(2)=Domain_size(1);
+        %x(1)=x(2)-dinitial(1)+1; kx=[-1 0]; kxx=1;     
         Wholevolume(2) = Domain_size(1);
         
     elseif strcmp(RVEparameters.Growthdirection,'Direction 2, from x min to x max')
         z=[1 Domain_size(3)]; kz=[0 0]; kzz=0;
         x=[1 Domain_size(1)]; kx=[0 0]; kxx=0;
-        y(1)=1;
-        y(2)=y(1)+dinitial(2)-1; ky=[0 1]; kyy=1;       
+        y=[1 dinitial(2)]; ky=[0 1]; kyy=1; 
+        %y(1)=1;
+        %y(2)=y(1)+dinitial(2)-1; ky=[0 1]; kyy=1;       
         Wholevolume(2) = Domain_size(2);
         
     elseif strcmp(RVEparameters.Growthdirection,'Direction 2, from x max to x min')
         z=[1 Domain_size(3)]; kz=[0 0]; kzz=0;
         x=[1 Domain_size(1)]; kx=[0 0]; kxx=0;
-        y(2)=Domain_size(2);
-        y(1)=y(2)-dinitial(2)+1; ky=[-1 0]; kyy=1;        
+        y=[Domain_size(2)-dinitial(2)+1 Domain_size(2)]; ky=[-1 0]; kyy=1;
+        %y(2)=Domain_size(2);
+        %y(1)=y(2)-dinitial(2)+1; ky=[-1 0]; kyy=1;        
         Wholevolume(2) = Domain_size(2);
         
     elseif strcmp(RVEparameters.Growthdirection,'Direction 3, from x min to x max')
         x=[1 Domain_size(1)]; kx=[0 0]; kxx=0;
         y=[1 Domain_size(2)]; ky=[0 0]; kyy=0;
-        z(1)=1;
-        z(2)=z(1)+dinitial(3)-1; kz=[0 1]; kzz=1; 
+        z=[1 dinitial(3)]; kz=[0 1]; kzz=1; 
+        %z(1)=1;
+        %z(2)=z(1)+dinitial(3)-1; kz=[0 1]; kzz=1; 
         Wholevolume(2) = Domain_size(3);
         
     elseif strcmp(RVEparameters.Growthdirection,'Direction 3, from x max to x min')
         x=[1 Domain_size(1)]; kx=[0 0]; kxx=0;
         y=[1 Domain_size(2)]; ky=[0 0]; kyy=0;
-        z(2)=Domain_size(3);
-        z(1)=z(2)-dinitial(3)+1; kz=[-1 0]; kzz=1;
+        z=[Domain_size(3)-dinitial(3)+1 Domain_size(3)]; kz=[-1 0]; kzz=1; 
+        %z(2)=Domain_size(3);
+        %z(1)=z(2)-dinitial(3)+1; kz=[-1 0]; kzz=1;
         Wholevolume(2) = Domain_size(3);
     end
     x0=min(x); x1=max(x);

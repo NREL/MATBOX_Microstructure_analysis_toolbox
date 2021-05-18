@@ -4,7 +4,7 @@ classdef Main_menu_exported < matlab.apps.AppBase
     properties (Access = public)
         MATBOXMicrostructureAnalysisToolboxUIFigure  matlab.ui.Figure
         MATBOXNRELMicrostructureAnalysisToolboxLabel  matlab.ui.control.Label
-        Version091March182021Label      matlab.ui.control.Label
+        Version10Matbox2021bMay182021Label  matlab.ui.control.Label
         SelectthemoduleassociatedwithyouractivityLabel  matlab.ui.control.Label
         Label                           matlab.ui.control.Label
         MicrostructuregenerationButton  matlab.ui.control.Button
@@ -123,12 +123,12 @@ classdef Main_menu_exported < matlab.apps.AppBase
             app.MATBOXNRELMicrostructureAnalysisToolboxLabel.Position = [1 788 439 75];
             app.MATBOXNRELMicrostructureAnalysisToolboxLabel.Text = {'MATBOX'; 'NREL Microstructure Analysis Toolbox '};
 
-            % Create Version091March182021Label
-            app.Version091March182021Label = uilabel(app.MATBOXMicrostructureAnalysisToolboxUIFigure);
-            app.Version091March182021Label.HorizontalAlignment = 'center';
-            app.Version091March182021Label.FontAngle = 'italic';
-            app.Version091March182021Label.Position = [1 761 439 22];
-            app.Version091March182021Label.Text = 'Version: 0.91 - March 18, 2021';
+            % Create Version10Matbox2021bMay182021Label
+            app.Version10Matbox2021bMay182021Label = uilabel(app.MATBOXMicrostructureAnalysisToolboxUIFigure);
+            app.Version10Matbox2021bMay182021Label.HorizontalAlignment = 'center';
+            app.Version10Matbox2021bMay182021Label.FontAngle = 'italic';
+            app.Version10Matbox2021bMay182021Label.Position = [1 761 439 22];
+            app.Version10Matbox2021bMay182021Label.Text = 'Version: 1.0 (Matbox2021b) - May 18, 2021';
 
             % Create SelectthemoduleassociatedwithyouractivityLabel
             app.SelectthemoduleassociatedwithyouractivityLabel = uilabel(app.MATBOXMicrostructureAnalysisToolboxUIFigure);
@@ -248,7 +248,7 @@ classdef Main_menu_exported < matlab.apps.AppBase
 
             % Create Generation_DropDown
             app.Generation_DropDown = uidropdown(app.MATBOXMicrostructureAnalysisToolboxUIFigure);
-            app.Generation_DropDown.Items = {'Ellipsoid-based stochastic', 'Additives (stochastic or energetic method)', 'Deterministic geometries'};
+            app.Generation_DropDown.Items = {'Ellipsoid-based stochastic', 'Additives (stochastic or energetic method)'};
             app.Generation_DropDown.Position = [243 632 183 22];
             app.Generation_DropDown.Value = 'Ellipsoid-based stochastic';
 

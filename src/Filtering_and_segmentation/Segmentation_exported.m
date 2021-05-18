@@ -1070,7 +1070,7 @@ classdef Segmentation_exported < matlab.apps.AppBase
             str_dialogbox = 'Select a .tif file';
             
             % Open dialog box to choose file path
-            [FileName,PathName,~] = uigetfile({'*.tif','Tif image (*.tif)'},str_dialogbox);
+            [FileName,PathName,~] = uigetfile({'*.tif;*.tiff','Tif image (*.tif, *.tiff)'},str_dialogbox);
             if FileName==0
                 % User clicked cancel button or closed the dialog box
                 app.VolumeLoadedStatus.Text ='No volume loaded. Please load a volume: Menu/Load volume';
