@@ -1,5 +1,14 @@
 Release version notes:
 
+•	v1.0 (04/18/2021)
+Generation module
+- submodule deterministic generation is no more selectable from the GUI. But you can still call it from app designer. Once fleshed out, it will be re-introduced in the GUI.
+- Microstructure genereation: dx and dz diameter were wrongly labelled. I think i got it right this time.
+Characterization module
+- Fix bug for RVE case D and E
+Miscellaneous
+- Import image file is now both *.tif and *.tiff
+
 •	v0.91 (03/18/2021)
 Generation module
 - Added additive phase generation algorithm from Dr. Aashutosh N. Mistry, with documentation updated.
