@@ -1,5 +1,13 @@
 Release version notes:
 
+•	v1.0b (04/19/2021)
+Updated author list. Version of softwareX journal article publication.
+
+•	v1.0a (04/19/2021)
+Updated author list
+Generation module
+- Fixed particle orientation visualization in the GUI
+
 •	v1.0 (04/18/2021)
 Generation module
 - submodule deterministic generation is no more selectable from the GUI. But you can still call it from app designer. Once fleshed out, it will be re-introduced in the GUI.
