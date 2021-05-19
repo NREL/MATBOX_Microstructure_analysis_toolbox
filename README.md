@@ -25,8 +25,11 @@ Installation and instructions are detailed in the documentation. Run src/Main_me
 Contributions (excluding third-party software):
 * Main developer and documentation writer: Francois Usseglio-Viretta (NREL)
 * GUI development of the particle generation module: Prehit Patel
-* Meshing module code adapted for monolithic mesh: Jeffery Allen (NREL)
 * Contrast correction documentation/examples for adapthisteq in the ROI, filering and segmentation module: Elizabeth Bernhardt
+* Additive generation algorithm (energy-based method): Aashutosh Mistry (Argonne National Laboratory) and Partha P. Mukherjee (Purdue University)
+* Meshing module code adapted for monolithic mesh: Jeffery Allen (NREL)
+* Discussion and alignment with DOE's objectives: Kandler Smith (NREL)
+
 
 ## How to cite
 If you produce results using the toolbox, or use some or parts of the algorithms contained within the toolbox, please quote them accordingly:
