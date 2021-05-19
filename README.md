@@ -1,6 +1,6 @@
 # MATBOX: Microstructure Analysis Toolbox
 **MATLAB open source microstructure analysis code embedded with a graphic user interface**\
-*v1.0a May 19, 2021*\
+*v1.0b May 19, 2021*\
 See release_notes.txt for a change log.
 
 ![MATBOX](https://github.com/NREL/MATBOX_Microstructure_analysis_toolbox/blob/master/MATBOX_logo.png)
@@ -24,12 +24,12 @@ Installation and instructions are detailed in the documentation. Run src/Main_me
 ## Authors
 Contributions (excluding third-party software):
 * Main developer and documentation writer: Francois Usseglio-Viretta (NREL)
-* GUI development of the particle generation module: Prehit Patel
-* Contrast correction documentation/examples for adapthisteq in the ROI, filering and segmentation module: Elizabeth Bernhardt
+* GUI development of the particle generation module: Prehit Patel (NREL)
+* Contrast correction documentation/examples for adapthisteq in the ROI, filering and segmentation module: Elizabeth Bernhardt (NREL)
 * Additive generation algorithm (energy-based method): Aashutosh Mistry (Argonne National Laboratory) and Partha P. Mukherjee (Purdue University)
 * Meshing module code adapted for monolithic mesh: Jeffery Allen (NREL)
+* Integration of TauFactor in the characterization module: Samuel J. Cooper (Imperial College London)
 * Discussion and alignment with DOE's objectives: Kandler Smith (NREL)
-
 
 ## How to cite
 If you produce results using the toolbox, or use some or parts of the algorithms contained within the toolbox, please quote them accordingly:
