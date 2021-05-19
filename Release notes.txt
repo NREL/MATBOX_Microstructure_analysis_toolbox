@@ -1,5 +1,8 @@
 Release version notes:
 
+•	v1.0b (04/19/2021)
+Updated author list. Version of softwareX journal article publication.
+
 •	v1.0a (04/19/2021)
 Updated author list
 Generation module
