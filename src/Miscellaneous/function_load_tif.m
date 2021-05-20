@@ -26,7 +26,7 @@ end
 if isfile(FileTif) % Check existence
     [~,~,ext] = fileparts(FileTif);
     
-    if strcmp(ext,'.tif') % Check file extension
+    if strcmp(ext,'.tif') || strcmp(ext,'.tiff')  % Check file extension
         InfoImage=imfinfo(FileTif);
         mImage=InfoImage(1).Width;
         nImage=InfoImage(1).Height;
