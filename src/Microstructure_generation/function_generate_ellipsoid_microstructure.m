@@ -1,12 +1,15 @@
-function [microstructure3D, phase] = function_generate_ellipsoid_microstructure(domain_size,phase,Maximum_interpenetration,Minimum_particle_volume_conservated)
+function [microstructure3D, phase, outcome] = function_generate_ellipsoid_microstructure(domain_size,phase,Maximum_overlapping,Minimum_particle_volume_conservated,check_contiguity, stoping_conditions, do_verification, save_options)
 % Generate ellipsoids-based microstructrures
 % Francois Usseglio-Viretta, NREL
 
-tic
+refresh_time_for_progression_figure = 5;% s
+have_stop_conditions = ~strcmp(stoping_conditions.action,'Ignore (no stoping condition)');
+
+%tic
 
 %% PARAMETERS
 simulate_calendering = false; % Useful to set it true to achieve high density
-check_contiguity = true; % Default, true. False useful for very elongated particles
+%check_contiguity = true; % Default, true. False useful for very elongated particles
 
 
 %% DEDUCE MICROSTRUCTURE INFORMATION
@@ -191,7 +194,80 @@ end
 %%
 %%  MICROSTRUCTURE GENERATION
 %%
+
+%% PROGRESSION RATE
+if stoping_conditions.plot || have_stop_conditions
+    time_progression = [0];
+    volumefraction_progression = zeros(number_phase,1);  
+    particle_progression = zeros(number_phase,1); 
+    
+    phase_being_generated = [];
+    
+    time_progression_generationrate = [];
+    generationrate_progression = [];
+    generationrate_progression_average = [];
+    particle_generationrate_progression = [];
+    particle_generationrate_progression_average = [];    
+    
+    time_progression_generationrate_avglastiterations =[];
+    generationrate_progression_lastiterations = [];    
+    particle_generationrate_progression_lastiterations = [];   
+end
+
+
+if stoping_conditions.plot
+    c_ = colororder;
+    
+    Fig_global_progression = figure; % Create figure
+    Fig_global_progression.Name= 'Algorithm generation progression and rate'; % Figure name
+    scrsz = get(0,'ScreenSize'); % Screen resolution
+    set(Fig_global_progression,'position',[scrsz(1) scrsz(2) scrsz(3) scrsz(4)/2]); % Full screen figure
+    Fig_global_progression.Color='white'; % Background colour
+    
+    sub_axes_progression_1=subplot(1,3,1,'Parent',Fig_global_progression);
+    hold(sub_axes_progression_1,'on'); % Active subplot
+    h_title=title ('Volume fraction');
+
+    for current_phase = 1:1:number_phase
+        plot([0,1],[phase(current_phase).volumefraction.total phase(current_phase).volumefraction.total],'LineWidth',2,'LineStyle','--','Color',c_(current_phase,:),'DisplayName',[phase(current_phase).name ' (inputs)']);
+    end
+    ylim(sub_axes_progression_1,[0 +Inf])
+    xlabel(sub_axes_progression_1,'Wallclock time (s)');
+    ylabel(sub_axes_progression_1,'Volume fraction');
+    grid(sub_axes_progression_1,'on');
+    legend(sub_axes_progression_1,'Location','best');
+    set(sub_axes_progression_1,'FontName','Times new roman','FontSize',12); % Fontname and fontsize
+    set(h_title,'FontSize',14)
+    hold(sub_axes_progression_1,'off');
+    
+    sub_axes_progression_2=subplot(1,3,2,'Parent',Fig_global_progression,'XScale', 'linear', 'YScale', 'log');
+    hold(sub_axes_progression_2,'on'); % Active subplo
+    h_title=title ('Volume fraction generation rate');
+    xlabel(sub_axes_progression_2,'Wallclock time (s)');
+    ylabel(sub_axes_progression_2,'Volume fraction.s^{-1}');
+    grid(sub_axes_progression_2,'on');
+    legend(sub_axes_progression_2,'Location','best');
+    set(sub_axes_progression_2,'FontName','Times new roman','FontSize',12); % Fontname and fontsize
+    set(h_title,'FontSize',14)    
+    hold(sub_axes_progression_2,'off');
+    
+    sub_axes_progression_3=subplot(1,3,3,'Parent',Fig_global_progression);
+    hold(sub_axes_progression_3,'on'); % Active subplo
+    h_title=title ('Particle generation rate');
+    xlabel(sub_axes_progression_3,'Wallclock time (s)');
+    ylabel(sub_axes_progression_3,'Particle.s^{-1}');
+    grid(sub_axes_progression_3,'on');
+    legend(sub_axes_progression_3,'Location','best');
+    set(sub_axes_progression_3,'FontName','Times new roman','FontSize',12); % Fontname and fontsize
+    set(h_title,'FontSize',14)    
+    hold(sub_axes_progression_3,'off'); 
+    
+    sgtitle(Fig_global_progression,'Algorithm generation progression and rate','FontWeight','bold','FontSize',16,'FontName','Times new roman');
+end
+
+%%
 start_generation_time = tic; % Start clockwatch
+start_figure_time = tic;
 
 % Phase are generated sequentially.
 % Order your phase so that the phase i+1 contains less and smaller particles compared with the phase i
@@ -252,8 +328,17 @@ particle_index(1:preallocating_particle) = struct('Index',0);
 % Then, distance map to fill the remaining, with competition between phase for zone attibuted to multiple phase
 update_waitbar_step=0.05;
 phase_volume_filled = zeros(number_phase,1); % Number of voxel assigned to each phase
+phase_number_particle = zeros(number_phase,1); % Number of particle assigned to each phase
+number_iteration = 0;
+complete_stop = false;
+outcome = 'Success !'; % Default
+first_continue = true;
 for current_pass=1:1:number_pass
     for current_phase=1:1:number_phase
+        stop_condition_not_reached = true;
+        if complete_stop
+            break
+        end
         % Progession bar
         unique_diameter = phase(current_phase).unique_dx_diameter;
         unique_dxdy_elongation = phase(current_phase).unique_dxdy_elongation;
@@ -272,12 +357,140 @@ for current_pass=1:1:number_pass
         phase_volume_target = phase(current_phase).voxel_number * phase(current_phase).fillratio(current_pass); % Number of voxel to assign for this phase before moving forward
         
         new_particle_hasbeen_generated = false;
+
         % Wait bar
         generation_progress = phase_volume_filled(current_phase,1)/phase_volume_target; % 0-1
         previous_generation_progress = generation_progress;
         h_waitbar = waitbar(generation_progress,['Pass:' num2str(current_pass) '/' num2str(number_pass), ' Phase ' num2str(current_phase) '/' num2str(number_phase) ' is being generated']);
-        while phase_volume_filled(current_phase,1) <= phase_volume_target
+        while phase_volume_filled(current_phase,1) <= phase_volume_target && stop_condition_not_reached
+            number_iteration = number_iteration+1;
             
+            % Progression/rate
+            time_since_start = toc(start_generation_time);
+            if time_since_start>stoping_conditions.maxtime
+                complete_stop = true;
+                outcome = ['Algorithm stalls at pass ' num2str(current_pass) ', for ' phase(current_phase).name];
+                break
+            end            
+            
+            if stoping_conditions.plot || have_stop_conditions
+                % Update array for figure
+                time_progression = [time_progression time_since_start];
+                volumefraction_progression = [volumefraction_progression phase_volume_filled(:,1)/voxel_number];
+                particle_progression = [particle_progression  phase_number_particle(:,1)];
+                
+                if number_iteration>1
+                    phase_being_generated = [phase_being_generated current_phase];
+                    time_progression_generationrate = [time_progression_generationrate time_progression(end-1)+((time_progression(end)-time_progression(end-1))/2)];
+                    generationrate_progression = [generationrate_progression (volumefraction_progression(:,end)-volumefraction_progression(:,end-1)) ./ (time_progression(end)-time_progression(end-1)) ];
+                    generationrate_progression_average = [generationrate_progression_average mean(generationrate_progression,2)];
+                    particle_generationrate_progression = [particle_generationrate_progression (particle_progression(:,end)-particle_progression(:,end-1)) ./ (time_progression(end)-time_progression(end-1)) ];
+                    particle_generationrate_progression_average = [particle_generationrate_progression_average mean(particle_generationrate_progression,2)];                    
+                    
+                end
+                
+                if number_iteration>stoping_conditions.average_on_last_n_iterations+1
+                    time_progression_generationrate_avglastiterations = [time_progression_generationrate_avglastiterations time_since_start];
+                    
+                    % The average on a phase generation rate must be done only for iterations that correspond to this phase
+                    pha = phase_being_generated(end-stoping_conditions.average_on_last_n_iterations:end);
+                    val1 = generationrate_progression(:,end-stoping_conditions.average_on_last_n_iterations:end);
+                    val2 = particle_generationrate_progression(:,end-stoping_conditions.average_on_last_n_iterations:end);
+                    val1a = NaN(number_phase,1); val2a = NaN(number_phase,1);
+                    for kk=1:1:number_phase
+                        idx_p = find(pha==kk);
+                        if ~isempty(idx_p) && length(idx_p)>=stoping_conditions.average_on_last_n_iterations
+                            val1a(kk,1) = mean(val1(kk,idx_p),2);
+                            val2a(kk,1) = mean(val2(kk,idx_p),2);
+                        end
+                    end
+                    generationrate_progression_lastiterations = [generationrate_progression_lastiterations val1a];
+                    particle_generationrate_progression_lastiterations = [particle_generationrate_progression_lastiterations val2a];
+                                
+                    % Check stoping condition
+                    max_vf_rate = max(generationrate_progression_lastiterations(:,end));
+                    max_particle_rate = max(particle_generationrate_progression_lastiterations(:,end));
+                    if max_vf_rate<stoping_conditions.vfrate_threshold
+                        vfrate_stoping_condition = true;
+                    else
+                        vfrate_stoping_condition = false;
+                    end
+                    if max_particle_rate<stoping_conditions.particlerate_threshold
+                        particlerate_stoping_condition = true;
+                    else
+                        particlerate_stoping_condition = false;
+                    end                    
+                    if (strcmp(stoping_conditions.andor,'or') && (vfrate_stoping_condition || particlerate_stoping_condition)) || (strcmp(stoping_conditions.andor,'and') && (vfrate_stoping_condition && particlerate_stoping_condition))
+                       % Reach stoping conditions
+                       if strcmp(stoping_conditions.action,'Move to next phase or generation pass (and stop if last iteration)')
+                           %disp 'Next'
+                           if first_continue
+                               outcome = ['Algorithm stalls at pass ' num2str(current_pass) ', for ' phase(current_phase).name];
+                               first_continue= false;
+                           else
+                               outcome = [outcome '. Then, pass ' num2str(current_pass) ', for ' phase(current_phase).name];
+                           end
+                           stop_condition_not_reached = false; % Exit while loop and go to next phase
+                       elseif strcmp(stoping_conditions.action,'Stop')
+                           %disp 'Stop'
+                           complete_stop = true;
+                           outcome = ['Algorithm stalls at pass ' num2str(current_pass) ', for ' phase(current_phase).name];
+                           break
+                       end
+                    end
+                end
+                
+                % Update figure
+                if stoping_conditions.plot
+                    time_since_last_plot = toc(start_figure_time);
+                    if time_since_last_plot>=refresh_time_for_progression_figure
+                        start_figure_time = tic; % reset timer
+                        
+                        cla(sub_axes_progression_1); % Clear axes
+                        hold(sub_axes_progression_1,'on'); % Active subplot
+                        for current_phase_figure = 1:1:number_phase
+                            plot(sub_axes_progression_1,[0,time_since_start],[phase(current_phase_figure).volumefraction.total phase(current_phase_figure).volumefraction.total],'LineWidth',2,'LineStyle','--','Color',c_(current_phase_figure,:),'DisplayName',[phase(current_phase_figure).name ' (inputs)']);
+                            plot(sub_axes_progression_1,time_progression,volumefraction_progression(current_phase_figure,:),'LineWidth',2,'LineStyle','-','Color',c_(current_phase_figure,:),'DisplayName',[phase(current_phase_figure).name ' (generated)']);
+                        end
+                        ylim(sub_axes_progression_1,[0 +Inf])
+                        xlim(sub_axes_progression_1,[0 time_since_start])
+                        legend(sub_axes_progression_1,'Location','best');
+                        hold(sub_axes_progression_1,'off');
+                        
+                        cla(sub_axes_progression_2); % Clear axes
+                        hold(sub_axes_progression_2,'on'); % Active subplot
+                        for current_phase_figure = 1:1:number_phase
+                            if ~isempty(time_progression_generationrate)
+                                plot(sub_axes_progression_2,time_progression_generationrate,generationrate_progression(current_phase_figure,:),'LineWidth',1,'LineStyle','-','Color',c_(current_phase_figure,:),'DisplayName',[phase(current_phase_figure).name ' (instantaneous)']);
+                                plot(sub_axes_progression_2,time_progression_generationrate,generationrate_progression_average(current_phase_figure,:),'LineWidth',2,'LineStyle','--','Color',c_(current_phase_figure,:),'DisplayName',[phase(current_phase_figure).name ' (global average)']);
+                            end
+                            if ~isempty(time_progression_generationrate_avglastiterations)
+                                plot(sub_axes_progression_2,time_progression_generationrate_avglastiterations,generationrate_progression_lastiterations(current_phase_figure,:),'LineWidth',2,'LineStyle',':','Color',c_(current_phase_figure,:),'DisplayName',[phase(current_phase_figure).name ' (average of last ' num2str(stoping_conditions.average_on_last_n_iterations) ' iterations)']);
+                            end
+                        end
+                        xlim(sub_axes_progression_2,[0 time_since_start])
+                        legend(sub_axes_progression_2,'Location','best');
+                        hold(sub_axes_progression_2,'off');
+                        
+                        cla(sub_axes_progression_3); % Clear axes
+                        hold(sub_axes_progression_3,'on'); % Active subplot
+                        for current_phase_figure = 1:1:number_phase
+                            if ~isempty(time_progression_generationrate)
+                                %plot(sub_axes_progression_3,time_progression_generationrate,particle_generationrate_progression(current_phase_figure,:),'LineWidth',1,'LineStyle','-','Color',c_(current_phase_figure,:),'DisplayName',[phase(current_phase_figure).name ' (instantaneous)']);
+                                plot(sub_axes_progression_3,time_progression_generationrate,particle_generationrate_progression_average(current_phase_figure,:),'LineWidth',2,'LineStyle','--','Color',c_(current_phase_figure,:),'DisplayName',[phase(current_phase_figure).name ' (global average)']);
+                            end
+                            if ~isempty(time_progression_generationrate_avglastiterations)
+                                plot(sub_axes_progression_3,time_progression_generationrate_avglastiterations,particle_generationrate_progression_lastiterations(current_phase_figure,:),'LineWidth',2,'LineStyle',':','Color',c_(current_phase_figure,:),'DisplayName',[phase(current_phase_figure).name ' (average of last ' num2str(stoping_conditions.average_on_last_n_iterations) ' iterations)']);
+                            end
+                        end
+                        xlim(sub_axes_progression_3,[0 time_since_start])
+                        legend(sub_axes_progression_3,'Location','best');
+                        hold(sub_axes_progression_3,'off');
+                        pause(0.01); % Force refresh of the graph
+                    end
+                end
+            end
+
             generation_progress = phase_volume_filled(current_phase,1)/phase_volume_target; % 0-1
             if generation_progress-previous_generation_progress > update_waitbar_step
                 waitbar(generation_progress,h_waitbar);
@@ -363,7 +576,7 @@ for current_pass=1:1:number_pass
                     % Indices of newly assigned voxels
                     linear_indices = rn_pos;
                     % 3D arrays assignment
-                    microstructure3D = ThreeD_array_assignment(microstructure3D, current_phase, linear_indices, particle_id, number_voxel_assigned, number_voxel_idealshape, 1, 1, 1, 0, 0, 0);
+                    microstructure3D = ThreeD_array_assignment(microstructure3D, current_phase, linear_indices, particle_id, number_voxel_assigned, number_voxel_idealshape, 1, 1, 1, 0, 0, 0, x_center, y_center, z_center);
                     % Update
                     new_particle_hasbeen_generated = true;
                     particle_xyz_min_max = [x_center y_center z_center x_center y_center z_center];
@@ -422,7 +635,7 @@ for current_pass=1:1:number_pass
                         % Indices of newly assigned voxels
                         [linear_indices] = Index_from_subdomain_to_domain(subdomain_ellipsoid, [], domain_size, [x_min y_min z_min]);
                         % 3D arrays assignment
-                        microstructure3D = ThreeD_array_assignment(microstructure3D, current_phase, linear_indices, particle_id, number_voxel_assigned, number_voxel_idealshape, dx, dy, dz, angle_x_deg, angle_y_deg, angle_z_deg);
+                        microstructure3D = ThreeD_array_assignment(microstructure3D, current_phase, linear_indices, particle_id, number_voxel_assigned, number_voxel_idealshape, dx, dy, dz, angle_x_deg, angle_y_deg, angle_z_deg, x_center, y_center, z_center);
                         % Update
                         particle_xyz_min_max = [x_min y_min z_min x_max y_max z_max];
                         new_particle_hasbeen_generated = true;
@@ -444,7 +657,7 @@ for current_pass=1:1:number_pass
                             % Indices of newly assigned voxels
                             [linear_indices] = Index_from_subdomain_to_domain(subdomain_ellipsoid, [], domain_size, [x_min y_min z_min]);
                             % 3D arrays assignment
-                            microstructure3D = ThreeD_array_assignment(microstructure3D, current_phase, linear_indices, particle_id, number_voxel_assigned, number_voxel_idealshape, dx, dy, dz, angle_x_deg, angle_y_deg, angle_z_deg);
+                            microstructure3D = ThreeD_array_assignment(microstructure3D, current_phase, linear_indices, particle_id, number_voxel_assigned, number_voxel_idealshape, dx, dy, dz, angle_x_deg, angle_y_deg, angle_z_deg, x_center, y_center, z_center);
                             % Update
                             particle_xyz_min_max = [x_min y_min z_min x_max y_max z_max];
                             new_particle_hasbeen_generated = true;
@@ -460,7 +673,7 @@ for current_pass=1:1:number_pass
                             for k_other = 1:1:n_otherparticles % Loop over all existing particles
                                 other_id = particles_id_subdomain(k_other); % Get code of the other particle
                                 other_phasenumber =  particle_info.Phase_number(other_id);
-                                current_maximum_interpenetration = Maximum_interpenetration(current_phase, other_phasenumber);
+                                current_maximum_interpenetration = Maximum_overlapping(current_phase, other_phasenumber);
                                 if current_maximum_interpenetration<=0 % No need to continue
                                     new_particle_hasbeen_generated = false;  % Not necessary. For clarification sake.
                                     continue_whileloop_and_go_to_next_randcenter = true;
@@ -512,7 +725,7 @@ for current_pass=1:1:number_pass
                                     d_max_overlapping_to_othercentre = max(distance_overlapping_to_othercenter);
                                     ratio_overlapping_other = (d_max_overlapping_to_othercentre-d_min_overlapping_to_othercentre)/d_max_overlapping_to_centre;
                                     
-                                    current_maximum_interpenetration = Maximum_interpenetration(current_phase, other_phasenumber);
+                                    current_maximum_interpenetration = Maximum_overlapping(current_phase, other_phasenumber);
                                     if max(ratio_overlapping, ratio_overlapping_other)<=current_maximum_interpenetration % Check overlapping
                                         
                                         % In case the overlapping is allowed, each particle will loose this number of voxels (which them impact its original shape)
@@ -586,7 +799,7 @@ for current_pass=1:1:number_pass
                                     % Phase assignment
                                     %subdomain_phase(all_particles_subdomain(k_particle).idx) = phase(current_phase).code;
                                     % 3D arrays assignment (it will overwritte overlapping region as well: thus updating the other particles)
-                                    microstructure3D = ThreeD_array_assignment(microstructure3D, current_phase, linear_indices, particle_id, number_voxel_assigned, number_voxel_idealshape, dx, dy, dz, angle_x_deg, angle_y_deg, angle_z_deg);
+                                    microstructure3D = ThreeD_array_assignment(microstructure3D, current_phase, linear_indices, particle_id, number_voxel_assigned, number_voxel_idealshape, dx, dy, dz, angle_x_deg, angle_y_deg, angle_z_deg, x_center, y_center, z_center);
                                     microstructure3D.phase(linear_indices) = phase(current_phase).code;
                                     % Min-max
                                     [I_particle,J_particle,K_particle] = ind2sub(domain_size,linear_indices);
@@ -638,6 +851,7 @@ for current_pass=1:1:number_pass
             if new_particle_hasbeen_generated % Update
                 phase_volume_filled(current_phase,1) = phase_volume_filled(current_phase,1) + number_voxel_assigned;
                 number_unassigned_voxels = number_unassigned_voxels - number_voxel_assigned;
+                phase_number_particle(current_phase,1) = phase_number_particle(current_phase,1) + 1;
                 % Particle info update
                 particle_info.Center_xyz(particle_id,:) = [x_center y_center z_center];
                 particle_info.Phase_code(particle_id) = phase(current_phase).code;
@@ -654,6 +868,72 @@ for current_pass=1:1:number_pass
 end % Loop over pass
 time_generation = toc(start_generation_time);
 fprintf('Generation terminated. Elapsed time: %1.1fs\n',time_generation)
+
+
+% Progression figure
+if stoping_conditions.plot
+    % Update array for figure
+    time_since_start = toc(start_generation_time);
+    time_progression = [time_progression time_since_start];
+    volumefraction_progression = [volumefraction_progression phase_volume_filled(:,1)/voxel_number];
+    particle_progression = [particle_progression  phase_number_particle(:,1)];
+    
+    time_progression_generationrate = [time_progression_generationrate time_progression(end-1)+((time_progression(end)-time_progression(end-1))/2)];;
+    generationrate_progression = [generationrate_progression (volumefraction_progression(:,end)-volumefraction_progression(:,end-1)) ./ (time_progression(end)-time_progression(end-1)) ];
+    generationrate_progression_average = [generationrate_progression_average mean(generationrate_progression,2)];
+    particle_generationrate_progression = [particle_generationrate_progression (particle_progression(:,end)-particle_progression(:,end-1)) ./ (time_progression(end)-time_progression(end-1)) ];
+    particle_generationrate_progression_average = [particle_generationrate_progression_average mean(particle_generationrate_progression,2)];
+    
+    if number_iteration>stoping_conditions.average_on_last_n_iterations
+        time_progression_generationrate_avglastiterations = [time_progression_generationrate_avglastiterations time_since_start];
+        generationrate_progression_lastiterations = [generationrate_progression_lastiterations mean(generationrate_progression(:,end-stoping_conditions.average_on_last_n_iterations:end),2)];
+        particle_generationrate_progression_lastiterations = [particle_generationrate_progression_lastiterations mean(particle_generationrate_progression(:,end-stoping_conditions.average_on_last_n_iterations:end),2)];
+    end
+
+    % Update figure
+    cla(sub_axes_progression_1); % Clear axes
+    hold(sub_axes_progression_1,'on'); % Active subplot
+    for current_phase_figure = 1:1:number_phase
+        plot(sub_axes_progression_1,[0,time_since_start],[phase(current_phase_figure).volumefraction.total phase(current_phase_figure).volumefraction.total],'LineWidth',2,'LineStyle','--','Color',c_(current_phase_figure,:),'DisplayName',[phase(current_phase_figure).name ' (inputs)']);
+        plot(sub_axes_progression_1,time_progression,volumefraction_progression(current_phase_figure,:),'LineWidth',2,'LineStyle','-','Color',c_(current_phase_figure,:),'DisplayName',[phase(current_phase_figure).name ' (generated)']);
+    end
+    ylim(sub_axes_progression_1,[0 +Inf])
+    xlim(sub_axes_progression_1,[0 time_since_start])
+    legend(sub_axes_progression_1,'Location','best');
+    hold(sub_axes_progression_1,'off');
+    
+    cla(sub_axes_progression_2); % Clear axes
+    hold(sub_axes_progression_2,'on'); % Active subplot
+    for current_phase_figure = 1:1:number_phase
+        plot(sub_axes_progression_2,time_progression_generationrate,generationrate_progression(current_phase_figure,:),'LineWidth',1,'LineStyle','-','Color',c_(current_phase_figure,:),'DisplayName',[phase(current_phase_figure).name ' (instantaneous)']);
+        plot(sub_axes_progression_2,time_progression_generationrate,generationrate_progression_average(current_phase_figure,:),'LineWidth',2,'LineStyle','--','Color',c_(current_phase_figure,:),'DisplayName',[phase(current_phase_figure).name ' (global average)']);
+        plot(sub_axes_progression_2,time_progression_generationrate_avglastiterations,generationrate_progression_lastiterations(current_phase_figure,:),'LineWidth',2,'LineStyle',':','Color',c_(current_phase_figure,:),'DisplayName',[phase(current_phase_figure).name ' (average of last ' num2str(stoping_conditions.average_on_last_n_iterations) ' iterations)']);
+    end
+    xlim(sub_axes_progression_2,[0 time_since_start])
+    legend(sub_axes_progression_2,'Location','best');
+    hold(sub_axes_progression_2,'off');
+    
+    cla(sub_axes_progression_3); % Clear axes
+    hold(sub_axes_progression_3,'on'); % Active subplot
+    for current_phase_figure = 1:1:number_phase
+        %plot(sub_axes_progression_3,time_progression_generationrate,particle_generationrate_progression(current_phase_figure,:),'LineWidth',1,'LineStyle','-','Color',c_(current_phase_figure,:),'DisplayName',[phase(current_phase_figure).name ' (instantaneous)']);
+        plot(sub_axes_progression_3,time_progression_generationrate,particle_generationrate_progression_average(current_phase_figure,:),'LineWidth',2,'LineStyle','--','Color',c_(current_phase_figure,:),'DisplayName',[phase(current_phase_figure).name ' (global average)']);
+        plot(sub_axes_progression_3,time_progression_generationrate_avglastiterations,particle_generationrate_progression_lastiterations(current_phase_figure,:),'LineWidth',2,'LineStyle',':','Color',c_(current_phase_figure,:),'DisplayName',[phase(current_phase_figure).name ' (average of last ' num2str(stoping_conditions.average_on_last_n_iterations) ' iterations)']);
+    end
+    xlim(sub_axes_progression_3,[0 time_since_start])
+    legend(sub_axes_progression_3,'Location','best');
+    hold(sub_axes_progression_3,'off');
+    
+    if ~isempty(save_options.folder) && save_options.save_progression
+        function_savefig(Fig_global_progression, save_options.folder, ['Algorithm_progression_run_' num2str(save_options.run_number)]);
+    end
+end
+
+% Verification
+if do_verification
+    function_verification_generatedmicrostructure(microstructure3D,phase,save_options)
+end
+
 
 
 %%
@@ -777,7 +1057,7 @@ Kdomain = Ksub + subdomain_min_location(3)-1;
 linear_indices_domain = sub2ind(domain_size, Idomain, Jdomain, Kdomain);
 end
 
-function [microstructure3D] = ThreeD_array_assignment(microstructure3D, phase_number, idx, particle_id, number_voxel, number_voxel_idealshape, dx, dy, dz, anglex, angley, anglez)
+function [microstructure3D] = ThreeD_array_assignment(microstructure3D, phase_number, idx, particle_id, number_voxel, number_voxel_idealshape, dx, dy, dz, anglex, angley, anglez, x_center, y_center, z_center)
 microstructure3D.particle_id(idx) = particle_id; % Assign particle id
 microstructure3D.particle_volume_numbervoxel(idx) = number_voxel; % Assign particle volume
 microstructure3D.particle_volume_numbervoxel_idealshape(idx) = number_voxel_idealshape; % Assign particle volume
@@ -788,6 +1068,7 @@ else
     volume_ideal_ellipsoid=1;
     sphere_equivalentdiameter_fromidealellipsoid=1;
 end
+microstructure3D.centroid(particle_id).xyz = [x_center, y_center, z_center]; % Centroid
 microstructure3D.particle_volume_idealellipsoid(idx) = volume_ideal_ellipsoid; % Assign ellipsoid volume
 microstructure3D.particle_equivalentspherediameter_fromidealellipsoid(idx) = sphere_equivalentdiameter_fromidealellipsoid; % Assign particle diameter
 microstructure3D.phase_(phase_number).particle_length_x(idx) = dx; % Assign ellispoid lenght along axe 1
@@ -864,7 +1145,6 @@ statistics_histogram = [min_ mean_ max_ std_];
 end
 
 
-toc
-t = toc;
+%toc
 end
 

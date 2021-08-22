@@ -3,22 +3,22 @@ classdef Main_menu_exported < matlab.apps.AppBase
     % Properties that correspond to app components
     properties (Access = public)
         MATBOXMicrostructureAnalysisToolboxUIFigure  matlab.ui.Figure
-        MATBOXNRELMicrostructureAnalysisToolboxLabel  matlab.ui.control.Label
-        Version10bMatbox2021cMay192021Label  matlab.ui.control.Label
-        SelectthemoduleassociatedwithyouractivityLabel  matlab.ui.control.Label
-        Label                           matlab.ui.control.Label
-        MicrostructuregenerationButton  matlab.ui.control.Button
-        MicrostructurecharacterizationButton_2  matlab.ui.control.Button
-        ROIFilteringandsegmentationButton_2  matlab.ui.control.Button
-        VisualizationButton             matlab.ui.control.Button
-        CorrelationButton               matlab.ui.control.Button
-        MeshingButton                   matlab.ui.control.Button
-        Label_2                         matlab.ui.control.Label
-        AboutButton                     matlab.ui.control.Button
-        RepositoryButton                matlab.ui.control.Button
-        DocumentationButton             matlab.ui.control.Button
-        About_Logo_NREL                 matlab.ui.control.Image
         Generation_DropDown             matlab.ui.control.DropDown
+        About_Logo_NREL                 matlab.ui.control.Image
+        DocumentationButton             matlab.ui.control.Button
+        RepositoryButton                matlab.ui.control.Button
+        AboutButton                     matlab.ui.control.Button
+        Label_2                         matlab.ui.control.Label
+        MeshingButton                   matlab.ui.control.Button
+        CorrelationButton               matlab.ui.control.Button
+        VisualizationButton             matlab.ui.control.Button
+        ROIFilteringandsegmentationButton_2  matlab.ui.control.Button
+        MicrostructurecharacterizationButton_2  matlab.ui.control.Button
+        MicrostructuregenerationButton  matlab.ui.control.Button
+        Label                           matlab.ui.control.Label
+        SelectthemoduleassociatedwithyouractivityLabel  matlab.ui.control.Label
+        Version10bMatbox2021cMay192021Label  matlab.ui.control.Label
+        MATBOXNRELMicrostructureAnalysisToolboxLabel  matlab.ui.control.Label
     end
 
     
@@ -43,7 +43,7 @@ classdef Main_menu_exported < matlab.apps.AppBase
         function MicrostructuregenerationButtonPushed(app, event)
             choice = app.Generation_DropDown.Value;
             if strcmp(choice,'Ellipsoid-based stochastic')
-                microstructure_generation_ellipsoids_GUI
+                Microstructure_generation_stochastic
             elseif strcmp(choice,'Additives (stochastic or energetic method)')
                 Microstructure_generation_additives
             elseif strcmp(choice,'Deterministic geometries')
