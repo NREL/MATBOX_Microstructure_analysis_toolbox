@@ -3,6 +3,9 @@
 *v1.0b May 19, 2021*\
 See release_notes.txt for a change log.
 
+*NOTE: I got some feedbacks from MAC users the GUI does not initialize well, while there is no issue for Windows Users.*\
+*Therefore, currently Windows is recommended over other OS.*
+
 ![MATBOX](https://github.com/NREL/MATBOX_Microstructure_analysis_toolbox/blob/master/MATBOX_logo.png)
 
 ## What is MATBOX?
