@@ -1,5 +1,13 @@
 Release version notes:
 
+08/22/2021
+Rework of the stochastic generation algorithm GUI
+- Transition to App designer.
+- Added stop conditions (generation rate and time limit).
+- Added algorithm progression plot.
+Documention is not yet updated, that would be for a next commit, however the GUI is more user-friendly now with additional explanations.
+The generation algorithm itslef has not beed changed.
+
 •	v1.0b (04/19/2021)
 Updated author list. Version of softwareX journal article publication.
 

@@ -3,6 +3,11 @@
 *v1.0b May 19, 2021*\
 See release_notes.txt for a change log.
 
+**IMPORTANT NOTES**
+* I got some feedbacks from MAC users the GUI does not initialize well, while there is no issue for Windows Users. Therefore, currently Windows is recommended over other OS.
+* Some module built with app designer required MATLAB 2021a. A simple workaround is to open the mlapp file with app designer as it will automatically convert the file to your MATLAB version (but you may loss some functionnality).
+* Matlab app designer does not have a consistent behavior from version to version about the tab (left side of the interface). It may be truncated or not. If not truncated, it may truncate the right side of the GUI. If that happens to you, open the mlapp file with app designer and increase the width of the GUI (both the figure and the tab container). It should fix your issue.
+
 ![MATBOX](https://github.com/NREL/MATBOX_Microstructure_analysis_toolbox/blob/master/MATBOX_logo.png)
 
 ## What is MATBOX?
