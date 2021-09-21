@@ -71,9 +71,9 @@ end
 
 %% CALCULATE THE SUM FUNCTION
 results.smoothed_cumulative_fct = []; % Initialize
-results.smoothed_x50 = [];
+results.smoothed_x50 = 0;
 results.smoothed_probability_density_fct = [];
-results.integral_smoothed_probability_density_fct = [];
+results.integral_smoothed_probability_density_fct = 0;
 
 if round_value~=-1
     x = round(x,round_value); % Round the array, to reduce the number of unique values
@@ -81,6 +81,7 @@ end
 if isempty(w)
     w = x*0+1; % Weight 1. Ensure x and w have same shape.
 end
+
 [results.cumulative_fct, results.x50] = function_calculate_cumulative_fct (x, w);
 if smooth_cumulative_fct
     % Step 3: smooth cummulative function
@@ -115,9 +116,9 @@ end
 [results.probability_density_fct, results.integral_probability_density_fct] = function_calculate_probability_density_fct(results.cumulative_fct(:,1),results.cumulative_fct(:,2));
 if ~isempty(results.smoothed_cumulative_fct)
     [results.smoothed_probability_density_fct, results.integral_smoothed_probability_density_fct] = function_calculate_probability_density_fct(results.smoothed_cumulative_fct(:,1),results.smoothed_cumulative_fct(:,2));
-else
-    results.smoothed_probability_density_fct = [];
-    results.integral_smoothed_probability_density_fct = [];
+% else
+%     results.smoothed_probability_density_fct = [];
+%     results.integral_smoothed_probability_density_fct = 0;
 end
 
 outcome = true; % Success
