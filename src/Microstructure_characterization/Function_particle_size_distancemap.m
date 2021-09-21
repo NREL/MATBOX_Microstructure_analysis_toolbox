@@ -180,10 +180,14 @@ for current_phase=1:1:number_phase
     array_tmp(:,1) = numericalpsd(current_phase).psd.cumulative_fct(:,1);
     array_tmp(:,2) = numericalpsd(current_phase).psd.cumulative_fct(:,2);
     array_tmp(:,3) = numericalpsd(current_phase).psd.probability_density_fct(:,2);
-    array_tmp(:,4) = numericalpsd(current_phase).psd.smoothed_cumulative_fct(:,1);
-    array_tmp(:,5) = numericalpsd(current_phase).psd.smoothed_cumulative_fct(:,2);
-    array_tmp(:,6) = numericalpsd(current_phase).psd.smoothed_probability_density_fct(:,2);
-    Variable_name_table={'Micrometers' 'Cumulative_function' 'Probability_density_distribution_function' 'Micrometers_smoothed' 'Cumulative_function_smoothed' 'Probability_density_function_smoothed'};
+    if ~isempty(numericalpsd(current_phase).psd.smoothed_cumulative_fct)
+        array_tmp(:,4) = numericalpsd(current_phase).psd.smoothed_cumulative_fct(:,1);
+        array_tmp(:,5) = numericalpsd(current_phase).psd.smoothed_cumulative_fct(:,2);
+        array_tmp(:,6) = numericalpsd(current_phase).psd.smoothed_probability_density_fct(:,2);
+        Variable_name_table={'Micrometers' 'Cumulative_function' 'Probability_density_distribution_function' 'Micrometers_smoothed' 'Cumulative_function_smoothed' 'Probability_density_function_smoothed'};
+    else
+        Variable_name_table={'Micrometers' 'Cumulative_function' 'Probability_density_distribution_function'};
+    end
     Table_cumulative_sizedistribution.phase(current_phase).table = array2table(array_tmp,...
         'VariableNames',Variable_name_table);
     clear array_tmp
