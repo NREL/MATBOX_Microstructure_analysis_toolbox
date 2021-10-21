@@ -1,5 +1,9 @@
 Release version notes:
 
+10/21/2021
+All app files updated to MATLAB 2021b. If you have truncated interfaces, you should update to 2021b.
+Stochastic particle generation algorithm documentation has been updated.
+
 08/22/2021
 Rework of the stochastic generation algorithm GUI
 - Transition to App designer.
