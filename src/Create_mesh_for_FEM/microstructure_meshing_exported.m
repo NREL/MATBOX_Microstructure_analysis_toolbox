@@ -5,222 +5,222 @@ classdef microstructure_meshing_exported < matlab.apps.AppBase
         MeshingmoduleUIFigure           matlab.ui.Figure
         TabGroup                        matlab.ui.container.TabGroup
         InstructionsTab                 matlab.ui.container.Tab
-        Instructions_title              matlab.ui.control.Label
-        Instructions_Label_3            matlab.ui.control.TextArea
-        Instructions_Label_1            matlab.ui.control.Label
-        Instructions_Label_2            matlab.ui.control.Label
-        Instructions_Label_4            matlab.ui.control.Label
-        Instructions_Label_5            matlab.ui.control.TextArea
-        Instructions_Label_6            matlab.ui.control.Label
         Instructions_Label_7            matlab.ui.control.TextArea
+        Instructions_Label_6            matlab.ui.control.Label
+        Instructions_Label_5            matlab.ui.control.TextArea
+        Instructions_Label_4            matlab.ui.control.Label
+        Instructions_Label_2            matlab.ui.control.Label
+        Instructions_Label_1            matlab.ui.control.Label
+        Instructions_Label_3            matlab.ui.control.TextArea
+        Instructions_title              matlab.ui.control.Label
         FolderandsaveoptionsTab         matlab.ui.container.Tab
-        Saveoptions_title               matlab.ui.control.Label
-        Save_Label                      matlab.ui.control.Label
-        ClicktoselectsavefolderButton   matlab.ui.control.Button
-        Save_folder_text                matlab.ui.control.Label
-        TabisNOTsetupcorrectlyLabel     matlab.ui.control.Label
-        Folder_Lamp                     matlab.ui.control.Lamp
         Setup_UITable                   matlab.ui.control.Table
+        Folder_Lamp                     matlab.ui.control.Lamp
+        TabisNOTsetupcorrectlyLabel     matlab.ui.control.Label
+        Save_folder_text                matlab.ui.control.Label
+        ClicktoselectsavefolderButton   matlab.ui.control.Button
+        Save_Label                      matlab.ui.control.Label
+        Saveoptions_title               matlab.ui.control.Label
         SelectmicrostructuresTab        matlab.ui.container.Tab
-        SelectMicrostructure_Title      matlab.ui.control.Label
-        OneuniquemicrostructureLabel    matlab.ui.control.Label
-        Halfcellorfullcellselectatleast2volumesLabel  matlab.ui.control.Label
-        PolycrystallinearchitectureBetaLabel  matlab.ui.control.Label
-        ImporttifButton_Unique          matlab.ui.control.Button
-        ImporttifButton_Cell            matlab.ui.control.Button
-        ImporttifButton_Poly            matlab.ui.control.Button
-        LeftelectrodeLabel              matlab.ui.control.Label
-        SeparatorLabel                  matlab.ui.control.Label
-        RightelectrodeLabel             matlab.ui.control.Label
-        ChoosedomainDropDownLabel       matlab.ui.control.Label
-        ChoosedomainDropDown            matlab.ui.control.DropDown
-        HomogenousButton_Cell           matlab.ui.control.Button
-        orLabel                         matlab.ui.control.Label
-        LengthinvoxelEditFieldLabel     matlab.ui.control.Label
-        LengthinvoxelEditField          matlab.ui.control.NumericEditField
-        SavemicrostructureButton        matlab.ui.control.Button
-        Label                           matlab.ui.control.Label
-        TiffileloadedLabel              matlab.ui.control.Label
-        Microstructure_vf_UITable       matlab.ui.control.Table
-        VolumefractionsLabel            matlab.ui.control.Label
-        Select_VisualizemicrostructureButton  matlab.ui.control.Button
-        Select_Lamp                     matlab.ui.control.Lamp
-        TabisNOTsetupcorrectlyLabel_2   matlab.ui.control.Label
-        Select_ROI_UITable              matlab.ui.control.Table
-        SelecttheregionofinterestROILabel  matlab.ui.control.Label
-        SelecttheregionofinterestROIoptionalLabel_2  matlab.ui.control.Label
-        Select_Orientation_UITable      matlab.ui.control.Table
-        Select_Rescale_UITable          matlab.ui.control.Table
-        SelecttheregionofinterestROIoptionalLabel_3  matlab.ui.control.Label
-        Rows12unswapedButton            matlab.ui.control.StateButton
-        Rows13unswapedButton            matlab.ui.control.StateButton
-        Rows23unswapedButton            matlab.ui.control.StateButton
-        Row1unflippedButton             matlab.ui.control.StateButton
-        Row2unflippedButton             matlab.ui.control.StateButton
-        Row3unflippedButton             matlab.ui.control.StateButton
-        ScalingfactorEditFieldLabel     matlab.ui.control.Label
-        ScalingfactorEditField          matlab.ui.control.NumericEditField
-        VoxelsizebeforeEditFieldLabel   matlab.ui.control.Label
-        VoxelsizebeforeEditField        matlab.ui.control.NumericEditField
-        VoxelsizeafterEditFieldLabel    matlab.ui.control.Label
-        VoxelsizeafterEditField         matlab.ui.control.NumericEditField
-        ApplyscalingButton              matlab.ui.control.Button
-        BackgroundidEditFieldLabel      matlab.ui.control.Label
-        BackgroundidEditField           matlab.ui.control.NumericEditField
-        CC_left                         matlab.ui.control.Label
         CC_right                        matlab.ui.control.Label
+        CC_left                         matlab.ui.control.Label
+        BackgroundidEditField           matlab.ui.control.NumericEditField
+        BackgroundidEditFieldLabel      matlab.ui.control.Label
+        ApplyscalingButton              matlab.ui.control.Button
+        VoxelsizeafterEditField         matlab.ui.control.NumericEditField
+        VoxelsizeafterEditFieldLabel    matlab.ui.control.Label
+        VoxelsizebeforeEditField        matlab.ui.control.NumericEditField
+        VoxelsizebeforeEditFieldLabel   matlab.ui.control.Label
+        ScalingfactorEditField          matlab.ui.control.NumericEditField
+        ScalingfactorEditFieldLabel     matlab.ui.control.Label
+        Row3unflippedButton             matlab.ui.control.StateButton
+        Row2unflippedButton             matlab.ui.control.StateButton
+        Row1unflippedButton             matlab.ui.control.StateButton
+        Rows23unswapedButton            matlab.ui.control.StateButton
+        Rows13unswapedButton            matlab.ui.control.StateButton
+        Rows12unswapedButton            matlab.ui.control.StateButton
+        SelecttheregionofinterestROIoptionalLabel_3  matlab.ui.control.Label
+        Select_Rescale_UITable          matlab.ui.control.Table
+        Select_Orientation_UITable      matlab.ui.control.Table
+        SelecttheregionofinterestROIoptionalLabel_2  matlab.ui.control.Label
+        SelecttheregionofinterestROILabel  matlab.ui.control.Label
+        Select_ROI_UITable              matlab.ui.control.Table
+        TabisNOTsetupcorrectlyLabel_2   matlab.ui.control.Label
+        Select_Lamp                     matlab.ui.control.Lamp
+        Select_VisualizemicrostructureButton  matlab.ui.control.Button
+        VolumefractionsLabel            matlab.ui.control.Label
+        Microstructure_vf_UITable       matlab.ui.control.Table
+        TiffileloadedLabel              matlab.ui.control.Label
+        Label                           matlab.ui.control.Label
+        SavemicrostructureButton        matlab.ui.control.Button
+        LengthinvoxelEditField          matlab.ui.control.NumericEditField
+        LengthinvoxelEditFieldLabel     matlab.ui.control.Label
+        orLabel                         matlab.ui.control.Label
+        HomogenousButton_Cell           matlab.ui.control.Button
+        ChoosedomainDropDown            matlab.ui.control.DropDown
+        ChoosedomainDropDownLabel       matlab.ui.control.Label
+        RightelectrodeLabel             matlab.ui.control.Label
+        SeparatorLabel                  matlab.ui.control.Label
+        LeftelectrodeLabel              matlab.ui.control.Label
+        ImporttifButton_Poly            matlab.ui.control.Button
+        ImporttifButton_Cell            matlab.ui.control.Button
+        ImporttifButton_Unique          matlab.ui.control.Button
+        PolycrystallinearchitectureBetaLabel  matlab.ui.control.Label
+        Halfcellorfullcellselectatleast2volumesLabel  matlab.ui.control.Label
+        OneuniquemicrostructureLabel    matlab.ui.control.Label
+        SelectMicrostructure_Title      matlab.ui.control.Label
         DimensioncompatibilityTab       matlab.ui.container.Tab
-        Compatibility_Title             matlab.ui.control.Label
-        Comp_voxelsize_text             matlab.ui.control.Label
-        Comp_Lamp                       matlab.ui.control.Lamp
-        TabisNOTsetupcorrectlyLabel_3   matlab.ui.control.Label
-        Label_2                         matlab.ui.control.Label
-        Comp_voxelsize_text_2           matlab.ui.control.Label
-        Dim_TP_UITable                  matlab.ui.control.Table
-        Comp_voxelsize_text_3           matlab.ui.control.Label
-        VoxelsizeEditFieldLabel         matlab.ui.control.Label
-        VoxelsizeEditField              matlab.ui.control.NumericEditField
-        ActualizeresetdimensionsButton  matlab.ui.control.Button
-        Actualizedim_text               matlab.ui.control.Label
-        Comp_voxelsize_text_4           matlab.ui.control.Label
-        Dim_IP1_UITable                 matlab.ui.control.Table
-        Comp_voxelsize_text_5           matlab.ui.control.Label
-        Dim_IP2_UITable                 matlab.ui.control.Table
-        Dim_Autocrop_1_Button           matlab.ui.control.Button
-        Dim_Autocrop_2_Button           matlab.ui.control.Button
-        Label_3                         matlab.ui.control.Label
-        SavecellButton                  matlab.ui.control.Button
-        Select_VisualizecellButton      matlab.ui.control.Button
-        Inplanedimension1arematchingLabel  matlab.ui.control.Label
-        Inplanedimension2arematchingLabel  matlab.ui.control.Label
-        Dim_YoucanskipthistabLabel      matlab.ui.control.Label
         micrometersLabel                matlab.ui.control.Label
+        Dim_YoucanskipthistabLabel      matlab.ui.control.Label
+        Inplanedimension2arematchingLabel  matlab.ui.control.Label
+        Inplanedimension1arematchingLabel  matlab.ui.control.Label
+        Select_VisualizecellButton      matlab.ui.control.Button
+        SavecellButton                  matlab.ui.control.Button
+        Label_3                         matlab.ui.control.Label
+        Dim_Autocrop_2_Button           matlab.ui.control.Button
+        Dim_Autocrop_1_Button           matlab.ui.control.Button
+        Dim_IP2_UITable                 matlab.ui.control.Table
+        Comp_voxelsize_text_5           matlab.ui.control.Label
+        Dim_IP1_UITable                 matlab.ui.control.Table
+        Comp_voxelsize_text_4           matlab.ui.control.Label
+        Actualizedim_text               matlab.ui.control.Label
+        ActualizeresetdimensionsButton  matlab.ui.control.Button
+        VoxelsizeEditField              matlab.ui.control.NumericEditField
+        VoxelsizeEditFieldLabel         matlab.ui.control.Label
+        Comp_voxelsize_text_3           matlab.ui.control.Label
+        Dim_TP_UITable                  matlab.ui.control.Table
+        Comp_voxelsize_text_2           matlab.ui.control.Label
+        Label_2                         matlab.ui.control.Label
+        TabisNOTsetupcorrectlyLabel_3   matlab.ui.control.Label
+        Comp_Lamp                       matlab.ui.control.Lamp
+        Comp_voxelsize_text             matlab.ui.control.Label
+        Compatibility_Title             matlab.ui.control.Label
         MorphologyopeningTab            matlab.ui.container.Tab
-        PerformalloperationssequentiallyLabel  matlab.ui.control.Label
-        MO_Title                        matlab.ui.control.Label
-        MO_text_1                       matlab.ui.control.Label
-        MO_SavecellButton               matlab.ui.control.Button
-        MO_text_2                       matlab.ui.control.Label
-        MO_VisualizecellButton          matlab.ui.control.Button
-        MO_vf_UITable                   matlab.ui.control.Table
-        MO_VolumefractionsLabel         matlab.ui.control.Label
-        MO_operations_UITable           matlab.ui.control.Table
-        MO_VolumefractionsLabel_2       matlab.ui.control.Label
-        MO_text_4                       matlab.ui.control.Label
-        MO_text_3                       matlab.ui.control.Label
-        ErosiondistanceinvoxellengthEditFieldLabel  matlab.ui.control.Label
-        ErosiondistanceinvoxellengthEditField  matlab.ui.control.NumericEditField
-        DilatationdistanceinvoxellengthEditFieldLabel  matlab.ui.control.Label
-        DilatationdistanceinvoxellengthEditField  matlab.ui.control.NumericEditField
-        NumberofiterationEditFieldLabel  matlab.ui.control.Label
-        ErosiondilatationNumberofiterationEditField  matlab.ui.control.NumericEditField
-        PerformDropDownLabel            matlab.ui.control.Label
-        PerformErosionDropDown          matlab.ui.control.DropDown
-        ErositiondilatationisalwaysperformedfirstLabel  matlab.ui.control.Label
-        MO_text_5                       matlab.ui.control.Label
-        DetectandremoveverticeverticeandedgeedgeconnectionsLabel  matlab.ui.control.Label
-        PerformDropDown_2Label          matlab.ui.control.Label
-        PerformCleanConnectionDropDown  matlab.ui.control.DropDown
-        MO_text_6                       matlab.ui.control.Label
-        GrainvolumefilterinnumberofvoxelEditFieldLabel  matlab.ui.control.Label
-        GrainvolumefilterinnumberofvoxelEditField  matlab.ui.control.NumericEditField
-        MO_DoButton                     matlab.ui.control.Button
-        MO_UndoButton                   matlab.ui.control.Button
-        MO_SaveButton                   matlab.ui.control.Button
-        MO_statut_Label                 matlab.ui.control.Label
-        MO_text_7                       matlab.ui.control.Label
-        MO_PreservebackgroundCheckBox   matlab.ui.control.CheckBox
-        MO_UnionsoliduniqueclusterCheckBox  matlab.ui.control.CheckBox
-        MO_PoreuniqueclusterCheckBox    matlab.ui.control.CheckBox
-        MO_SkipButton                   matlab.ui.control.Button
-        MO_UndoAllButton                matlab.ui.control.Button
         CheckgraincontiguityandfixitifdiscontinousslowCheckBox  matlab.ui.control.CheckBox
+        MO_UndoAllButton                matlab.ui.control.Button
+        MO_SkipButton                   matlab.ui.control.Button
+        MO_PoreuniqueclusterCheckBox    matlab.ui.control.CheckBox
+        MO_UnionsoliduniqueclusterCheckBox  matlab.ui.control.CheckBox
+        MO_PreservebackgroundCheckBox   matlab.ui.control.CheckBox
+        MO_text_7                       matlab.ui.control.Label
+        MO_statut_Label                 matlab.ui.control.Label
+        MO_SaveButton                   matlab.ui.control.Button
+        MO_UndoButton                   matlab.ui.control.Button
+        MO_DoButton                     matlab.ui.control.Button
+        GrainvolumefilterinnumberofvoxelEditField  matlab.ui.control.NumericEditField
+        GrainvolumefilterinnumberofvoxelEditFieldLabel  matlab.ui.control.Label
+        MO_text_6                       matlab.ui.control.Label
+        PerformCleanConnectionDropDown  matlab.ui.control.DropDown
+        PerformDropDown_2Label          matlab.ui.control.Label
+        DetectandremoveverticeverticeandedgeedgeconnectionsLabel  matlab.ui.control.Label
+        MO_text_5                       matlab.ui.control.Label
+        ErositiondilatationisalwaysperformedfirstLabel  matlab.ui.control.Label
+        PerformErosionDropDown          matlab.ui.control.DropDown
+        PerformDropDownLabel            matlab.ui.control.Label
+        ErosiondilatationNumberofiterationEditField  matlab.ui.control.NumericEditField
+        NumberofiterationEditFieldLabel  matlab.ui.control.Label
+        DilatationdistanceinvoxellengthEditField  matlab.ui.control.NumericEditField
+        DilatationdistanceinvoxellengthEditFieldLabel  matlab.ui.control.Label
+        ErosiondistanceinvoxellengthEditField  matlab.ui.control.NumericEditField
+        ErosiondistanceinvoxellengthEditFieldLabel  matlab.ui.control.Label
+        MO_text_3                       matlab.ui.control.Label
+        MO_text_4                       matlab.ui.control.Label
+        MO_VolumefractionsLabel_2       matlab.ui.control.Label
+        MO_operations_UITable           matlab.ui.control.Table
+        MO_VolumefractionsLabel         matlab.ui.control.Label
+        MO_vf_UITable                   matlab.ui.control.Table
+        MO_VisualizecellButton          matlab.ui.control.Button
+        MO_text_2                       matlab.ui.control.Label
+        MO_SavecellButton               matlab.ui.control.Button
+        MO_text_1                       matlab.ui.control.Label
+        MO_Title                        matlab.ui.control.Label
+        PerformalloperationssequentiallyLabel  matlab.ui.control.Label
         AssemblecellTab                 matlab.ui.container.Tab
-        Assemble_Title                  matlab.ui.control.Label
-        Assemble_Instructions           matlab.ui.control.Label
-        Assemble_Lamp                   matlab.ui.control.Lamp
-        TabisNOTsetupcorrectlyLabel_4   matlab.ui.control.Label
-        Assemble_UITable                matlab.ui.control.Table
-        Assemble_Label_4                matlab.ui.control.Label
-        Assemble_SavecellButton         matlab.ui.control.Button
-        Assemble_VisualizecellButton    matlab.ui.control.Button
-        Label_4                         matlab.ui.control.Label
-        UpdateButton                    matlab.ui.control.Button
-        UpdateButton_label              matlab.ui.control.Label
-        Group_UITable                   matlab.ui.control.Table
         UpdateButton_label_2            matlab.ui.control.Label
+        Group_UITable                   matlab.ui.control.Table
+        UpdateButton_label              matlab.ui.control.Label
+        UpdateButton                    matlab.ui.control.Button
+        Label_4                         matlab.ui.control.Label
+        Assemble_VisualizecellButton    matlab.ui.control.Button
+        Assemble_SavecellButton         matlab.ui.control.Button
+        Assemble_Label_4                matlab.ui.control.Label
+        Assemble_UITable                matlab.ui.control.Table
+        TabisNOTsetupcorrectlyLabel_4   matlab.ui.control.Label
+        Assemble_Lamp                   matlab.ui.control.Lamp
+        Assemble_Instructions           matlab.ui.control.Label
+        Assemble_Title                  matlab.ui.control.Label
         Meshgenerationchoice            matlab.ui.container.Tab
-        Meshgen_Title                   matlab.ui.control.Label
-        Meshgen_Iso2mesh                matlab.ui.control.Button
-        Meshgen_Cuboidmesh              matlab.ui.control.Button
-        Label_5                         matlab.ui.control.Label
-        Label_6                         matlab.ui.control.Label
         Label_7                         matlab.ui.control.Label
+        Label_6                         matlab.ui.control.Label
+        Label_5                         matlab.ui.control.Label
+        Meshgen_Cuboidmesh              matlab.ui.control.Button
+        Meshgen_Iso2mesh                matlab.ui.control.Button
+        Meshgen_Title                   matlab.ui.control.Label
         Iso2meshoptionsTab              matlab.ui.container.Tab
-        Iso2mesh_Title                  matlab.ui.control.Label
-        CGAL_UITable                    matlab.ui.control.Table
-        Iso2mesh_label                  matlab.ui.control.Label
-        Iso2mesh_label_2                matlab.ui.control.Label
-        MethodDropDownLabel             matlab.ui.control.Label
-        Surfacemesh_MethodDropDown      matlab.ui.control.DropDown
-        Smoothing_UITable               matlab.ui.control.Table
-        Iso2mesh_label_3                matlab.ui.control.Label
-        Meshdensity_UITable             matlab.ui.control.Table
-        Label_12                        matlab.ui.control.Label
         Iso2meshversionnumberLabel      matlab.ui.control.Label
+        Label_12                        matlab.ui.control.Label
+        Meshdensity_UITable             matlab.ui.control.Table
+        Iso2mesh_label_3                matlab.ui.control.Label
+        Smoothing_UITable               matlab.ui.control.Table
+        Surfacemesh_MethodDropDown      matlab.ui.control.DropDown
+        MethodDropDownLabel             matlab.ui.control.Label
+        Iso2mesh_label_2                matlab.ui.control.Label
+        Iso2mesh_label                  matlab.ui.control.Label
+        CGAL_UITable                    matlab.ui.control.Table
+        Iso2mesh_Title                  matlab.ui.control.Label
         StructuredmeshoptionsTab        matlab.ui.container.Tab
-        Regularmesh_Title               matlab.ui.control.Label
-        EachvoxelwillberepresentedwithDropDownLabel  matlab.ui.control.Label
-        EachvoxelwillberepresentedwithDropDown  matlab.ui.control.DropDown
-        Regularmesh_Image5              matlab.ui.control.Image
-        Regularmesh_Image24             matlab.ui.control.Image
         Regularmesh_Image6              matlab.ui.control.Image
+        Regularmesh_Image24             matlab.ui.control.Image
+        Regularmesh_Image5              matlab.ui.control.Image
+        EachvoxelwillberepresentedwithDropDown  matlab.ui.control.DropDown
+        EachvoxelwillberepresentedwithDropDownLabel  matlab.ui.control.Label
+        Regularmesh_Title               matlab.ui.control.Label
         CreatemeshTab                   matlab.ui.container.Tab
-        Createmesh_Title                matlab.ui.control.Label
-        Createmesh_button               matlab.ui.control.Button
-        Meshchoice_UITable              matlab.ui.control.Table
-        Label_8                         matlab.ui.control.Label
-        Mesh_VisualizeButton            matlab.ui.control.Button
-        Cellindexstartsat0CheckBox      matlab.ui.control.CheckBox
-        Createmesh_choicemesh           matlab.ui.control.Label
-        Mesh_SaveButton                 matlab.ui.control.Button
-        StatutTextAreaLabel             matlab.ui.control.Label
-        Createmesh_StatutTextArea       matlab.ui.control.TextArea
-        CreateMesh_text_1               matlab.ui.control.Label
-        LightingDropDownLabel           matlab.ui.control.Label
-        LightingDropDown                matlab.ui.control.DropDown
-        MeshedgesDropDownLabel          matlab.ui.control.Label
-        MeshedgesDropDown               matlab.ui.control.DropDown
-        ColormapDropDownLabel           matlab.ui.control.Label
-        ColormapDropDown                matlab.ui.control.DropDown
-        Transparency01EditFieldLabel    matlab.ui.control.Label
-        Transparency01EditField         matlab.ui.control.NumericEditField
-        ShowDropDownLabel               matlab.ui.control.Label
-        ShowDropDown                    matlab.ui.control.DropDown
-        SavepngCheckBox                 matlab.ui.control.CheckBox
-        SavefigCheckBox                 matlab.ui.control.CheckBox
-        Label_9                         matlab.ui.control.Label
-        GridCheckBox                    matlab.ui.control.CheckBox
-        AxislabelCheckBox               matlab.ui.control.CheckBox
-        Meshformat_UITable              matlab.ui.control.Table
-        CreateMesh_text_2               matlab.ui.control.Label
-        csvandmatLabel                  matlab.ui.control.Label
-        Face_CheckBox                   matlab.ui.control.CheckBox
-        ColorisDropDownLabel            matlab.ui.control.Label
         ColorisDropDown                 matlab.ui.control.DropDown
+        ColorisDropDownLabel            matlab.ui.control.Label
+        Face_CheckBox                   matlab.ui.control.CheckBox
+        csvandmatLabel                  matlab.ui.control.Label
+        CreateMesh_text_2               matlab.ui.control.Label
+        Meshformat_UITable              matlab.ui.control.Table
+        AxislabelCheckBox               matlab.ui.control.CheckBox
+        GridCheckBox                    matlab.ui.control.CheckBox
+        Label_9                         matlab.ui.control.Label
+        SavefigCheckBox                 matlab.ui.control.CheckBox
+        SavepngCheckBox                 matlab.ui.control.CheckBox
+        ShowDropDown                    matlab.ui.control.DropDown
+        ShowDropDownLabel               matlab.ui.control.Label
+        Transparency01EditField         matlab.ui.control.NumericEditField
+        Transparency01EditFieldLabel    matlab.ui.control.Label
+        ColormapDropDown                matlab.ui.control.DropDown
+        ColormapDropDownLabel           matlab.ui.control.Label
+        MeshedgesDropDown               matlab.ui.control.DropDown
+        MeshedgesDropDownLabel          matlab.ui.control.Label
+        LightingDropDown                matlab.ui.control.DropDown
+        LightingDropDownLabel           matlab.ui.control.Label
+        CreateMesh_text_1               matlab.ui.control.Label
+        Createmesh_StatutTextArea       matlab.ui.control.TextArea
+        StatutTextAreaLabel             matlab.ui.control.Label
+        Mesh_SaveButton                 matlab.ui.control.Button
+        Createmesh_choicemesh           matlab.ui.control.Label
+        Cellindexstartsat0CheckBox      matlab.ui.control.CheckBox
+        Mesh_VisualizeButton            matlab.ui.control.Button
+        Label_8                         matlab.ui.control.Label
+        Meshchoice_UITable              matlab.ui.control.Table
+        Createmesh_button               matlab.ui.control.Button
+        Createmesh_Title                matlab.ui.control.Label
         CalculatemeshqualityTab         matlab.ui.container.Tab
-        Meshquality_Title               matlab.ui.control.Label
-        Label_11                        matlab.ui.control.Label
         Meshquality_JoeLiu_button       matlab.ui.control.Button
+        Label_11                        matlab.ui.control.Label
+        Meshquality_Title               matlab.ui.control.Label
         AboutTab                        matlab.ui.container.Tab
-        About_title                     matlab.ui.control.Label
-        About_TextArea                  matlab.ui.control.TextArea
-        QuotationinstructionsTextAreaLabel  matlab.ui.control.Label
-        About_Quotationinstructions     matlab.ui.control.TextArea
-        About_Logo_NREL                 matlab.ui.control.Image
-        OpendocumentationButton         matlab.ui.control.Button
-        Iso2MeshwebsiteButton           matlab.ui.control.Button
         Label_10                        matlab.ui.control.Label
+        Iso2MeshwebsiteButton           matlab.ui.control.Button
+        OpendocumentationButton         matlab.ui.control.Button
+        About_Logo_NREL                 matlab.ui.control.Image
+        About_Quotationinstructions     matlab.ui.control.TextArea
+        QuotationinstructionsTextAreaLabel  matlab.ui.control.Label
+        About_TextArea                  matlab.ui.control.TextArea
+        About_title                     matlab.ui.control.Label
     end
 
     
@@ -1006,8 +1006,7 @@ classdef microstructure_meshing_exported < matlab.apps.AppBase
             app.SavemicrostructureButton.Text = 'Save microstructure';
         end
 
-        % Button pushed function: 
-        % Select_VisualizemicrostructureButton
+        % Button pushed function: Select_VisualizemicrostructureButton
         function Select_VisualizemicrostructureButtonPushed(app, event)
             direction_name = {'Normal to Through-plane direction';'Normal to In-plane direction 1';'Normal to In-plane direction 2'};
             Microstructure_basic_visualization_interface(app.current_array, direction_name);            
@@ -2052,8 +2051,7 @@ classdef microstructure_meshing_exported < matlab.apps.AppBase
             app.Face_CheckBox.Value = true; app.Face_CheckBox.Enable = true;
         end
 
-        % Value changed function: 
-        % EachvoxelwillberepresentedwithDropDown
+        % Value changed function: EachvoxelwillberepresentedwithDropDown
         function EachvoxelwillberepresentedwithDropDownValueChanged(app, event)
             value = app.EachvoxelwillberepresentedwithDropDown.Value;
             if strcmp(value,'5 tetrahedrons') % Can generate the mesh but FEM calculations bug for this one, so there is sth to fix
@@ -2541,14 +2539,14 @@ classdef microstructure_meshing_exported < matlab.apps.AppBase
 
             % Create MeshingmoduleUIFigure and hide until all components are created
             app.MeshingmoduleUIFigure = uifigure('Visible', 'off');
-            app.MeshingmoduleUIFigure.Position = [100 100 1121 667];
+            app.MeshingmoduleUIFigure.Position = [100 100 1070 667];
             app.MeshingmoduleUIFigure.Name = 'Meshing module';
             app.MeshingmoduleUIFigure.Icon = 'Icon_Meshing.png';
 
             % Create TabGroup
             app.TabGroup = uitabgroup(app.MeshingmoduleUIFigure);
             app.TabGroup.TabLocation = 'left';
-            app.TabGroup.Position = [1 1 1121 667];
+            app.TabGroup.Position = [1 1 1070 667];
 
             % Create InstructionsTab
             app.InstructionsTab = uitab(app.TabGroup);

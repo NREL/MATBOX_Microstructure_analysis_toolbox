@@ -7,55 +7,55 @@ classdef microstructure_visualization_segmentation_exported < matlab.apps.AppBas
         SelectsavefolderMenu            matlab.ui.container.Menu
         SavefigureMenu                  matlab.ui.container.Menu
         SavevideoMenu                   matlab.ui.container.Menu
-        OverlayEditFieldLabel           matlab.ui.control.Label
-        OverlayEditField                matlab.ui.control.NumericEditField
-        GridnumberEditFieldLabel        matlab.ui.control.Label
-        GridnumberEditField             matlab.ui.control.NumericEditField
-        ViewnormaltoDropDownLabel       matlab.ui.control.Label
-        ViewnormaltoDropDown            matlab.ui.control.DropDown
-        SliderLabel                     matlab.ui.control.Label
-        Slider                          matlab.ui.control.Slider
-        MethodDropDownLabel             matlab.ui.control.Label
-        MethodDropDown                  matlab.ui.control.DropDown
-        UITable                         matlab.ui.control.Table
-        SelectdirectionandsliceLabel    matlab.ui.control.Label
-        SlicexyabLabel                  matlab.ui.control.Label
-        ComparisonandcoloroptionsLabel  matlab.ui.control.Label
-        FilenameLabel                   matlab.ui.control.Label
-        FilenameEditField               matlab.ui.control.EditField
-        FramepersEditFieldLabel         matlab.ui.control.Label
-        FramepersEditField              matlab.ui.control.NumericEditField
-        SaveoptionsLabel                matlab.ui.control.Label
-        Button_plus                     matlab.ui.control.Button
-        Button_minus                    matlab.ui.control.Button
-        Button_plus_2                   matlab.ui.control.Button
-        Button_minus_2                  matlab.ui.control.Button
-        FieldofviewLabel                matlab.ui.control.Label
-        line1                           matlab.ui.control.Label
-        ViewnornaltoaxexLabel           matlab.ui.control.Label
-        SlicexyabLabel_2                matlab.ui.control.Label
-        Domainssizeaxbxcum3voxelsizeumLabel  matlab.ui.control.Label
-        PhasesLabel                     matlab.ui.control.Label
-        line2                           matlab.ui.control.Label
-        colphase1                       matlab.ui.control.Label
-        Phase1volumefractionxLabel      matlab.ui.control.Label
-        colphase2                       matlab.ui.control.Label
-        Phase2volumefractionxLabel      matlab.ui.control.Label
-        colphase3                       matlab.ui.control.Label
-        Phase3volumefractionxLabel      matlab.ui.control.Label
-        colphase4                       matlab.ui.control.Label
-        Phase4volumefractionxLabel      matlab.ui.control.Label
-        colphase5                       matlab.ui.control.Label
-        Phase5volumefractionxLabel      matlab.ui.control.Label
-        colphase6                       matlab.ui.control.Label
-        Phase6volumefractionxLabel      matlab.ui.control.Label
-        colphase7                       matlab.ui.control.Label
-        Phase7volumefractionxLabel      matlab.ui.control.Label
-        VideoformatDropDownLabel        matlab.ui.control.Label
         VideoformatDropDown             matlab.ui.control.DropDown
-        UIAxes_grey                     matlab.ui.control.UIAxes
-        UIAxes_seg                      matlab.ui.control.UIAxes
+        VideoformatDropDownLabel        matlab.ui.control.Label
+        Phase7volumefractionxLabel      matlab.ui.control.Label
+        colphase7                       matlab.ui.control.Label
+        Phase6volumefractionxLabel      matlab.ui.control.Label
+        colphase6                       matlab.ui.control.Label
+        Phase5volumefractionxLabel      matlab.ui.control.Label
+        colphase5                       matlab.ui.control.Label
+        Phase4volumefractionxLabel      matlab.ui.control.Label
+        colphase4                       matlab.ui.control.Label
+        Phase3volumefractionxLabel      matlab.ui.control.Label
+        colphase3                       matlab.ui.control.Label
+        Phase2volumefractionxLabel      matlab.ui.control.Label
+        colphase2                       matlab.ui.control.Label
+        Phase1volumefractionxLabel      matlab.ui.control.Label
+        colphase1                       matlab.ui.control.Label
+        line2                           matlab.ui.control.Label
+        PhasesLabel                     matlab.ui.control.Label
+        Domainssizeaxbxcum3voxelsizeumLabel  matlab.ui.control.Label
+        SlicexyabLabel_2                matlab.ui.control.Label
+        ViewnornaltoaxexLabel           matlab.ui.control.Label
+        line1                           matlab.ui.control.Label
+        FieldofviewLabel                matlab.ui.control.Label
+        Button_minus_2                  matlab.ui.control.Button
+        Button_plus_2                   matlab.ui.control.Button
+        Button_minus                    matlab.ui.control.Button
+        Button_plus                     matlab.ui.control.Button
+        SaveoptionsLabel                matlab.ui.control.Label
+        FramepersEditField              matlab.ui.control.NumericEditField
+        FramepersEditFieldLabel         matlab.ui.control.Label
+        FilenameEditField               matlab.ui.control.EditField
+        FilenameLabel                   matlab.ui.control.Label
+        ComparisonandcoloroptionsLabel  matlab.ui.control.Label
+        SlicexyabLabel                  matlab.ui.control.Label
+        SelectdirectionandsliceLabel    matlab.ui.control.Label
+        UITable                         matlab.ui.control.Table
+        MethodDropDown                  matlab.ui.control.DropDown
+        MethodDropDownLabel             matlab.ui.control.Label
+        Slider                          matlab.ui.control.Slider
+        SliderLabel                     matlab.ui.control.Label
+        ViewnormaltoDropDown            matlab.ui.control.DropDown
+        ViewnormaltoDropDownLabel       matlab.ui.control.Label
+        GridnumberEditField             matlab.ui.control.NumericEditField
+        GridnumberEditFieldLabel        matlab.ui.control.Label
+        OverlayEditField                matlab.ui.control.NumericEditField
+        OverlayEditFieldLabel           matlab.ui.control.Label
         UIAxes_comparison               matlab.ui.control.UIAxes
+        UIAxes_seg                      matlab.ui.control.UIAxes
+        UIAxes_grey                     matlab.ui.control.UIAxes
     end
 
     
@@ -653,6 +653,33 @@ classdef microstructure_visualization_segmentation_exported < matlab.apps.AppBas
             app.SavevideoMenu.Enable = 'off';
             app.SavevideoMenu.Text = 'Save video';
 
+            % Create UIAxes_grey
+            app.UIAxes_grey = uiaxes(app.GreylevelsegmentedimagecomparisonUIFigure);
+            title(app.UIAxes_grey, 'Title')
+            xlabel(app.UIAxes_grey, 'X')
+            ylabel(app.UIAxes_grey, 'Y')
+            zlabel(app.UIAxes_grey, 'Z')
+            app.UIAxes_grey.PlotBoxAspectRatio = [1 1 1];
+            app.UIAxes_grey.Position = [58 410 408 362];
+
+            % Create UIAxes_seg
+            app.UIAxes_seg = uiaxes(app.GreylevelsegmentedimagecomparisonUIFigure);
+            title(app.UIAxes_seg, 'Title')
+            xlabel(app.UIAxes_seg, 'X')
+            ylabel(app.UIAxes_seg, 'Y')
+            zlabel(app.UIAxes_seg, 'Z')
+            app.UIAxes_seg.PlotBoxAspectRatio = [1 1 1];
+            app.UIAxes_seg.Position = [573 410 408 362];
+
+            % Create UIAxes_comparison
+            app.UIAxes_comparison = uiaxes(app.GreylevelsegmentedimagecomparisonUIFigure);
+            title(app.UIAxes_comparison, 'Title')
+            xlabel(app.UIAxes_comparison, 'X')
+            ylabel(app.UIAxes_comparison, 'Y')
+            zlabel(app.UIAxes_comparison, 'Z')
+            app.UIAxes_comparison.PlotBoxAspectRatio = [1 1 1];
+            app.UIAxes_comparison.Position = [58 25 408 362];
+
             % Create OverlayEditFieldLabel
             app.OverlayEditFieldLabel = uilabel(app.GreylevelsegmentedimagecomparisonUIFigure);
             app.OverlayEditFieldLabel.HorizontalAlignment = 'right';
@@ -929,33 +956,6 @@ classdef microstructure_visualization_segmentation_exported < matlab.apps.AppBas
             app.VideoformatDropDown.Items = {'mpeg-4', 'Uncompressed AVI'};
             app.VideoformatDropDown.Position = [944 13 82 22];
             app.VideoformatDropDown.Value = 'mpeg-4';
-
-            % Create UIAxes_grey
-            app.UIAxes_grey = uiaxes(app.GreylevelsegmentedimagecomparisonUIFigure);
-            title(app.UIAxes_grey, 'Title')
-            xlabel(app.UIAxes_grey, 'X')
-            ylabel(app.UIAxes_grey, 'Y')
-            zlabel(app.UIAxes_grey, 'Z')
-            app.UIAxes_grey.PlotBoxAspectRatio = [1 1 1];
-            app.UIAxes_grey.Position = [58 410 408 362];
-
-            % Create UIAxes_seg
-            app.UIAxes_seg = uiaxes(app.GreylevelsegmentedimagecomparisonUIFigure);
-            title(app.UIAxes_seg, 'Title')
-            xlabel(app.UIAxes_seg, 'X')
-            ylabel(app.UIAxes_seg, 'Y')
-            zlabel(app.UIAxes_seg, 'Z')
-            app.UIAxes_seg.PlotBoxAspectRatio = [1 1 1];
-            app.UIAxes_seg.Position = [573 410 408 362];
-
-            % Create UIAxes_comparison
-            app.UIAxes_comparison = uiaxes(app.GreylevelsegmentedimagecomparisonUIFigure);
-            title(app.UIAxes_comparison, 'Title')
-            xlabel(app.UIAxes_comparison, 'X')
-            ylabel(app.UIAxes_comparison, 'Y')
-            zlabel(app.UIAxes_comparison, 'Z')
-            app.UIAxes_comparison.PlotBoxAspectRatio = [1 1 1];
-            app.UIAxes_comparison.Position = [58 25 408 362];
 
             % Show the figure after all components are created
             app.GreylevelsegmentedimagecomparisonUIFigure.Visible = 'on';

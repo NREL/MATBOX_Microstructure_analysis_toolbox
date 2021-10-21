@@ -51,14 +51,12 @@ classdef Main_menu_exported < matlab.apps.AppBase
             end
         end
 
-        % Button pushed function: 
-        % ROIFilteringandsegmentationButton_2
+        % Button pushed function: ROIFilteringandsegmentationButton_2
         function ROIFilteringandsegmentationButton_2Pushed(app, event)
             Segmentation
         end
 
-        % Button pushed function: 
-        % MicrostructurecharacterizationButton_2
+        % Button pushed function: MicrostructurecharacterizationButton_2
         function MicrostructurecharacterizationButton_2Pushed(app, event)
             microstructure_characterization_GUI
         end
@@ -97,6 +95,16 @@ classdef Main_menu_exported < matlab.apps.AppBase
         % Button pushed function: DocumentationButton
         function DocumentationButtonPushed(app, event)
             Find_file('NREL_MATBOX_Microstructure_analysis_toolbox_documentation.pdf','MATBOX_Microstructure_analysis_toolbox','Default location is \MATBOX_Microstructure_analysis_toolbox\Documentation\');
+        end
+
+        % Value changed function: Generation_DropDown
+        function Generation_DropDownValueChanged(app, event)
+            value = app.Generation_DropDown.Value;
+            if strcmp(value,'Ellipsoid-based stochastic')
+                app.MicrostructuregenerationButton.Icon = 'Icon_generation.png';
+            elseif strcmp(value,'Additives (stochastic or energetic method)')
+                app.MicrostructuregenerationButton.Icon = 'Icon_generation_additive.png';
+            end
         end
     end
 
@@ -249,6 +257,7 @@ classdef Main_menu_exported < matlab.apps.AppBase
             % Create Generation_DropDown
             app.Generation_DropDown = uidropdown(app.MATBOXMicrostructureAnalysisToolboxUIFigure);
             app.Generation_DropDown.Items = {'Ellipsoid-based stochastic', 'Additives (stochastic or energetic method)'};
+            app.Generation_DropDown.ValueChangedFcn = createCallbackFcn(app, @Generation_DropDownValueChanged, true);
             app.Generation_DropDown.Position = [243 632 183 22];
             app.Generation_DropDown.Value = 'Ellipsoid-based stochastic';
 

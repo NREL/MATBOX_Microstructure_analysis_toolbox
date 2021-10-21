@@ -5,53 +5,53 @@ classdef microstructure_visualization_exported < matlab.apps.AppBase
         Visualizationmodule_UIFigure    matlab.ui.Figure
         TabGroup                        matlab.ui.container.TabGroup
         InstructionsTab                 matlab.ui.container.Tab
-        Main_instructions_title         matlab.ui.control.Label
-        instructions_1                  matlab.ui.control.Label
-        instructions_2                  matlab.ui.control.Label
         instructions_3                  matlab.ui.control.Label
+        instructions_2                  matlab.ui.control.Label
+        instructions_1                  matlab.ui.control.Label
+        Main_instructions_title         matlab.ui.control.Label
         ViewvolumesTab                  matlab.ui.container.Tab
-        Checkseg_title_2                matlab.ui.control.Label
-        Viewvolume_Selecttif_Button     matlab.ui.control.Button
-        Checkseg_instructions_2         matlab.ui.control.Label
-        View_UITable                    matlab.ui.control.Table
-        View_Labelloaded                matlab.ui.control.Label
-        View_createfigure_button        matlab.ui.control.Button
-        View_3Dfigure_button            matlab.ui.control.Button
-        IdleLabel                       matlab.ui.control.Label
-        VoxelsizeEditFieldLabel_2       matlab.ui.control.Label
-        View_VoxelsizeEditField         matlab.ui.control.NumericEditField
-        UnitEditFieldLabel_2            matlab.ui.control.Label
         View_UnitEditField              matlab.ui.control.EditField
+        UnitEditFieldLabel_2            matlab.ui.control.Label
+        View_VoxelsizeEditField         matlab.ui.control.NumericEditField
+        VoxelsizeEditFieldLabel_2       matlab.ui.control.Label
+        IdleLabel                       matlab.ui.control.Label
+        View_3Dfigure_button            matlab.ui.control.Button
+        View_createfigure_button        matlab.ui.control.Button
+        View_Labelloaded                matlab.ui.control.Label
+        View_UITable                    matlab.ui.control.Table
+        Checkseg_instructions_2         matlab.ui.control.Label
+        Viewvolume_Selecttif_Button     matlab.ui.control.Button
+        Checkseg_title_2                matlab.ui.control.Label
         ChecksegmentationTab            matlab.ui.container.Tab
-        Checkseg_title                  matlab.ui.control.Label
-        Checkseg_Importtif_grey_Button  matlab.ui.control.Button
-        Checkseg_Importtif_segmented_Button  matlab.ui.control.Button
-        Checkseg_instructions           matlab.ui.control.Label
-        Checkseg_createfigure_button    matlab.ui.control.Button
-        Checkseg_Greyvolumename         matlab.ui.control.Label
-        Checkseg_Segmentedvolumename    matlab.ui.control.Label
-        VoxelsizeEditFieldLabel         matlab.ui.control.Label
-        Checkseg_VoxelsizeEditField     matlab.ui.control.NumericEditField
-        UnitEditFieldLabel              matlab.ui.control.Label
         Checkseg_UnitEditField          matlab.ui.control.EditField
+        UnitEditFieldLabel              matlab.ui.control.Label
+        Checkseg_VoxelsizeEditField     matlab.ui.control.NumericEditField
+        VoxelsizeEditFieldLabel         matlab.ui.control.Label
+        Checkseg_Segmentedvolumename    matlab.ui.control.Label
+        Checkseg_Greyvolumename         matlab.ui.control.Label
+        Checkseg_createfigure_button    matlab.ui.control.Button
+        Checkseg_instructions           matlab.ui.control.Label
+        Checkseg_Importtif_segmented_Button  matlab.ui.control.Button
+        Checkseg_Importtif_grey_Button  matlab.ui.control.Button
+        Checkseg_title                  matlab.ui.control.Label
         ViewcharacterizationresultsTab  matlab.ui.container.Tab
-        Res_title                       matlab.ui.control.Label
-        Res_Selectfolder_Button         matlab.ui.control.Button
-        Res_instructions                matlab.ui.control.Label
-        Res_Labelloaded                 matlab.ui.control.Label
-        Res_createfigure_button         matlab.ui.control.Button
-        Res_3Dfigure_button             matlab.ui.control.Button
-        VoxelsizeEditFieldLabel_3       matlab.ui.control.Label
-        Res_VoxelsizeEditField          matlab.ui.control.NumericEditField
-        UnitEditFieldLabel_3            matlab.ui.control.Label
-        Res_UnitEditField               matlab.ui.control.EditField
-        PropertytoplotDropDownLabel     matlab.ui.control.Label
-        PropertytoplotDropDown          matlab.ui.control.DropDown
-        ForthephaseDropDownLabel        matlab.ui.control.Label
-        ForthephaseDropDown             matlab.ui.control.DropDown
-        Res_ErrormessageLabel           matlab.ui.control.Label
-        PropertyunitLabel               matlab.ui.control.Label
         Res_ResUnitEditField            matlab.ui.control.EditField
+        PropertyunitLabel               matlab.ui.control.Label
+        Res_ErrormessageLabel           matlab.ui.control.Label
+        ForthephaseDropDown             matlab.ui.control.DropDown
+        ForthephaseDropDownLabel        matlab.ui.control.Label
+        PropertytoplotDropDown          matlab.ui.control.DropDown
+        PropertytoplotDropDownLabel     matlab.ui.control.Label
+        Res_UnitEditField               matlab.ui.control.EditField
+        UnitEditFieldLabel_3            matlab.ui.control.Label
+        Res_VoxelsizeEditField          matlab.ui.control.NumericEditField
+        VoxelsizeEditFieldLabel_3       matlab.ui.control.Label
+        Res_3Dfigure_button             matlab.ui.control.Button
+        Res_createfigure_button         matlab.ui.control.Button
+        Res_Labelloaded                 matlab.ui.control.Label
+        Res_instructions                matlab.ui.control.Label
+        Res_Selectfolder_Button         matlab.ui.control.Button
+        Res_title                       matlab.ui.control.Label
     end
 
     
@@ -133,8 +133,7 @@ classdef microstructure_visualization_exported < matlab.apps.AppBase
             end
         end
 
-        % Button pushed function: 
-        % Checkseg_Importtif_segmented_Button
+        % Button pushed function: Checkseg_Importtif_segmented_Button
         function Checkseg_Importtif_segmented_ButtonPushed(app, event)
             % Open dialog box to choose file path
             str_dialogbox = 'Select segmented volume';
@@ -456,14 +455,14 @@ classdef microstructure_visualization_exported < matlab.apps.AppBase
 
             % Create Visualizationmodule_UIFigure and hide until all components are created
             app.Visualizationmodule_UIFigure = uifigure('Visible', 'off');
-            app.Visualizationmodule_UIFigure.Position = [100 100 858 590];
+            app.Visualizationmodule_UIFigure.Position = [100 100 775 590];
             app.Visualizationmodule_UIFigure.Name = 'Visualization module';
             app.Visualizationmodule_UIFigure.Icon = 'Icon_visualization.png';
 
             % Create TabGroup
             app.TabGroup = uitabgroup(app.Visualizationmodule_UIFigure);
             app.TabGroup.TabLocation = 'left';
-            app.TabGroup.Position = [1 1 858 590];
+            app.TabGroup.Position = [1 1 775 590];
 
             % Create InstructionsTab
             app.InstructionsTab = uitab(app.TabGroup);

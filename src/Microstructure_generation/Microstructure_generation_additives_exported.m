@@ -5,70 +5,70 @@ classdef Microstructure_generation_additives_exported < matlab.apps.AppBase
         Microstructure_additive_phase_generation  matlab.ui.Figure
         TabGroup                        matlab.ui.container.TabGroup
         LoadvolumeandvolumefractionTab  matlab.ui.container.Tab
-        Load_instructions               matlab.ui.control.Label
-        Load_title                      matlab.ui.control.Label
-        Load_LoadvolumeButton           matlab.ui.control.Button
-        Load_VolumeloaedLabel           matlab.ui.control.Label
-        Load_ExistingphasesUITable      matlab.ui.control.Table
-        Load_ExistingphasesLabel        matlab.ui.control.Label
-        Load_NewphaseparameterLabel     matlab.ui.control.Label
-        VolumefractiondenseLabel_3      matlab.ui.control.Label
-        Load_volumefraction_dense       matlab.ui.control.NumericEditField
-        NanoporosityLabel_3             matlab.ui.control.Label
-        Load_nanoporosity               matlab.ui.control.NumericEditField
-        TargetvolumefractionLabel_3     matlab.ui.control.Label
-        Load_targetvolumefraction       matlab.ui.control.NumericEditField
-        AdditiveidLabel                 matlab.ui.control.Label
-        Load_Additive_id                matlab.ui.control.NumericEditField
         VisualizeloadedmicrostructureButton  matlab.ui.control.Button
+        Load_Additive_id                matlab.ui.control.NumericEditField
+        AdditiveidLabel                 matlab.ui.control.Label
+        Load_targetvolumefraction       matlab.ui.control.NumericEditField
+        TargetvolumefractionLabel_3     matlab.ui.control.Label
+        Load_nanoporosity               matlab.ui.control.NumericEditField
+        NanoporosityLabel_3             matlab.ui.control.Label
+        Load_volumefraction_dense       matlab.ui.control.NumericEditField
+        VolumefractiondenseLabel_3      matlab.ui.control.Label
+        Load_NewphaseparameterLabel     matlab.ui.control.Label
+        Load_ExistingphasesLabel        matlab.ui.control.Label
+        Load_ExistingphasesUITable      matlab.ui.control.Table
+        Load_VolumeloaedLabel           matlab.ui.control.Label
+        Load_LoadvolumeButton           matlab.ui.control.Button
+        Load_title                      matlab.ui.control.Label
+        Load_instructions               matlab.ui.control.Label
         BetweenneighboursparticlesTab   matlab.ui.container.Tab
-        Bridge_instructions             matlab.ui.control.Label
-        Bridge_title                    matlab.ui.control.Label
-        Bridge_NewphaseparameterLabel   matlab.ui.control.Label
-        TargetvolumefractionLabel       matlab.ui.control.Label
-        Bridge_targetvolumefraction     matlab.ui.control.NumericEditField
-        Bridge_parameters_UITable       matlab.ui.control.Table
-        Bridge_generation               matlab.ui.control.Button
-        ProgressionGaugeLabel           matlab.ui.control.Label
-        ProgressionGauge                matlab.ui.control.LinearGauge
-        TextArea                        matlab.ui.control.TextArea
-        AchievedEditFieldLabel          matlab.ui.control.Label
         Bridged_AchievedEditField       matlab.ui.control.NumericEditField
+        AchievedEditFieldLabel          matlab.ui.control.Label
+        TextArea                        matlab.ui.control.TextArea
+        ProgressionGauge                matlab.ui.control.LinearGauge
+        ProgressionGaugeLabel           matlab.ui.control.Label
+        Bridge_generation               matlab.ui.control.Button
+        Bridge_parameters_UITable       matlab.ui.control.Table
+        Bridge_targetvolumefraction     matlab.ui.control.NumericEditField
+        TargetvolumefractionLabel       matlab.ui.control.Label
+        Bridge_NewphaseparameterLabel   matlab.ui.control.Label
+        Bridge_title                    matlab.ui.control.Label
+        Bridge_instructions             matlab.ui.control.Label
         EnergycriterionTab              matlab.ui.container.Tab
-        PD_title                        matlab.ui.control.Label
-        PD_instructions                 matlab.ui.control.Label
-        PD_NewphaseparameterLabel       matlab.ui.control.Label
-        PD_parameters_UITable           matlab.ui.control.Table
-        AchievedEditFieldLabel_2        matlab.ui.control.Label
-        PD_AchievedEditField            matlab.ui.control.NumericEditField
-        TargetvolumefractionLabel_4     matlab.ui.control.Label
-        PD_targetvolumefraction         matlab.ui.control.NumericEditField
-        PD_generation                   matlab.ui.control.Button
-        PD_TextArea                     matlab.ui.control.TextArea
-        ProgressionGauge_2Label         matlab.ui.control.Label
         PD_ProgressionGauge             matlab.ui.control.LinearGauge
+        ProgressionGauge_2Label         matlab.ui.control.Label
+        PD_TextArea                     matlab.ui.control.TextArea
+        PD_generation                   matlab.ui.control.Button
+        PD_targetvolumefraction         matlab.ui.control.NumericEditField
+        TargetvolumefractionLabel_4     matlab.ui.control.Label
+        PD_AchievedEditField            matlab.ui.control.NumericEditField
+        AchievedEditFieldLabel_2        matlab.ui.control.Label
+        PD_parameters_UITable           matlab.ui.control.Table
+        PD_NewphaseparameterLabel       matlab.ui.control.Label
+        PD_instructions                 matlab.ui.control.Label
+        PD_title                        matlab.ui.control.Label
         OutcomeTab                      matlab.ui.container.Tab
-        O_title                         matlab.ui.control.Label
-        O_savebutton                    matlab.ui.control.Button
-        O_vf_UITable                    matlab.ui.control.Table
-        O_instructions                  matlab.ui.control.Label
-        O_vf_Label                      matlab.ui.control.Label
-        O_visualize                     matlab.ui.control.Button
-        O_Label                         matlab.ui.control.Label
-        O_FilenameLabel                 matlab.ui.control.Label
-        O_filename_save                 matlab.ui.control.EditField
-        O_savefolderButton              matlab.ui.control.Button
         O_savefolderLabel               matlab.ui.control.Label
+        O_savefolderButton              matlab.ui.control.Button
+        O_filename_save                 matlab.ui.control.EditField
+        O_FilenameLabel                 matlab.ui.control.Label
+        O_Label                         matlab.ui.control.Label
+        O_visualize                     matlab.ui.control.Button
+        O_vf_Label                      matlab.ui.control.Label
+        O_instructions                  matlab.ui.control.Label
+        O_vf_UITable                    matlab.ui.control.Table
+        O_savebutton                    matlab.ui.control.Button
+        O_title                         matlab.ui.control.Label
         AboutTab                        matlab.ui.container.Tab
-        O_title_2                       matlab.ui.control.Label
-        About_TextArea                  matlab.ui.control.TextArea
-        QuotationinstructionsTextAreaLabel  matlab.ui.control.Label
-        About_Quotationinstructions     matlab.ui.control.TextArea
-        About_Logo_NREL                 matlab.ui.control.Image
-        OpendocumentationButton         matlab.ui.control.Button
-        Github_ushbutton                matlab.ui.control.Button
-        LinksLabel                      matlab.ui.control.Label
         Mistry_article                  matlab.ui.control.Button
+        LinksLabel                      matlab.ui.control.Label
+        Github_ushbutton                matlab.ui.control.Button
+        OpendocumentationButton         matlab.ui.control.Button
+        About_Logo_NREL                 matlab.ui.control.Image
+        About_Quotationinstructions     matlab.ui.control.TextArea
+        QuotationinstructionsTextAreaLabel  matlab.ui.control.Label
+        About_TextArea                  matlab.ui.control.TextArea
+        O_title_2                       matlab.ui.control.Label
     end
 
     
@@ -593,8 +593,7 @@ classdef Microstructure_generation_additives_exported < matlab.apps.AppBase
             Microstructure_basic_visualization_interface(app.Microstructure, direction_name);            
         end
 
-        % Button pushed function: 
-        % VisualizeloadedmicrostructureButton
+        % Button pushed function: VisualizeloadedmicrostructureButton
         function VisualizeloadedmicrostructureButtonPushed(app, event)
             direction_name = {'Normal to Axis 1';'Normal to Axis 2';'Normal to Axis 3'};
             Microstructure_basic_visualization_interface(app.Microstructure_initial, direction_name);
@@ -665,13 +664,13 @@ classdef Microstructure_generation_additives_exported < matlab.apps.AppBase
 
             % Create Microstructure_additive_phase_generation and hide until all components are created
             app.Microstructure_additive_phase_generation = uifigure('Visible', 'off');
-            app.Microstructure_additive_phase_generation.Position = [100 100 958 590];
+            app.Microstructure_additive_phase_generation.Position = [100 100 843 590];
             app.Microstructure_additive_phase_generation.Name = 'Additive phase generation';
 
             % Create TabGroup
             app.TabGroup = uitabgroup(app.Microstructure_additive_phase_generation);
             app.TabGroup.TabLocation = 'left';
-            app.TabGroup.Position = [2 1 957 590];
+            app.TabGroup.Position = [2 1 842 590];
 
             % Create LoadvolumeandvolumefractionTab
             app.LoadvolumeandvolumefractionTab = uitab(app.TabGroup);

@@ -3,63 +3,63 @@ classdef microstructure_visualization_slices_exported < matlab.apps.AppBase
     % Properties that correspond to app components
     properties (Access = public)
         UIFigure                       matlab.ui.Figure
-        ColoroptionsPanel              matlab.ui.container.Panel
-        ColormapDropDownLabel          matlab.ui.control.Label
-        ColormapDropDown               matlab.ui.control.DropDown
-        CustomchangeDropDownLabel      matlab.ui.control.Label
-        CustomchangeDropDown           matlab.ui.control.DropDown
-        ScaleDropDownLabel             matlab.ui.control.Label
-        ScaleDropDown                  matlab.ui.control.DropDown
-        MaxEditFieldLabel              matlab.ui.control.Label
-        MaxEditField                   matlab.ui.control.NumericEditField
-        MinEditField_2Label            matlab.ui.control.Label
-        MinEditField                   matlab.ui.control.NumericEditField
-        AddcolorbarCheckBox            matlab.ui.control.CheckBox
-        TakeoppositevaluesButton       matlab.ui.control.StateButton
-        FigurebackgroundDropDownLabel  matlab.ui.control.Label
-        FigurebackgroundDropDown       matlab.ui.control.DropDown
-        AxisoptionsPanel               matlab.ui.container.Panel
-        Viewnormaltoaxe1CheckBox       matlab.ui.control.CheckBox
-        Viewnormaltoaxe2CheckBox       matlab.ui.control.CheckBox
-        Viewnormaltoaxe3CheckBox       matlab.ui.control.CheckBox
-        ShowingslicesisCPUandRAMexpensiveLabel  matlab.ui.control.Label
-        DslicesDropDownLabel           matlab.ui.control.Label
-        DslicesDropDown                matlab.ui.control.DropDown
-        Button_p_1                     matlab.ui.control.Button
-        Button_pp_1                    matlab.ui.control.Button
-        Slider_1                       matlab.ui.control.Slider
-        Button_m_1                     matlab.ui.control.Button
-        Button_mm_1                    matlab.ui.control.Button
-        Positionalongaxe1Label         matlab.ui.control.Label
-        Positionalongaxe2Label         matlab.ui.control.Label
-        Slider_2                       matlab.ui.control.Slider
-        Button_m_2                     matlab.ui.control.Button
-        Button_mm_2                    matlab.ui.control.Button
-        Button_p_2                     matlab.ui.control.Button
-        Button_pp_2                    matlab.ui.control.Button
-        Positionalongaxe3Label         matlab.ui.control.Label
-        Slider_3                       matlab.ui.control.Slider
-        Button_m_3                     matlab.ui.control.Button
-        Button_mm_3                    matlab.ui.control.Button
-        Button_p_3                     matlab.ui.control.Button
-        Button_pp_3                    matlab.ui.control.Button
-        AdjustviewasmovingsliderCheckBox  matlab.ui.control.CheckBox
-        FigureandvideooptionsPanel     matlab.ui.container.Panel
-        ClicktoselectsavefolderButton  matlab.ui.control.Button
-        FilenameEditFieldLabel         matlab.ui.control.Label
-        FilenameEditField              matlab.ui.control.EditField
-        NosavefolderselectedLabel      matlab.ui.control.Label
-        VideoformatDropDownLabel       matlab.ui.control.Label
-        VideoformatDropDown            matlab.ui.control.DropDown
-        FramepersEditFieldLabel        matlab.ui.control.Label
-        FramepersEditField             matlab.ui.control.NumericEditField
-        Savefigure_button              matlab.ui.control.Button
-        Savevideo_button               matlab.ui.control.Button
         VolumenameLabel                matlab.ui.control.Label
-        UIAxes_1                       matlab.ui.control.UIAxes
-        UIAxes_2                       matlab.ui.control.UIAxes
-        UIAxes_3                       matlab.ui.control.UIAxes
+        FigureandvideooptionsPanel     matlab.ui.container.Panel
+        Savevideo_button               matlab.ui.control.Button
+        Savefigure_button              matlab.ui.control.Button
+        FramepersEditField             matlab.ui.control.NumericEditField
+        FramepersEditFieldLabel        matlab.ui.control.Label
+        VideoformatDropDown            matlab.ui.control.DropDown
+        VideoformatDropDownLabel       matlab.ui.control.Label
+        NosavefolderselectedLabel      matlab.ui.control.Label
+        FilenameEditField              matlab.ui.control.EditField
+        FilenameEditFieldLabel         matlab.ui.control.Label
+        ClicktoselectsavefolderButton  matlab.ui.control.Button
+        AxisoptionsPanel               matlab.ui.container.Panel
+        AdjustviewasmovingsliderCheckBox  matlab.ui.control.CheckBox
+        Button_pp_3                    matlab.ui.control.Button
+        Button_p_3                     matlab.ui.control.Button
+        Button_mm_3                    matlab.ui.control.Button
+        Button_m_3                     matlab.ui.control.Button
+        Slider_3                       matlab.ui.control.Slider
+        Positionalongaxe3Label         matlab.ui.control.Label
+        Button_pp_2                    matlab.ui.control.Button
+        Button_p_2                     matlab.ui.control.Button
+        Button_mm_2                    matlab.ui.control.Button
+        Button_m_2                     matlab.ui.control.Button
+        Slider_2                       matlab.ui.control.Slider
+        Positionalongaxe2Label         matlab.ui.control.Label
+        Positionalongaxe1Label         matlab.ui.control.Label
+        Button_mm_1                    matlab.ui.control.Button
+        Button_m_1                     matlab.ui.control.Button
+        Slider_1                       matlab.ui.control.Slider
+        Button_pp_1                    matlab.ui.control.Button
+        Button_p_1                     matlab.ui.control.Button
+        DslicesDropDown                matlab.ui.control.DropDown
+        DslicesDropDownLabel           matlab.ui.control.Label
+        ShowingslicesisCPUandRAMexpensiveLabel  matlab.ui.control.Label
+        Viewnormaltoaxe3CheckBox       matlab.ui.control.CheckBox
+        Viewnormaltoaxe2CheckBox       matlab.ui.control.CheckBox
+        Viewnormaltoaxe1CheckBox       matlab.ui.control.CheckBox
+        ColoroptionsPanel              matlab.ui.container.Panel
+        FigurebackgroundDropDown       matlab.ui.control.DropDown
+        FigurebackgroundDropDownLabel  matlab.ui.control.Label
+        TakeoppositevaluesButton       matlab.ui.control.StateButton
+        AddcolorbarCheckBox            matlab.ui.control.CheckBox
+        MinEditField                   matlab.ui.control.NumericEditField
+        MinEditField_2Label            matlab.ui.control.Label
+        MaxEditField                   matlab.ui.control.NumericEditField
+        MaxEditFieldLabel              matlab.ui.control.Label
+        ScaleDropDown                  matlab.ui.control.DropDown
+        ScaleDropDownLabel             matlab.ui.control.Label
+        CustomchangeDropDown           matlab.ui.control.DropDown
+        CustomchangeDropDownLabel      matlab.ui.control.Label
+        ColormapDropDown               matlab.ui.control.DropDown
+        ColormapDropDownLabel          matlab.ui.control.Label
         UIAxes_3D                      matlab.ui.control.UIAxes
+        UIAxes_3                       matlab.ui.control.UIAxes
+        UIAxes_2                       matlab.ui.control.UIAxes
+        UIAxes_1                       matlab.ui.control.UIAxes
     end
 
     
@@ -172,6 +172,8 @@ classdef microstructure_visualization_slices_exported < matlab.apps.AppBase
             view(axe_,3)
             if strcmp(app.DslicesDropDown.Value,'Show slices')
                 slice( double(app.volume), app.position_slice(2),app.position_slice(1),app.position_slice(3),'Parent', axe_);
+                %slice( double(app.volume), app.position_slice(2),[],app.position_slice(3),'Parent', axe_);
+
                 if strcmp(app.CustomchangeDropDown.Value,'1st color is white')
                     line_color1='k';
                     line_color2='k';
@@ -185,6 +187,9 @@ classdef microstructure_visualization_slices_exported < matlab.apps.AppBase
                     line_color1=c(1,:);
                     line_color2=c(2,:);
                     line_color3=c(3,:);
+                    % line_color1='w';
+                    % line_color2='w';
+                    % line_color3='w';                    
                 end
             elseif strcmp(app.DslicesDropDown.Value,'Show only locations')
                 X = [0 app.domain_size(2) app.domain_size(2) 0];
@@ -212,15 +217,15 @@ classdef microstructure_visualization_slices_exported < matlab.apps.AppBase
             X=[app.position_slice(2) app.position_slice(2)];
             Y=[0 app.domain_size(1)];
             Z=[app.position_slice(3) app.position_slice(3)];
-            plot3(X,Y,Z,'--','Color',line_color1,'LineWidth',2,'Parent', axe_)
+            plot3(X,Y,Z,'--','Color',line_color1,'LineWidth',4,'Parent', axe_)
             X=[0 app.domain_size(2)];
             Y=[app.position_slice(1) app.position_slice(1)];
             Z=[app.position_slice(3) app.position_slice(3)];
-            plot3(X,Y,Z,'--','Color',line_color2','LineWidth',2,'Parent', axe_)
+            plot3(X,Y,Z,'--','Color',line_color2','LineWidth',4,'Parent', axe_)
             X=[app.position_slice(2) app.position_slice(2)];
             Y=[app.position_slice(1) app.position_slice(1)];
             Z=[0 app.domain_size(3)];
-            plot3(X,Y,Z,'--','Color',line_color3,'LineWidth',2,'Parent', axe_)
+            plot3(X,Y,Z,'--','Color',line_color3,'LineWidth',4,'Parent', axe_)
             grid(axe_,'on'); % Display grid
             set(axe_,'XMinorGrid','on','YMinorGrid','on','ZMinorGrid','on'); % Display grid for minor thicks also
             set(axe_,'FontName',app.font_name_GUI,'FontSize',app.font_size_axe); % - Fontname and fontsize
@@ -244,6 +249,9 @@ classdef microstructure_visualization_slices_exported < matlab.apps.AppBase
                 colormap(axe_,gray)
             end
             shading(axe_,'flat');
+            
+            %get(axe_)
+            
             set(axe_,'XTickMode','auto')
             set(axe_,'YTickMode','auto')
             set(axe_,'ZTickMode','auto')
@@ -253,6 +261,11 @@ classdef microstructure_visualization_slices_exported < matlab.apps.AppBase
             set(axe_,'YtickLabel',round(y_value*app.voxelsize,1));
             z_value = get(axe_,'ZTick');
             set(axe_,'ZtickLabel',round(z_value*app.voxelsize,1));
+            
+%             set(axe_,'Box','off')
+%             set(axe_,'XGrid','off'); set(axe_,'YGrid','off'); set(axe_,'ZGrid','off');
+%             set(axe_,'XMinorGrid','off'); set(axe_,'YMinorGrid','off'); set(axe_,'ZMinorGrid','off');    
+            
             hold(axe_,'off');
         end
         
@@ -943,6 +956,57 @@ classdef microstructure_visualization_slices_exported < matlab.apps.AppBase
             app.UIFigure.Position = [100 100 1556 939];
             app.UIFigure.Name = 'MATLAB App';
 
+            % Create UIAxes_1
+            app.UIAxes_1 = uiaxes(app.UIFigure);
+            title(app.UIAxes_1, 'View normal to first axis')
+            xlabel(app.UIAxes_1, 'Third axis x um')
+            ylabel(app.UIAxes_1, 'Second axis x um')
+            zlabel(app.UIAxes_1, 'Z')
+            subtitle(app.UIAxes_1, 'Slice: x / y, a / b')
+            app.UIAxes_1.DataAspectRatio = [1 1 1];
+            app.UIAxes_1.XColor = [0 0 0];
+            app.UIAxes_1.BoxStyle = 'full';
+            app.UIAxes_1.Box = 'on';
+            app.UIAxes_1.Position = [127 466 503 437];
+
+            % Create UIAxes_2
+            app.UIAxes_2 = uiaxes(app.UIFigure);
+            title(app.UIAxes_2, 'View normal to second axis')
+            xlabel(app.UIAxes_2, 'Third axis x um')
+            ylabel(app.UIAxes_2, 'First axis x um')
+            zlabel(app.UIAxes_2, 'Z')
+            subtitle(app.UIAxes_2, 'Slice: x / y, a / b')
+            app.UIAxes_2.DataAspectRatio = [1 1 1];
+            app.UIAxes_2.XColor = [0 0 0];
+            app.UIAxes_2.BoxStyle = 'full';
+            app.UIAxes_2.Box = 'on';
+            app.UIAxes_2.Position = [700 466 503 437];
+
+            % Create UIAxes_3
+            app.UIAxes_3 = uiaxes(app.UIFigure);
+            title(app.UIAxes_3, 'View normal to third axis')
+            xlabel(app.UIAxes_3, 'First axis x um')
+            ylabel(app.UIAxes_3, 'Second axis x um')
+            zlabel(app.UIAxes_3, 'Z')
+            subtitle(app.UIAxes_3, 'Slice: x / y, a / b')
+            app.UIAxes_3.DataAspectRatio = [1 1 1];
+            app.UIAxes_3.XColor = [0 0 0];
+            app.UIAxes_3.BoxStyle = 'full';
+            app.UIAxes_3.Box = 'on';
+            app.UIAxes_3.Position = [127 12 503 437];
+
+            % Create UIAxes_3D
+            app.UIAxes_3D = uiaxes(app.UIFigure);
+            title(app.UIAxes_3D, '3D view')
+            xlabel(app.UIAxes_3D, 'First axis x um')
+            ylabel(app.UIAxes_3D, 'Second axis x um')
+            zlabel(app.UIAxes_3D, 'Z')
+            app.UIAxes_3D.DataAspectRatio = [1 1 1];
+            app.UIAxes_3D.XColor = [0 0 0];
+            app.UIAxes_3D.BoxStyle = 'full';
+            app.UIAxes_3D.Box = 'on';
+            app.UIAxes_3D.Position = [700 12 503 437];
+
             % Create ColoroptionsPanel
             app.ColoroptionsPanel = uipanel(app.UIFigure);
             app.ColoroptionsPanel.Title = 'Color options';
@@ -1279,57 +1343,6 @@ classdef microstructure_visualization_slices_exported < matlab.apps.AppBase
             app.VolumenameLabel.FontWeight = 'bold';
             app.VolumenameLabel.Position = [127 911 1076 22];
             app.VolumenameLabel.Text = 'Volume name';
-
-            % Create UIAxes_1
-            app.UIAxes_1 = uiaxes(app.UIFigure);
-            title(app.UIAxes_1, 'View normal to first axis')
-            xlabel(app.UIAxes_1, 'Third axis x um')
-            ylabel(app.UIAxes_1, 'Second axis x um')
-            zlabel(app.UIAxes_1, 'Z')
-            subtitle(app.UIAxes_1, 'Slice: x / y, a / b')
-            app.UIAxes_1.DataAspectRatio = [1 1 1];
-            app.UIAxes_1.XColor = [0 0 0];
-            app.UIAxes_1.BoxStyle = 'full';
-            app.UIAxes_1.Box = 'on';
-            app.UIAxes_1.Position = [127 466 503 437];
-
-            % Create UIAxes_2
-            app.UIAxes_2 = uiaxes(app.UIFigure);
-            title(app.UIAxes_2, 'View normal to second axis')
-            xlabel(app.UIAxes_2, 'Third axis x um')
-            ylabel(app.UIAxes_2, 'First axis x um')
-            zlabel(app.UIAxes_2, 'Z')
-            subtitle(app.UIAxes_2, 'Slice: x / y, a / b')
-            app.UIAxes_2.DataAspectRatio = [1 1 1];
-            app.UIAxes_2.XColor = [0 0 0];
-            app.UIAxes_2.BoxStyle = 'full';
-            app.UIAxes_2.Box = 'on';
-            app.UIAxes_2.Position = [700 466 503 437];
-
-            % Create UIAxes_3
-            app.UIAxes_3 = uiaxes(app.UIFigure);
-            title(app.UIAxes_3, 'View normal to third axis')
-            xlabel(app.UIAxes_3, 'First axis x um')
-            ylabel(app.UIAxes_3, 'Second axis x um')
-            zlabel(app.UIAxes_3, 'Z')
-            subtitle(app.UIAxes_3, 'Slice: x / y, a / b')
-            app.UIAxes_3.DataAspectRatio = [1 1 1];
-            app.UIAxes_3.XColor = [0 0 0];
-            app.UIAxes_3.BoxStyle = 'full';
-            app.UIAxes_3.Box = 'on';
-            app.UIAxes_3.Position = [127 12 503 437];
-
-            % Create UIAxes_3D
-            app.UIAxes_3D = uiaxes(app.UIFigure);
-            title(app.UIAxes_3D, '3D view')
-            xlabel(app.UIAxes_3D, 'First axis x um')
-            ylabel(app.UIAxes_3D, 'Second axis x um')
-            zlabel(app.UIAxes_3D, 'Z')
-            app.UIAxes_3D.DataAspectRatio = [1 1 1];
-            app.UIAxes_3D.XColor = [0 0 0];
-            app.UIAxes_3D.BoxStyle = 'full';
-            app.UIAxes_3D.Box = 'on';
-            app.UIAxes_3D.Position = [700 12 503 437];
 
             % Show the figure after all components are created
             app.UIFigure.Visible = 'on';

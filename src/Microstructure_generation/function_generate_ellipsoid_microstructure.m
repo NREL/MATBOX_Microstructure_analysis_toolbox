@@ -221,7 +221,7 @@ if stoping_conditions.plot
     Fig_global_progression = figure; % Create figure
     Fig_global_progression.Name= 'Algorithm generation progression and rate'; % Figure name
     scrsz = get(0,'ScreenSize'); % Screen resolution
-    set(Fig_global_progression,'position',[scrsz(1) scrsz(2) scrsz(3) scrsz(4)/2]); % Full screen figure
+    set(Fig_global_progression,'position',[scrsz(1) scrsz(2) scrsz(3) scrsz(4)*2/3]); % Full screen figure
     Fig_global_progression.Color='white'; % Background colour
     
     sub_axes_progression_1=subplot(1,3,1,'Parent',Fig_global_progression);
@@ -235,7 +235,7 @@ if stoping_conditions.plot
     xlabel(sub_axes_progression_1,'Wallclock time (s)');
     ylabel(sub_axes_progression_1,'Volume fraction');
     grid(sub_axes_progression_1,'on');
-    legend(sub_axes_progression_1,'Location','best');
+    legend(sub_axes_progression_1,'Location','southoutside');
     set(sub_axes_progression_1,'FontName','Times new roman','FontSize',12); % Fontname and fontsize
     set(h_title,'FontSize',14)
     hold(sub_axes_progression_1,'off');
@@ -246,7 +246,7 @@ if stoping_conditions.plot
     xlabel(sub_axes_progression_2,'Wallclock time (s)');
     ylabel(sub_axes_progression_2,'Volume fraction.s^{-1}');
     grid(sub_axes_progression_2,'on');
-    legend(sub_axes_progression_2,'Location','best');
+    legend(sub_axes_progression_2,'Location','southoutside');
     set(sub_axes_progression_2,'FontName','Times new roman','FontSize',12); % Fontname and fontsize
     set(h_title,'FontSize',14)    
     hold(sub_axes_progression_2,'off');
@@ -257,12 +257,45 @@ if stoping_conditions.plot
     xlabel(sub_axes_progression_3,'Wallclock time (s)');
     ylabel(sub_axes_progression_3,'Particle.s^{-1}');
     grid(sub_axes_progression_3,'on');
-    legend(sub_axes_progression_3,'Location','best');
+    legend(sub_axes_progression_3,'Location','southoutside');
     set(sub_axes_progression_3,'FontName','Times new roman','FontSize',12); % Fontname and fontsize
     set(h_title,'FontSize',14)    
     hold(sub_axes_progression_3,'off'); 
     
     sgtitle(Fig_global_progression,'Algorithm generation progression and rate','FontWeight','bold','FontSize',16,'FontName','Times new roman');
+
+    video_format = 'mpeg-4';
+    video_handle = VideoWriter([save_options.folder 'Algorithm_progression_video_run_' num2str(save_options.run_number)],video_format);
+    set(video_handle,'Quality',100); % Set video quality
+    % Set video framerate
+    set(video_handle,'FrameRate',5);
+    % Open video
+    open(video_handle)
+    frame_number = 1;
+    Fig_progression_video = figure; % Create figure
+    Fig_progression_video.Name= 'Algorithm generation progression (volume fractions along thickness)'; % Figure name
+    set(Fig_progression_video,'position',[scrsz(1) scrsz(2) scrsz(3)*1/2 scrsz(4)*1/2]); % Full screen figure
+    Fig_progression_video.Color='white'; % Background colour
+    ax_video = axes('Parent',Fig_progression_video);
+    hold(ax_video,'on'); % Active subplot
+    h_title=title ({'Volume fraction along thickness','Wall clock time = 0 s'});
+    for current_phase = 1:1:number_phase
+        plot(phase(current_phase).volumefraction.along_3rd_axis(1,:), phase(current_phase).volumefraction.along_3rd_axis(2,:),'DisplayName',[phase(current_phase).name ' (inputs)'],'Color', c_(current_phase,:),'LineWidth',2,'LineStyle','--');
+    end
+    for current_phase = 1:1:number_phase
+        plot([0,1], [0,0],'DisplayName',[phase(current_phase).name ', (generated)'],'Color', c_(current_phase,:),'LineWidth',2,'LineStyle','-');
+    end    
+    ylim(ax_video,[0 +Inf])
+    xlabel('Normalized position along direction 3 (thickness)');
+    ylabel(ax_video,'Volume fraction');
+    grid(ax_video,'on');
+    legend(ax_video,'Location','southoutside','NumColumns',2);
+    set(ax_video,'FontName','Times new roman','FontSize',12); % Fontname and fontsize
+    set(h_title,'FontSize',14)
+    stored_frame(frame_number) = getframe(Fig_progression_video);
+    writeVideo(video_handle,stored_frame(frame_number))
+    pause(0.01); % Force refresh of the graph
+    hold(ax_video,'off');
 end
 
 %%
@@ -355,11 +388,15 @@ for current_pass=1:1:number_pass
         histogram_currentphase_z_rotation_z = phase(current_phase).orientation_histogram_angledeg_z.along_3rd_axis_allslices(1,:); % elongation dx/dz histogram (x) of the current phase
     
         phase_volume_target = phase(current_phase).voxel_number * phase(current_phase).fillratio(current_pass); % Number of voxel to assign for this phase before moving forward
-        
+
         new_particle_hasbeen_generated = false;
 
         % Wait bar
         generation_progress = phase_volume_filled(current_phase,1)/phase_volume_target; % 0-1
+        if generation_progress==1 || isnan(generation_progress)
+            continue
+        end
+
         previous_generation_progress = generation_progress;
         h_waitbar = waitbar(generation_progress,['Pass:' num2str(current_pass) '/' num2str(number_pass), ' Phase ' num2str(current_phase) '/' num2str(number_phase) ' is being generated']);
         while phase_volume_filled(current_phase,1) <= phase_volume_target && stop_condition_not_reached
@@ -454,7 +491,7 @@ for current_pass=1:1:number_pass
                         end
                         ylim(sub_axes_progression_1,[0 +Inf])
                         xlim(sub_axes_progression_1,[0 time_since_start])
-                        legend(sub_axes_progression_1,'Location','best');
+                        legend(sub_axes_progression_1,'Location','southoutside');
                         hold(sub_axes_progression_1,'off');
                         
                         cla(sub_axes_progression_2); % Clear axes
@@ -469,7 +506,7 @@ for current_pass=1:1:number_pass
                             end
                         end
                         xlim(sub_axes_progression_2,[0 time_since_start])
-                        legend(sub_axes_progression_2,'Location','best');
+                        legend(sub_axes_progression_2,'Location','southoutside');
                         hold(sub_axes_progression_2,'off');
                         
                         cla(sub_axes_progression_3); % Clear axes
@@ -484,17 +521,46 @@ for current_pass=1:1:number_pass
                             end
                         end
                         xlim(sub_axes_progression_3,[0 time_since_start])
-                        legend(sub_axes_progression_3,'Location','best');
+                        legend(sub_axes_progression_3,'Location','southoutside');
                         hold(sub_axes_progression_3,'off');
                         pause(0.01); % Force refresh of the graph
+
+                        frame_number = frame_number+1;
+                        cla(ax_video);
+                        hold(ax_video,'on'); % Active subplot
+                        h_title=title(ax_video,{'Volume fraction along thickness',['Wall clock time = ' num2str(time_since_start,'%1.1f') ' s']});
+                        for current_phase_fig = 1:1:number_phase
+                            plot(ax_video,phase(current_phase_fig).volumefraction.along_3rd_axis(1,:), phase(current_phase_fig).volumefraction.along_3rd_axis(2,:),'DisplayName',[phase(current_phase_fig).name ' (inputs)'],'Color', c_(current_phase_fig,:),'LineWidth',2,'LineStyle','--');
+                        end
+                        for current_phase_fig = 1:1:number_phase
+                            % Along direction
+                            vf_position = zeros(2,domain_size(3));
+                            for current_position=1:1:domain_size(3) % Loop over postion
+                                vf_position(2,current_position) = sum(sum(microstructure3D.phase(:,:,current_position)==phase(current_phase_fig).code));
+                            end
+                            vf_position(2,:) = vf_position(2,:)/area_xy;
+                            vf_position(1,:) = [1:1:domain_size(3)]/domain_size(3);
+                            plot(ax_video,vf_position(1,:), vf_position(2,:),'DisplayName',[phase(current_phase_fig).name ', (generated)'],'Color', c_(current_phase_fig,:),'LineWidth',2,'LineStyle','-');
+                        end
+                        ylim(ax_video,[0 +Inf])
+                        xlabel(ax_video,'Normalized position along direction 3 (thickness)');
+                        ylabel(ax_video,'Volume fraction');
+                        grid(ax_video,'on');
+                        legend(ax_video,'Location','southoutside','NumColumns',2);
+                        set(ax_video,'FontName','Times new roman','FontSize',12); % Fontname and fontsize
+                        set(h_title,'FontSize',14)
+                        hold(ax_video,'off');
+                        pause(0.01); % Force refresh of the graph
+                        stored_frame(frame_number) = getframe(Fig_progression_video);
+                        writeVideo(video_handle,stored_frame(frame_number))
                     end
                 end
             end
 
             generation_progress = phase_volume_filled(current_phase,1)/phase_volume_target; % 0-1
             if generation_progress-previous_generation_progress > update_waitbar_step
-                waitbar(generation_progress,h_waitbar);
-                previous_generation_progress=generation_progress;
+               waitbar(generation_progress,h_waitbar);
+               previous_generation_progress=generation_progress;
             end
             
             if new_particle_hasbeen_generated
@@ -899,7 +965,7 @@ if stoping_conditions.plot
     end
     ylim(sub_axes_progression_1,[0 +Inf])
     xlim(sub_axes_progression_1,[0 time_since_start])
-    legend(sub_axes_progression_1,'Location','best');
+    legend(sub_axes_progression_1,'Location','southoutside');
     hold(sub_axes_progression_1,'off');
     
     cla(sub_axes_progression_2); % Clear axes
@@ -910,7 +976,7 @@ if stoping_conditions.plot
         plot(sub_axes_progression_2,time_progression_generationrate_avglastiterations,generationrate_progression_lastiterations(current_phase_figure,:),'LineWidth',2,'LineStyle',':','Color',c_(current_phase_figure,:),'DisplayName',[phase(current_phase_figure).name ' (average of last ' num2str(stoping_conditions.average_on_last_n_iterations) ' iterations)']);
     end
     xlim(sub_axes_progression_2,[0 time_since_start])
-    legend(sub_axes_progression_2,'Location','best');
+    legend(sub_axes_progression_2,'Location','southoutside');
     hold(sub_axes_progression_2,'off');
     
     cla(sub_axes_progression_3); % Clear axes
@@ -921,12 +987,44 @@ if stoping_conditions.plot
         plot(sub_axes_progression_3,time_progression_generationrate_avglastiterations,particle_generationrate_progression_lastiterations(current_phase_figure,:),'LineWidth',2,'LineStyle',':','Color',c_(current_phase_figure,:),'DisplayName',[phase(current_phase_figure).name ' (average of last ' num2str(stoping_conditions.average_on_last_n_iterations) ' iterations)']);
     end
     xlim(sub_axes_progression_3,[0 time_since_start])
-    legend(sub_axes_progression_3,'Location','best');
+    legend(sub_axes_progression_3,'Location','southoutside');
     hold(sub_axes_progression_3,'off');
     
     if ~isempty(save_options.folder) && save_options.save_progression
         function_savefig(Fig_global_progression, save_options.folder, ['Algorithm_progression_run_' num2str(save_options.run_number)]);
     end
+
+    frame_number = frame_number+1;
+    cla(ax_video);
+    hold(ax_video,'on'); % Active subplot
+    h_title=title(ax_video,{'Volume fraction along thickness',['Wall clock time = ' num2str(time_since_start,'%1.1f') ' s']});
+    for current_phase_fig = 1:1:number_phase
+        plot(phase(current_phase_fig).volumefraction.along_3rd_axis(1,:), phase(current_phase_fig).volumefraction.along_3rd_axis(2,:),'DisplayName',[phase(current_phase_fig).name ' (inputs)'],'Color', c_(current_phase_fig,:),'LineWidth',2,'LineStyle','--');
+    end
+    for current_phase_fig = 1:1:number_phase
+        % Along direction
+        vf_position = zeros(2,domain_size(3));
+        for current_position=1:1:domain_size(3) % Loop over postion
+            vf_position(2,current_position) = sum(sum(microstructure3D.phase(:,:,current_position)==phase(current_phase_fig).code));
+        end
+        vf_position(2,:) = vf_position(2,:)/area_xy;
+        vf_position(1,:) = [1:1:domain_size(3)]/domain_size(3);
+        plot(vf_position(1,:), vf_position(2,:),'DisplayName',[phase(current_phase_fig).name ', (generated)'],'Color', c_(current_phase_fig,:),'LineWidth',2,'LineStyle','-');
+    end    
+    ylim(ax_video,[0 +Inf])
+    xlabel(ax_video,'Normalized position along direction 3 (thickness)');
+    ylabel(ax_video,'Volume fraction');
+    grid(ax_video,'on');
+    legend(ax_video,'Location','southoutside','NumColumns',2);
+    set(ax_video,'FontName','Times new roman','FontSize',12); % Fontname and fontsize
+    set(h_title,'FontSize',14)
+    hold(ax_video,'off');
+    stored_frame(frame_number) = getframe(Fig_progression_video);
+    writeVideo(video_handle,stored_frame(frame_number))
+    pause(0.01); % Force refresh of the graph
+    close(video_handle) % Close video
+    hold(ax_video,'off'); % Active subplot
+
 end
 
 % Verification

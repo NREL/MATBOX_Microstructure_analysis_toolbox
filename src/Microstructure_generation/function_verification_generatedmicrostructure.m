@@ -35,15 +35,15 @@ for id_axe=1:1:2
         sub_axes=subplot(2,1,id_axe,'Parent',Fig);
         hold(sub_axes,'on'); % Active subplot
         for current_phase = 1:1:number_phase
-            plot(x_, phase(current_phase).volumefraction.along_3rd_axis_allslices,'DisplayName',[phase(current_phase).name ' (inputs)'],'Color', c_(current_phase,:),'LineWidth',2,'LineStyle','--');
-            plot(x_, phase(current_phase).volumefraction.along_3rd_axis_allslice_calculatedaftergeneration,'DisplayName',[phase(current_phase).name ', (generated)'],'Color', c_(current_phase,:),'LineWidth',2,'LineStyle','-');
+            plot(x_/x_(end), phase(current_phase).volumefraction.along_3rd_axis_allslices,'DisplayName',[phase(current_phase).name ' (inputs)'],'Color', c_(current_phase,:),'LineWidth',2,'LineStyle','--');
+            plot(x_/x_(end), phase(current_phase).volumefraction.along_3rd_axis_allslice_calculatedaftergeneration,'DisplayName',[phase(current_phase).name ', (generated)'],'Color', c_(current_phase,:),'LineWidth',2,'LineStyle','-');
         end
         ylabel('Volume fractions');
     elseif id_axe==2
         sub_axes=subplot(2,1,id_axe,'Parent',Fig);
         hold(sub_axes,'on'); % Active subplot        
         for current_phase = 1:1:number_phase
-            plot(x_,(phase(current_phase).volumefraction.along_3rd_axis_allslice_calculatedaftergeneration - phase(current_phase).volumefraction.along_3rd_axis_allslices),'DisplayName',[phase(current_phase).name ', (error)'],'LineWidth',2,'Color', c_(current_phase,:));
+            plot(x_/x_(end),(phase(current_phase).volumefraction.along_3rd_axis_allslice_calculatedaftergeneration - phase(current_phase).volumefraction.along_3rd_axis_allslices),'DisplayName',[phase(current_phase).name ', (error)'],'LineWidth',2,'Color', c_(current_phase,:));
         end
         ylabel('Volume fraction errors');
     end
@@ -190,10 +190,10 @@ for current_phase=1:1:number_phase % Loop over phases
         xlabel('Normalized position along direction 3 (thickness)');
         ylabel('Volume repartition (%)');
         for k_value = 1:1:length(values_)
-            plot(x_, y_consign(:,k_value),'DisplayName',[num2str(values_(k_value)) ' (inputs)'], 'Color', c_(k_value,:),'LineWidth',2,'LineStyle','--');
+            plot(x_/x_(end), y_consign(:,k_value),'DisplayName',[num2str(values_(k_value)) ' (inputs)'], 'Color', c_(k_value,:),'LineWidth',2,'LineStyle','--');
         end   
         for k_value = 1:1:length(values_)
-            plot(x_, y_obtained(:,k_value),'DisplayName',[num2str(values_(k_value)) ' (generated)'],'Color', c_(k_value,:),'LineWidth',2,'LineStyle','-');
+            plot(x_/x_(end), y_obtained(:,k_value),'DisplayName',[num2str(values_(k_value)) ' (generated)'],'Color', c_(k_value,:),'LineWidth',2,'LineStyle','-');
         end          
         % Legend
         lgd = legend(sub_axes,'Location','best','NumColumns',2);
@@ -206,11 +206,12 @@ for current_phase=1:1:number_phase % Loop over phases
         hold(sub_axes,'off'); % Relase figure
     end
     sgtitle(Fig,{['Particle diameter of ' phase(current_phase).name],'In-plane distribution'},'FontWeight','bold','FontSize',16,'FontName','Times new roman');
+    if ~isempty(save_options.folder) && save_options.save_verification
+        phasename = function_remove_emptyandspecialcharacter_string(phase(current_phase).name);
+        function_savefig(Fig, save_options.folder, ['Particlediameter_' phasename '_run_' num2str(save_options.run_number)]);
+    end
 end
-if ~isempty(save_options.folder) && save_options.save_verification
-    phasename = function_remove_emptyandspecialcharacter_string(phase(current_phase).name);
-    function_savefig(Fig, save_options.folder, ['Particlediameter_' phasename '_run_' num2str(save_options.run_number)]);
-end
+
 
 % Figure (particle orientation consign)
 for current_phase=1:1:number_phase % Loop over phases
@@ -243,10 +244,10 @@ for current_phase=1:1:number_phase % Loop over phases
         xlabel('Normalized position along direction 3 (thickness)');
         ylabel('Volume repartition (%)');
         for k_value = 1:1:length(values_)
-            plot(x_, y_consign(:,k_value),'DisplayName',[num2str(values_(k_value)) ' (inputs)'], 'Color', c_(k_value,:),'LineWidth',2,'LineStyle','--');
+            plot(x_/x_(end), y_consign(:,k_value),'DisplayName',[num2str(values_(k_value)) ' (inputs)'], 'Color', c_(k_value,:),'LineWidth',2,'LineStyle','--');
         end
         for k_value = 1:1:length(values_)
-            plot(x_, y_obtained(:,k_value),'DisplayName',[num2str(values_(k_value)) ' (generated)'],'Color', c_(k_value,:),'LineWidth',2,'LineStyle','-');
+            plot(x_/x_(end), y_obtained(:,k_value),'DisplayName',[num2str(values_(k_value)) ' (generated)'],'Color', c_(k_value,:),'LineWidth',2,'LineStyle','-');
         end        
         % Legend
         lgd = legend(sub_axes,'Location','best','NumColumns',2);
@@ -260,10 +261,10 @@ for current_phase=1:1:number_phase % Loop over phases
         hold(sub_axes,'off'); % Relase figure
     end
     sgtitle(Fig,{['Particle rotation of ' phase(current_phase).name],'In-plane distribution'},'FontWeight','bold','FontSize',16,'FontName','Times new roman');
-end
-if ~isempty(save_options.folder) && save_options.save_verification
-    phasename = function_remove_emptyandspecialcharacter_string(phase(current_phase).name);
-    function_savefig(Fig, save_options.folder, ['Particlerotation_' phasename '_run_' num2str(save_options.run_number)]);
+    if ~isempty(save_options.folder) && save_options.save_verification
+        phasename = function_remove_emptyandspecialcharacter_string(phase(current_phase).name);
+        function_savefig(Fig, save_options.folder, ['Particlerotation_' phasename '_run_' num2str(save_options.run_number)]);
+    end
 end
 
 % Figure, Particle size and elongation (stats)
@@ -301,18 +302,18 @@ for current_phase=1:1:number_phase % Loop over phases
         h_title=title (str_title,'FontName','Times new roman','FontSize',14); % Set title font
         xlabel('Normalized position along direction 3 (thickness)');
         % Mean
-        h_mean=plot(x_,y_(:,2)); % For the legend order
+        h_mean=plot(x_/x_(end),y_(:,2)); % For the legend order
         % Extremums
-        h_min=plot(x_,y_(:,1));
-        h_max=plot(x_,y_(:,3));
+        h_min=plot(x_/x_(end),y_(:,1));
+        h_max=plot(x_/x_(end),y_(:,3));
         % Colors, thickness, markers
         set(h_mean, 'Color', 'k','LineWidth',1,'LineWidth',2);
         set(h_min, 'Color', 'b','LineStyle','--','LineWidth',1);
         set(h_max, 'Color', 'r','LineStyle','--','LineWidth',1);
         % Mean with error bar (+- standard deviation)
-        h_mean_witherrorbar = errorbar(x_,y_(:,2),y_(:,4));
+        h_mean_witherrorbar = errorbar(x_/x_(end),y_(:,2),y_(:,4));
         set(h_mean_witherrorbar, 'Color', 'k','LineWidth',1);
-        h_mean=plot(x_,y_(:,2)); % Plot over the other
+        h_mean=plot(x_/x_(end),y_(:,2)); % Plot over the other
         set(h_mean, 'Color', 'k','LineWidth',1,'LineWidth',2);
         lgd = legend(sub_axes,'Mean diameter with +- standard deviation','Minimum diameter', 'Maximun diameter','Location','best');        
         % - Grid
@@ -323,10 +324,10 @@ for current_phase=1:1:number_phase % Loop over phases
         hold(sub_axes,'off'); % Relase figure
     end
     sgtitle(Fig,{['Particle diameter statistics of ' phase(current_phase).name],'In-plane distribution'},'FontWeight','bold','FontSize',16,'FontName','Times new roman');
-end
-if ~isempty(save_options.folder) && save_options.save_verification
-    phasename = function_remove_emptyandspecialcharacter_string(phase(current_phase).name);
-    function_savefig(Fig, save_options.folder, ['Particlediameter_stats_' phasename '_run_' num2str(save_options.run_number)]);
+    if ~isempty(save_options.folder) && save_options.save_verification
+        phasename = function_remove_emptyandspecialcharacter_string(phase(current_phase).name);
+        function_savefig(Fig, save_options.folder, ['Particlediameter_stats_' phasename '_run_' num2str(save_options.run_number)]);
+    end
 end
 
 % Figure, Particle rotation (stats)
@@ -355,18 +356,18 @@ for current_phase=1:1:number_phase % Loop over phases
         xlabel('Normalized position along direction 3 (thickness)');
         % Plot
         % Mean
-        h_mean=plot(x_,y_(:,2)); % For the legend order
+        h_mean=plot(x_/x_(end),y_(:,2)); % For the legend order
         % Extremums
-        h_min=plot(x_,y_(:,1));
-        h_max=plot(x_,y_(:,3));
+        h_min=plot(x_/x_(end),y_(:,1));
+        h_max=plot(x_/x_(end),y_(:,3));
         % Colors, thickness, markers
         set(h_mean, 'Color', 'k','LineWidth',1,'LineWidth',2);
         set(h_min, 'Color', 'b','LineStyle','--','LineWidth',1);
         set(h_max, 'Color', 'r','LineStyle','--','LineWidth',1);
         % Mean with error bar (+- standard deviation)
-        h_mean_witherrorbar = errorbar(x_,y_(:,2),y_(:,4));
+        h_mean_witherrorbar = errorbar(x_/x_(end),y_(:,2),y_(:,4));
         set(h_mean_witherrorbar, 'Color', 'k','LineWidth',1);
-        h_mean=plot(x_,y_(:,2)); % Plot over the other
+        h_mean=plot(x_/x_(end),y_(:,2)); % Plot over the other
         set(h_mean, 'Color', 'k','LineWidth',1,'LineWidth',2);
         lgd = legend(sub_axes,'Mean rotation with +- standard deviation','Minimum rotation', 'Maximun rotation','Location','best');        
         % - Grid
@@ -377,16 +378,15 @@ for current_phase=1:1:number_phase % Loop over phases
         hold(sub_axes,'off'); % Relase figure
     end
     sgtitle(Fig,{['Particle rotation statistics of ' phase(current_phase).name],'In-plane distribution'},'FontWeight','bold','FontSize',16,'FontName','Times new roman');
+    if ~isempty(save_options.folder) && save_options.save_verification
+        phasename = function_remove_emptyandspecialcharacter_string(phase(current_phase).name);
+        function_savefig(Fig, save_options.folder, ['Particlerotation_stats_' phasename '_run_' num2str(save_options.run_number)]);
+    end
 end
-if ~isempty(save_options.folder) && save_options.save_verification
-    phasename = function_remove_emptyandspecialcharacter_string(phase(current_phase).name);
-    function_savefig(Fig, save_options.folder, ['Particlerotation_stats_' phasename '_run_' num2str(save_options.run_number)]);
-end
+
 
 function [probabiliy_histogram] = Calculate_histogram_probability_perslice(array3D, direction, uniquevalue, volumefractions)
-
 array3D = round(array3D,4);
-
 domain_size = size(array3D);
 number_unique_value = length(uniquevalue);
 if direction==1
@@ -404,27 +404,30 @@ for current_position=1:1:domain_size(direction) % Loop over postion
     end
     probabiliy_histogram(current_position,:) = 100 * probabiliy_histogram(current_position,:) /(area_inplane*volumefractions(current_position));
 end
+probabiliy_histogram(isnan(probabiliy_histogram)) = 0; % NaN when divided by 0 volume fraction
 end
 
-function [statistics_histogram] = Statistics_from_histogram(histogram, values)
+function [statistics_histogram] = Statistics_from_histogram(histogram_, values)
 % values are sorted from low to high (histogram is the weight of the values)
-tmp = [values; histogram];
+tmp = [values; histogram_];
 tmp=sortrows(tmp',1)';
 values = tmp(1,:);
-histogram = tmp(2:end,:);
+histogram_ = tmp(2:end,:);
 
-[n_position, ~] = size(histogram);
+[n_position, ~] = size(histogram_);
 min_ = zeros(n_position,1);
 mean_ = zeros(n_position,1);
 max_ = zeros(n_position,1);
 std_ = zeros(n_position,1);
-sum_weight = sum(histogram,2);
+sum_weight = sum(histogram_,2);
 for k=1:1:n_position
-    mean_(k) = sum(histogram(k,:) .* values)/sum_weight(k);
-    idx_ = find( histogram(k,:) ~= 0);
-    min_(k) = values(idx_(1));
-    max_(k) = values(idx_(end));
-    std_(k) = std(values, histogram(k,:));
+    idx_ = find( histogram_(k,:) ~= 0);
+    if ~isempty(idx_)
+        mean_(k) = sum(histogram_(k,:) .* values)/sum_weight(k);
+        min_(k) = values(idx_(1));
+        max_(k) = values(idx_(end));
+        std_(k) = std(values, histogram_(k,:));
+    end
 end
 statistics_histogram = [min_ mean_ max_ std_];
 end

@@ -24,273 +24,273 @@ classdef Segmentation_exported < matlab.apps.AppBase
         DocumentationMenu               matlab.ui.container.Menu
         TabGroup                        matlab.ui.container.TabGroup
         InstructionsTab                 matlab.ui.container.Tab
-        Logo                            matlab.ui.control.Image
-        Instructions1                   matlab.ui.control.Label
-        Instructions_Instructions       matlab.ui.control.Label
-        Instructions2                   matlab.ui.control.Label
-        Instructions3                   matlab.ui.control.Label
-        Instructions4                   matlab.ui.control.Label
-        Instructions5                   matlab.ui.control.Label
-        Instructions6                   matlab.ui.control.Label
-        Instructions7                   matlab.ui.control.Label
-        VolumeLoadedStatus              matlab.ui.control.Label
-        Fileloaded_Path                 matlab.ui.control.Label
-        Fileloaded_Filename             matlab.ui.control.Label
-        Fileloaded_dimension            matlab.ui.control.Label
-        Fileloaded_numberofvoxel        matlab.ui.control.Label
-        Fileloaded_memory_datatype      matlab.ui.control.Label
-        Fileloaded_min_max              matlab.ui.control.Label
-        Fileloaded_text                 matlab.ui.control.Label
         Loading_message                 matlab.ui.control.Label
+        Fileloaded_text                 matlab.ui.control.Label
+        Fileloaded_min_max              matlab.ui.control.Label
+        Fileloaded_memory_datatype      matlab.ui.control.Label
+        Fileloaded_numberofvoxel        matlab.ui.control.Label
+        Fileloaded_dimension            matlab.ui.control.Label
+        Fileloaded_Filename             matlab.ui.control.Label
+        Fileloaded_Path                 matlab.ui.control.Label
+        VolumeLoadedStatus              matlab.ui.control.Label
+        Instructions7                   matlab.ui.control.Label
+        Instructions6                   matlab.ui.control.Label
+        Instructions5                   matlab.ui.control.Label
+        Instructions4                   matlab.ui.control.Label
+        Instructions3                   matlab.ui.control.Label
+        Instructions2                   matlab.ui.control.Label
+        Instructions_Instructions       matlab.ui.control.Label
+        Instructions1                   matlab.ui.control.Label
+        Logo                            matlab.ui.control.Image
         SaveOptions                     matlab.ui.container.Tab
-        Save_instructions               matlab.ui.control.Label
-        ClicktoselectsavefolderButton   matlab.ui.control.Button
-        DefaultsavefoldernoneselectedLabel  matlab.ui.control.Label
-        DefaultfilenamenoneLabel        matlab.ui.control.Label
-        FolderandfilenameusedifyouselectMenuSavevolumeLabel  matlab.ui.control.Label
-        Save_checkbox                   matlab.ui.control.CheckBox
-        FontnameusedforfiguresLabel     matlab.ui.control.Label
         Save_choiceFont_DropDown        matlab.ui.control.DropDown
+        FontnameusedforfiguresLabel     matlab.ui.control.Label
+        Save_checkbox                   matlab.ui.control.CheckBox
+        FolderandfilenameusedifyouselectMenuSavevolumeLabel  matlab.ui.control.Label
+        DefaultfilenamenoneLabel        matlab.ui.control.Label
+        DefaultsavefoldernoneselectedLabel  matlab.ui.control.Label
+        ClicktoselectsavefolderButton   matlab.ui.control.Button
+        Save_instructions               matlab.ui.control.Label
         RegionofInterestViewTab         matlab.ui.container.Tab
-        ViewnormaltoDropDown_2Label     matlab.ui.control.Label
-        ROI_ViewnormaltoDropDown        matlab.ui.control.DropDown
-        SliceselectionLabel             matlab.ui.control.Label
-        ROI_SliceSlider                 matlab.ui.control.Slider
-        ColormapLabel                   matlab.ui.control.Label
-        ROI_colormap                    matlab.ui.control.DropDown
-        ROI_instructions_tab            matlab.ui.control.Label
-        ROI_checkbox_updateslicer       matlab.ui.control.CheckBox
-        ROI_View3D                      matlab.ui.control.Button
-        ROI_SliceSpinner                matlab.ui.control.Spinner
-        ROI_table_crop                  matlab.ui.control.Table
-        ROI_crop_text                   matlab.ui.control.Label
-        ROI_crop_DoButton               matlab.ui.control.Button
-        ROI_crop_UndoButton             matlab.ui.control.Button
-        ROI_crop_SaveButton             matlab.ui.control.Button
-        VoxelsizeoptionalLabel          matlab.ui.control.Label
-        ROI_voxelsize                   matlab.ui.control.NumericEditField
-        ROI_rotation_text               matlab.ui.control.Label
-        ROI_angle_spinner               matlab.ui.control.Spinner
-        AngleDropDownLabel              matlab.ui.control.Label
-        ROI_angle_choice_DropDown       matlab.ui.control.DropDown
-        ROI_rotation_DoButton           matlab.ui.control.Button
-        ROI_rotation_UndoButton         matlab.ui.control.Button
-        ROI_rotation_SaveButton         matlab.ui.control.Button
-        ROI_flipswapDropDown            matlab.ui.control.DropDown
-        FliporswapaxisLabel             matlab.ui.control.Label
-        ROI_flipswap_DoButton           matlab.ui.control.Button
-        ROI_flipswap_UndoButton         matlab.ui.control.Button
-        ROI_flipswap_SaveButton         matlab.ui.control.Button
-        ROI_ModifysomeslicesalongLabel  matlab.ui.control.Label
-        ROI_modify_axeAxeDropDown       matlab.ui.control.DropDown
-        FromsliceAEditFieldLabel        matlab.ui.control.Label
-        ROI_modify_FromsliceA           matlab.ui.control.NumericEditField
-        TosliceBEditFieldLabel          matlab.ui.control.Label
-        ROI_modify_TosliceB             matlab.ui.control.NumericEditField
-        ActionforSlicesfromAtoBDropDownLabel  matlab.ui.control.Label
-        ROI_modify_ActionDropDown       matlab.ui.control.DropDown
-        ROI_modify_DoButton             matlab.ui.control.Button
-        ROI_modify_UndoButton           matlab.ui.control.Button
-        ROI_modify_SaveButton           matlab.ui.control.Button
-        CropbackgroundButton            matlab.ui.control.Button
-        BackgroundvalueEditFieldLabel   matlab.ui.control.Label
-        BackgroundvalueEditField        matlab.ui.control.NumericEditField
-        MedianfilterrangeEditFieldLabel  matlab.ui.control.Label
-        MedianfilterrangeEditField      matlab.ui.control.NumericEditField
-        StdthresholdEditFieldLabel      matlab.ui.control.Label
-        StdthresholdEditField           matlab.ui.control.NumericEditField
-        VieworthogonalslicesButton      matlab.ui.control.Button
-        Savecurrent2DviewButton         matlab.ui.control.Button
-        ROI_ModifysomeslicesalongLabel_2  matlab.ui.control.Label
-        Label                           matlab.ui.control.Label
-        ROI_backgroundetection_DropDown  matlab.ui.control.DropDown
-        ROI_background_DoButton         matlab.ui.control.Button
-        ROI_background_UndoButton       matlab.ui.control.Button
-        ROI_background_SaveButton       matlab.ui.control.Button
-        SetidentifiedbackgroundvaluetoEditFieldLabel  matlab.ui.control.Label
-        SetidentifiedbackgroundvaluetoEditField  matlab.ui.control.NumericEditField
-        AutocropforLabel                matlab.ui.control.Label
         ROI_background_OptionsDropDown  matlab.ui.control.DropDown
+        AutocropforLabel                matlab.ui.control.Label
+        SetidentifiedbackgroundvaluetoEditField  matlab.ui.control.NumericEditField
+        SetidentifiedbackgroundvaluetoEditFieldLabel  matlab.ui.control.Label
+        ROI_background_SaveButton       matlab.ui.control.Button
+        ROI_background_UndoButton       matlab.ui.control.Button
+        ROI_background_DoButton         matlab.ui.control.Button
+        ROI_backgroundetection_DropDown  matlab.ui.control.DropDown
+        Label                           matlab.ui.control.Label
+        ROI_ModifysomeslicesalongLabel_2  matlab.ui.control.Label
+        Savecurrent2DviewButton         matlab.ui.control.Button
+        VieworthogonalslicesButton      matlab.ui.control.Button
+        StdthresholdEditField           matlab.ui.control.NumericEditField
+        StdthresholdEditFieldLabel      matlab.ui.control.Label
+        MedianfilterrangeEditField      matlab.ui.control.NumericEditField
+        MedianfilterrangeEditFieldLabel  matlab.ui.control.Label
+        BackgroundvalueEditField        matlab.ui.control.NumericEditField
+        BackgroundvalueEditFieldLabel   matlab.ui.control.Label
+        CropbackgroundButton            matlab.ui.control.Button
+        ROI_modify_SaveButton           matlab.ui.control.Button
+        ROI_modify_UndoButton           matlab.ui.control.Button
+        ROI_modify_DoButton             matlab.ui.control.Button
+        ROI_modify_ActionDropDown       matlab.ui.control.DropDown
+        ActionforSlicesfromAtoBDropDownLabel  matlab.ui.control.Label
+        ROI_modify_TosliceB             matlab.ui.control.NumericEditField
+        TosliceBEditFieldLabel          matlab.ui.control.Label
+        ROI_modify_FromsliceA           matlab.ui.control.NumericEditField
+        FromsliceAEditFieldLabel        matlab.ui.control.Label
+        ROI_modify_axeAxeDropDown       matlab.ui.control.DropDown
+        ROI_ModifysomeslicesalongLabel  matlab.ui.control.Label
+        ROI_flipswap_SaveButton         matlab.ui.control.Button
+        ROI_flipswap_UndoButton         matlab.ui.control.Button
+        ROI_flipswap_DoButton           matlab.ui.control.Button
+        FliporswapaxisLabel             matlab.ui.control.Label
+        ROI_flipswapDropDown            matlab.ui.control.DropDown
+        ROI_rotation_SaveButton         matlab.ui.control.Button
+        ROI_rotation_UndoButton         matlab.ui.control.Button
+        ROI_rotation_DoButton           matlab.ui.control.Button
+        ROI_angle_choice_DropDown       matlab.ui.control.DropDown
+        AngleDropDownLabel              matlab.ui.control.Label
+        ROI_angle_spinner               matlab.ui.control.Spinner
+        ROI_rotation_text               matlab.ui.control.Label
+        ROI_voxelsize                   matlab.ui.control.NumericEditField
+        VoxelsizeoptionalLabel          matlab.ui.control.Label
+        ROI_crop_SaveButton             matlab.ui.control.Button
+        ROI_crop_UndoButton             matlab.ui.control.Button
+        ROI_crop_DoButton               matlab.ui.control.Button
+        ROI_crop_text                   matlab.ui.control.Label
+        ROI_table_crop                  matlab.ui.control.Table
+        ROI_SliceSpinner                matlab.ui.control.Spinner
+        ROI_View3D                      matlab.ui.control.Button
+        ROI_checkbox_updateslicer       matlab.ui.control.CheckBox
+        ROI_instructions_tab            matlab.ui.control.Label
+        ROI_colormap                    matlab.ui.control.DropDown
+        ColormapLabel                   matlab.ui.control.Label
+        ROI_SliceSlider                 matlab.ui.control.Slider
+        SliceselectionLabel             matlab.ui.control.Label
+        ROI_ViewnormaltoDropDown        matlab.ui.control.DropDown
+        ViewnormaltoDropDown_2Label     matlab.ui.control.Label
         ROI_2Dslice                     matlab.ui.control.UIAxes
         FormatconversionTab             matlab.ui.container.Tab
-        TovisualizeimpactonhistogramCalculateHistogramLabel  matlab.ui.control.Label
-        ConverttoLabel                  matlab.ui.control.Label
-        Convert_Choice_DropDown         matlab.ui.control.DropDown
-        Convert_instructions            matlab.ui.control.Label
-        Convert_DoButton                matlab.ui.control.Button
-        Convert_UndoButton              matlab.ui.control.Button
-        Convert_SaveButton              matlab.ui.control.Button
-        Convert_table                   matlab.ui.control.Table
-        Convert_Utilization_checkbox    matlab.ui.control.CheckBox
         Convert_UpdatetableButton       matlab.ui.control.Button
+        Convert_Utilization_checkbox    matlab.ui.control.CheckBox
+        Convert_table                   matlab.ui.control.Table
+        Convert_SaveButton              matlab.ui.control.Button
+        Convert_UndoButton              matlab.ui.control.Button
+        Convert_DoButton                matlab.ui.control.Button
+        Convert_instructions            matlab.ui.control.Label
+        Convert_Choice_DropDown         matlab.ui.control.DropDown
+        ConverttoLabel                  matlab.ui.control.Label
+        TovisualizeimpactonhistogramCalculateHistogramLabel  matlab.ui.control.Label
         UpdownscalingTab                matlab.ui.container.Tab
-        Scale_text_2                    matlab.ui.control.Label
-        Scale_text_3                    matlab.ui.control.Label
-        ScalingfactorEditFieldLabel     matlab.ui.control.Label
-        Scale_scalingfactorEditField    matlab.ui.control.NumericEditField
-        Scale_text_1                    matlab.ui.control.Label
-        InitialvoxelsizeEditFieldLabel  matlab.ui.control.Label
-        Scale_InitialvoxelsizeEditField  matlab.ui.control.NumericEditField
-        VoxelunitDropDownLabel          matlab.ui.control.Label
-        Scale_VoxelunitDropDown         matlab.ui.control.DropDown
-        Scale_table                     matlab.ui.control.Table
-        NewvoxelsizeEditFieldLabel      matlab.ui.control.Label
-        Scale_NewvoxelsizeEditField     matlab.ui.control.NumericEditField
-        Scale_newvoxelsizeunitLabel     matlab.ui.control.Label
-        Scale_text_4                    matlab.ui.control.Label
-        Scale_DatatypeButtonGroup       matlab.ui.container.ButtonGroup
-        GreylevelButton                 matlab.ui.control.ToggleButton
-        LabelButton                     matlab.ui.control.ToggleButton
-        SliceselectionSliderLabel       matlab.ui.control.Label
-        Scale_SliceselectionSlider      matlab.ui.control.Slider
-        Scale_instructions              matlab.ui.control.Label
-        Scale_DoButton                  matlab.ui.control.Button
-        Scale_UndoButton                matlab.ui.control.Button
-        Scale_SaveButton                matlab.ui.control.Button
-        BackgroundvalueEditField_2Label  matlab.ui.control.Label
         Scale_BackgroundvalueEditField  matlab.ui.control.NumericEditField
-        Scaling_UIAxes_before           matlab.ui.control.UIAxes
+        BackgroundvalueEditField_2Label  matlab.ui.control.Label
+        Scale_SaveButton                matlab.ui.control.Button
+        Scale_UndoButton                matlab.ui.control.Button
+        Scale_DoButton                  matlab.ui.control.Button
+        Scale_instructions              matlab.ui.control.Label
+        Scale_SliceselectionSlider      matlab.ui.control.Slider
+        SliceselectionSliderLabel       matlab.ui.control.Label
+        Scale_DatatypeButtonGroup       matlab.ui.container.ButtonGroup
+        LabelButton                     matlab.ui.control.ToggleButton
+        GreylevelButton                 matlab.ui.control.ToggleButton
+        Scale_text_4                    matlab.ui.control.Label
+        Scale_newvoxelsizeunitLabel     matlab.ui.control.Label
+        Scale_NewvoxelsizeEditField     matlab.ui.control.NumericEditField
+        NewvoxelsizeEditFieldLabel      matlab.ui.control.Label
+        Scale_table                     matlab.ui.control.Table
+        Scale_VoxelunitDropDown         matlab.ui.control.DropDown
+        VoxelunitDropDownLabel          matlab.ui.control.Label
+        Scale_InitialvoxelsizeEditField  matlab.ui.control.NumericEditField
+        InitialvoxelsizeEditFieldLabel  matlab.ui.control.Label
+        Scale_text_1                    matlab.ui.control.Label
+        Scale_scalingfactorEditField    matlab.ui.control.NumericEditField
+        ScalingfactorEditFieldLabel     matlab.ui.control.Label
+        Scale_text_3                    matlab.ui.control.Label
+        Scale_text_2                    matlab.ui.control.Label
         Scaling_UIAxes_after            matlab.ui.control.UIAxes
+        Scaling_UIAxes_before           matlab.ui.control.UIAxes
         ImagequalityTab                 matlab.ui.container.Tab
-        Quality_instructions            matlab.ui.control.Label
-        NumberofphaseincludingporebackgroundLabel  matlab.ui.control.Label
-        Quality_numberofphase           matlab.ui.control.NumericEditField
-        Quality_Text1                   matlab.ui.control.Label
         Quality_CalculateSeparabilityButton  matlab.ui.control.Button
+        Quality_Text1                   matlab.ui.control.Label
+        Quality_numberofphase           matlab.ui.control.NumericEditField
+        NumberofphaseincludingporebackgroundLabel  matlab.ui.control.Label
+        Quality_instructions            matlab.ui.control.Label
         ContrastcorrectionTab           matlab.ui.container.Tab
-        VolumepercentthresholdforthehighvaluesEditFieldLabel  matlab.ui.control.Label
-        Contrast_VolumepercentthresholdforthehighvaluesEditField  matlab.ui.control.NumericEditField
-        VolumepercentthresholdforthelowvaluesEditFieldLabel  matlab.ui.control.Label
-        Contrast_VolumepercentthresholdforthelowvaluesEditField  matlab.ui.control.NumericEditField
-        RescaleimageusingthisnumberofvalueLabel  matlab.ui.control.Label
-        Contrast_CustomrangerescaleusingthisnumberofvalueEditField  matlab.ui.control.NumericEditField
-        Contrast_Text1                  matlab.ui.control.Label
-        Contrast_instructions           matlab.ui.control.Label
-        Contrast_Burn_DoButton          matlab.ui.control.Button
-        Contrast_Burn_UndoButton        matlab.ui.control.Button
-        Contrast_Burn_SaveButton        matlab.ui.control.Button
-        Contrast_Text2                  matlab.ui.control.Label
-        Contrast_Customrange_DoButton   matlab.ui.control.Button
-        Contrast_Customrange_UndoButton  matlab.ui.control.Button
-        Contrast_Customrange_SaveButton  matlab.ui.control.Button
-        SliceselectionSliderLabel_2     matlab.ui.control.Label
-        Contrast_SliceselectionSlider   matlab.ui.control.Slider
-        Contrast_Text3                  matlab.ui.control.Label
-        Contrast_TableWhere             matlab.ui.control.Table
-        Contrast_Text5                  matlab.ui.control.Label
-        Contrast_Text4                  matlab.ui.control.Label
-        Contrast_Text6                  matlab.ui.control.Label
-        Contrast_TableParameters        matlab.ui.control.Table
-        Contrast_Text7                  matlab.ui.control.Label
-        Contrast_Text8                  matlab.ui.control.Label
-        Contrast_Advanced_DoButton      matlab.ui.control.Button
-        Contrast_Advanced_UndoButton    matlab.ui.control.Button
-        Contrast_Advanced_SaveButton    matlab.ui.control.Button
-        OperationLabel                  matlab.ui.control.Label
         Contrast_Method_DropDown        matlab.ui.control.DropDown
-        Contrast_UIAxes_before          matlab.ui.control.UIAxes
+        OperationLabel                  matlab.ui.control.Label
+        Contrast_Advanced_SaveButton    matlab.ui.control.Button
+        Contrast_Advanced_UndoButton    matlab.ui.control.Button
+        Contrast_Advanced_DoButton      matlab.ui.control.Button
+        Contrast_Text8                  matlab.ui.control.Label
+        Contrast_Text7                  matlab.ui.control.Label
+        Contrast_TableParameters        matlab.ui.control.Table
+        Contrast_Text6                  matlab.ui.control.Label
+        Contrast_Text4                  matlab.ui.control.Label
+        Contrast_Text5                  matlab.ui.control.Label
+        Contrast_TableWhere             matlab.ui.control.Table
+        Contrast_Text3                  matlab.ui.control.Label
+        Contrast_SliceselectionSlider   matlab.ui.control.Slider
+        SliceselectionSliderLabel_2     matlab.ui.control.Label
+        Contrast_Customrange_SaveButton  matlab.ui.control.Button
+        Contrast_Customrange_UndoButton  matlab.ui.control.Button
+        Contrast_Customrange_DoButton   matlab.ui.control.Button
+        Contrast_Text2                  matlab.ui.control.Label
+        Contrast_Burn_SaveButton        matlab.ui.control.Button
+        Contrast_Burn_UndoButton        matlab.ui.control.Button
+        Contrast_Burn_DoButton          matlab.ui.control.Button
+        Contrast_instructions           matlab.ui.control.Label
+        Contrast_Text1                  matlab.ui.control.Label
+        Contrast_CustomrangerescaleusingthisnumberofvalueEditField  matlab.ui.control.NumericEditField
+        RescaleimageusingthisnumberofvalueLabel  matlab.ui.control.Label
+        Contrast_VolumepercentthresholdforthelowvaluesEditField  matlab.ui.control.NumericEditField
+        VolumepercentthresholdforthelowvaluesEditFieldLabel  matlab.ui.control.Label
+        Contrast_VolumepercentthresholdforthehighvaluesEditField  matlab.ui.control.NumericEditField
+        VolumepercentthresholdforthehighvaluesEditFieldLabel  matlab.ui.control.Label
         Contrast_UIAxes_after           matlab.ui.control.UIAxes
+        Contrast_UIAxes_before          matlab.ui.control.UIAxes
         FilteringTab                    matlab.ui.container.Tab
-        Filtering_instructions          matlab.ui.control.Label
-        Filtering_Text1                 matlab.ui.control.Label
-        ApplyDropDownLabel              matlab.ui.control.Label
-        Filtering_AnisotropicFilter_2D3DDropDown  matlab.ui.control.DropDown
-        ConductionmethodDropDownLabel   matlab.ui.control.Label
-        Filtering_AnisotropicFilter_MethodDropDown  matlab.ui.control.DropDown
-        ConnectivityDropDownLabel       matlab.ui.control.Label
-        Filtering_AnisotropicFilter_ConnDropDown  matlab.ui.control.DropDown
-        NumberofiterationEditFieldLabel  matlab.ui.control.Label
-        Filtering_AnisotropicFilter_IterEditField  matlab.ui.control.NumericEditField
-        Filtering_AnisotropicGradient_Table  matlab.ui.control.Table
-        Filtering_Anisotropic_DoButton  matlab.ui.control.Button
-        Filtering_Anisotropic_UndoButton  matlab.ui.control.Button
-        Filtering_Anisotropic_SaveButton  matlab.ui.control.Button
-        Filtering_Text3                 matlab.ui.control.Label
-        SliceselectionSliderLabel_3     matlab.ui.control.Label
-        Filtering_SliceselectionSlider  matlab.ui.control.Slider
-        Filtering_Text2                 matlab.ui.control.Label
-        Filetring_NLMF_EstimateCheckBox  matlab.ui.control.CheckBox
-        DegreeofsmoothingEditFieldLabel  matlab.ui.control.Label
-        Filetring_NLMF_DegreeofsmoothingEditField  matlab.ui.control.NumericEditField
-        SearchwindowsizeEditFieldLabel  matlab.ui.control.Label
-        Filetring_NLMF_SearchwindowsizeEditField  matlab.ui.control.NumericEditField
-        ComparisonwindowsizeEditFieldLabel  matlab.ui.control.Label
-        Filetring_NLMF_ComparisonwindowsizeEditField  matlab.ui.control.NumericEditField
-        Filtering_NLMF_DoButton         matlab.ui.control.Button
-        Filtering_NLMF_UndoButton       matlab.ui.control.Button
-        Filtering_NLMF_SaveButton       matlab.ui.control.Button
-        Filtering_Text4                 matlab.ui.control.Label
-        Filtering_previewCheckBox       matlab.ui.control.CheckBox
-        Filtering_ProgressnotrunningLabel  matlab.ui.control.Label
         Filtering_Anisotropy_EstimateCheckBox  matlab.ui.control.CheckBox
-        Filtering_UIAxes_before         matlab.ui.control.UIAxes
+        Filtering_ProgressnotrunningLabel  matlab.ui.control.Label
+        Filtering_previewCheckBox       matlab.ui.control.CheckBox
+        Filtering_Text4                 matlab.ui.control.Label
+        Filtering_NLMF_SaveButton       matlab.ui.control.Button
+        Filtering_NLMF_UndoButton       matlab.ui.control.Button
+        Filtering_NLMF_DoButton         matlab.ui.control.Button
+        Filetring_NLMF_ComparisonwindowsizeEditField  matlab.ui.control.NumericEditField
+        ComparisonwindowsizeEditFieldLabel  matlab.ui.control.Label
+        Filetring_NLMF_SearchwindowsizeEditField  matlab.ui.control.NumericEditField
+        SearchwindowsizeEditFieldLabel  matlab.ui.control.Label
+        Filetring_NLMF_DegreeofsmoothingEditField  matlab.ui.control.NumericEditField
+        DegreeofsmoothingEditFieldLabel  matlab.ui.control.Label
+        Filetring_NLMF_EstimateCheckBox  matlab.ui.control.CheckBox
+        Filtering_Text2                 matlab.ui.control.Label
+        Filtering_SliceselectionSlider  matlab.ui.control.Slider
+        SliceselectionSliderLabel_3     matlab.ui.control.Label
+        Filtering_Text3                 matlab.ui.control.Label
+        Filtering_Anisotropic_SaveButton  matlab.ui.control.Button
+        Filtering_Anisotropic_UndoButton  matlab.ui.control.Button
+        Filtering_Anisotropic_DoButton  matlab.ui.control.Button
+        Filtering_AnisotropicGradient_Table  matlab.ui.control.Table
+        Filtering_AnisotropicFilter_IterEditField  matlab.ui.control.NumericEditField
+        NumberofiterationEditFieldLabel  matlab.ui.control.Label
+        Filtering_AnisotropicFilter_ConnDropDown  matlab.ui.control.DropDown
+        ConnectivityDropDownLabel       matlab.ui.control.Label
+        Filtering_AnisotropicFilter_MethodDropDown  matlab.ui.control.DropDown
+        ConductionmethodDropDownLabel   matlab.ui.control.Label
+        Filtering_AnisotropicFilter_2D3DDropDown  matlab.ui.control.DropDown
+        ApplyDropDownLabel              matlab.ui.control.Label
+        Filtering_Text1                 matlab.ui.control.Label
+        Filtering_instructions          matlab.ui.control.Label
         Filetring_UIAxes_after          matlab.ui.control.UIAxes
+        Filtering_UIAxes_before         matlab.ui.control.UIAxes
         SegmentationTab                 matlab.ui.container.Tab
-        Segmentation_instructions       matlab.ui.control.Label
-        Segmentation_Text1              matlab.ui.control.Label
-        MethodDropDownLabel             matlab.ui.control.Label
-        Segmentation_Global_MethodDropDown  matlab.ui.control.DropDown
-        VoxelsizemicrometersEditFieldLabel  matlab.ui.control.Label
-        Segmentation_VoxelsizemicrometersEditField  matlab.ui.control.NumericEditField
-        Segmentation_Phase_UITable      matlab.ui.control.Table
-        NumberofphaseEditFieldLabel     matlab.ui.control.Label
-        Segmentation_NumberofphaseEditField  matlab.ui.control.NumericEditField
-        Segmentation_Global_UITable     matlab.ui.control.Table
-        Segmentation_CompareOtsuandexpectedvolumefractionsButton  matlab.ui.control.Button
-        Segmentation_Global_DoButton    matlab.ui.control.Button
-        Segmentation_Global_UndoButton  matlab.ui.control.Button
-        Segmentation_Global_SaveButton  matlab.ui.control.Button
-        Segmentation_Text2              matlab.ui.control.Label
-        MethodDropDown_2Label           matlab.ui.control.Label
-        Segmentation_Local_MethodDropDown  matlab.ui.control.DropDown
-        Segmentation_Local_DoButton     matlab.ui.control.Button
-        Segmentation_Local_UndoButton   matlab.ui.control.Button
-        Segmentation_Local_SaveButton   matlab.ui.control.Button
-        SliceselectionLabel_2           matlab.ui.control.Label
-        Segmentation_SliceSlider        matlab.ui.control.Slider
-        ThresholdlowLabel               matlab.ui.control.Label
-        Segmentation_Lowthreshold_SliceSlider  matlab.ui.control.Slider
-        ThresholdhighLabel              matlab.ui.control.Label
-        Segmentation_Highthreshold_SliceSlider  matlab.ui.control.Slider
-        Segmentation_update_range       matlab.ui.control.Button
-        Segmentation_Lowthreshold_SliceSpinner  matlab.ui.control.Spinner
-        Segmentation_Highthreshold_SliceSpinner  matlab.ui.control.Spinner
-        OpacityoverlayEditFieldLabel    matlab.ui.control.Label
-        Segmentation_OpacityoverlayEditField  matlab.ui.control.NumericEditField
-        Segmentation_SmoothSliceThreshold_CheckBox  matlab.ui.control.CheckBox
-        MovingaveragefilterrangeEditFieldLabel  matlab.ui.control.Label
         Segmentation_MovingaveragefilterrangeEditField  matlab.ui.control.NumericEditField
+        MovingaveragefilterrangeEditFieldLabel  matlab.ui.control.Label
+        Segmentation_SmoothSliceThreshold_CheckBox  matlab.ui.control.CheckBox
+        Segmentation_OpacityoverlayEditField  matlab.ui.control.NumericEditField
+        OpacityoverlayEditFieldLabel    matlab.ui.control.Label
+        Segmentation_Highthreshold_SliceSpinner  matlab.ui.control.Spinner
+        Segmentation_Lowthreshold_SliceSpinner  matlab.ui.control.Spinner
+        Segmentation_update_range       matlab.ui.control.Button
+        Segmentation_Highthreshold_SliceSlider  matlab.ui.control.Slider
+        ThresholdhighLabel              matlab.ui.control.Label
+        Segmentation_Lowthreshold_SliceSlider  matlab.ui.control.Slider
+        ThresholdlowLabel               matlab.ui.control.Label
+        Segmentation_SliceSlider        matlab.ui.control.Slider
+        SliceselectionLabel_2           matlab.ui.control.Label
+        Segmentation_Local_SaveButton   matlab.ui.control.Button
+        Segmentation_Local_UndoButton   matlab.ui.control.Button
+        Segmentation_Local_DoButton     matlab.ui.control.Button
+        Segmentation_Local_MethodDropDown  matlab.ui.control.DropDown
+        MethodDropDown_2Label           matlab.ui.control.Label
+        Segmentation_Text2              matlab.ui.control.Label
+        Segmentation_Global_SaveButton  matlab.ui.control.Button
+        Segmentation_Global_UndoButton  matlab.ui.control.Button
+        Segmentation_Global_DoButton    matlab.ui.control.Button
+        Segmentation_CompareOtsuandexpectedvolumefractionsButton  matlab.ui.control.Button
+        Segmentation_Global_UITable     matlab.ui.control.Table
+        Segmentation_NumberofphaseEditField  matlab.ui.control.NumericEditField
+        NumberofphaseEditFieldLabel     matlab.ui.control.Label
+        Segmentation_Phase_UITable      matlab.ui.control.Table
+        Segmentation_VoxelsizemicrometersEditField  matlab.ui.control.NumericEditField
+        VoxelsizemicrometersEditFieldLabel  matlab.ui.control.Label
+        Segmentation_Global_MethodDropDown  matlab.ui.control.DropDown
+        MethodDropDownLabel             matlab.ui.control.Label
+        Segmentation_Text1              matlab.ui.control.Label
+        Segmentation_instructions       matlab.ui.control.Label
         Segmentation_UIAxes             matlab.ui.control.UIAxes
         SegmentationsensitivityTab      matlab.ui.container.Tab
-        Sensitivity_PorosityCheckBox    matlab.ui.control.CheckBox
-        Sensitivity_ParticlediameterCheckBox  matlab.ui.control.CheckBox
-        Sensitivity_SpecificsurfaceareaCheckBox  matlab.ui.control.CheckBox
-        Sensitivity_PoretortuosityCheckBox  matlab.ui.control.CheckBox
-        LowerboundEditFieldLabel        matlab.ui.control.Label
-        Sensitivity_LowerboundEditField  matlab.ui.control.NumericEditField
-        HigherboundEditFieldLabel       matlab.ui.control.Label
-        Sensitivity_HigherboundEditField  matlab.ui.control.NumericEditField
-        ExpectedporosityEditFieldLabel  matlab.ui.control.Label
-        Sensitivity_ExpectedporosityEditField  matlab.ui.control.NumericEditField
-        MaximumnumberofthresholdevaluatedEditFieldLabel  matlab.ui.control.Label
-        Sensitivity_MaximumnumberofthresholdevaluatedEditField  matlab.ui.control.NumericEditField
-        VoxelsizemicrometersLabel       matlab.ui.control.Label
-        Sensitivity_VoxelsizenanometersEditField  matlab.ui.control.NumericEditField
-        Sensitivity_instructions        matlab.ui.control.Label
-        Sensitivity_Text_1              matlab.ui.control.Label
-        Sensitivity_Text_2              matlab.ui.control.Label
-        Sensitivity_CalculateparametersensitivityButton  matlab.ui.control.Button
         Sensitivity_ProgressnotrunningLabel  matlab.ui.control.Label
+        Sensitivity_CalculateparametersensitivityButton  matlab.ui.control.Button
+        Sensitivity_Text_2              matlab.ui.control.Label
+        Sensitivity_Text_1              matlab.ui.control.Label
+        Sensitivity_instructions        matlab.ui.control.Label
+        Sensitivity_VoxelsizenanometersEditField  matlab.ui.control.NumericEditField
+        VoxelsizemicrometersLabel       matlab.ui.control.Label
+        Sensitivity_MaximumnumberofthresholdevaluatedEditField  matlab.ui.control.NumericEditField
+        MaximumnumberofthresholdevaluatedEditFieldLabel  matlab.ui.control.Label
+        Sensitivity_ExpectedporosityEditField  matlab.ui.control.NumericEditField
+        ExpectedporosityEditFieldLabel  matlab.ui.control.Label
+        Sensitivity_HigherboundEditField  matlab.ui.control.NumericEditField
+        HigherboundEditFieldLabel       matlab.ui.control.Label
+        Sensitivity_LowerboundEditField  matlab.ui.control.NumericEditField
+        LowerboundEditFieldLabel        matlab.ui.control.Label
+        Sensitivity_PoretortuosityCheckBox  matlab.ui.control.CheckBox
+        Sensitivity_SpecificsurfaceareaCheckBox  matlab.ui.control.CheckBox
+        Sensitivity_ParticlediameterCheckBox  matlab.ui.control.CheckBox
+        Sensitivity_PorosityCheckBox    matlab.ui.control.CheckBox
         PhasereassignmentTab            matlab.ui.container.Tab
-        PhaseAssignment_Instructions    matlab.ui.control.Label
-        PhaseAssignment_UITable         matlab.ui.control.Table
-        PhaseAssignment_DoButton        matlab.ui.control.Button
-        PhaseAssignment_UndoButton      matlab.ui.control.Button
-        PhaseAssignment_SaveButton      matlab.ui.control.Button
         PhaseAssignment_UpdatetableButton  matlab.ui.control.Button
+        PhaseAssignment_SaveButton      matlab.ui.control.Button
+        PhaseAssignment_UndoButton      matlab.ui.control.Button
+        PhaseAssignment_DoButton        matlab.ui.control.Button
+        PhaseAssignment_UITable         matlab.ui.control.Table
+        PhaseAssignment_Instructions    matlab.ui.control.Label
         HistoryTab                      matlab.ui.container.Tab
-        Instructions_History            matlab.ui.control.Label
         UITable_History                 matlab.ui.control.Table
+        Instructions_History            matlab.ui.control.Label
     end
 
     
@@ -1848,8 +1848,7 @@ classdef Segmentation_exported < matlab.apps.AppBase
             web(url)
         end
 
-        % Menu selected function: 
-        % histogram_standard_wholevolume_auto
+        % Menu selected function: histogram_standard_wholevolume_auto
         function histogram_standard_wholevolume_autoSelected(app, event)
             options.bin = 'auto';
             app.create_histogram(options);
@@ -2395,8 +2394,7 @@ classdef Segmentation_exported < matlab.apps.AppBase
             end
         end
 
-        % Button pushed function: 
-        % Quality_CalculateSeparabilityButton
+        % Button pushed function: Quality_CalculateSeparabilityButton
         function Quality_CalculateSeparabilityButtonPushed(app, event)
             n_class = app.Quality_numberofphase.Value;
             
@@ -3083,10 +3081,8 @@ classdef Segmentation_exported < matlab.apps.AppBase
             app.Contrast_TableParameters.Data.Variables = tmp;
         end
 
-        % Value changed function: 
-        % Sensitivity_ExpectedporosityEditField, 
-        % Sensitivity_HigherboundEditField, 
-        % Sensitivity_LowerboundEditField
+        % Value changed function: Sensitivity_ExpectedporosityEditField, 
+        % Sensitivity_HigherboundEditField, Sensitivity_LowerboundEditField
         function Sensitivity_LowerboundEditFieldValueChanged(app, event)
             expected_porosity = app.Sensitivity_ExpectedporosityEditField.Value;
             lower_bound = app.Sensitivity_LowerboundEditField.Value;
@@ -3776,8 +3772,7 @@ classdef Segmentation_exported < matlab.apps.AppBase
             app.Sensitivity_ProgressnotrunningLabel.Text = 'Progress: not running'; 
         end
 
-        % Value changed function: 
-        % Filtering_AnisotropicFilter_IterEditField
+        % Value changed function: Filtering_AnisotropicFilter_IterEditField
         function Filtering_AnisotropicFilter_IterEditFieldValueChanged(app, event)
             numberiteration = app.Filtering_AnisotropicFilter_IterEditField.Value;
             tmp=zeros(numberiteration,2);
@@ -3974,8 +3969,7 @@ classdef Segmentation_exported < matlab.apps.AppBase
             app.update_history_log                 
         end
 
-        % Value changed function: 
-        % Filtering_Anisotropy_EstimateCheckBox
+        % Value changed function: Filtering_Anisotropy_EstimateCheckBox
         function Filtering_Anisotropy_EstimateCheckBoxValueChanged(app, event)
             app.Filtering_AnisotropicFilter_IterEditField.Enable = ~app.Filtering_Anisotropy_EstimateCheckBox.Value;  
             if app.Filtering_Anisotropy_EstimateCheckBox.Value
@@ -3985,8 +3979,7 @@ classdef Segmentation_exported < matlab.apps.AppBase
             end
         end
 
-        % Value changed function: 
-        % Segmentation_NumberofphaseEditField
+        % Value changed function: Segmentation_NumberofphaseEditField
         function Segmentation_NumberofphaseEditFieldValueChanged(app, event)
             numberphase = app.Segmentation_NumberofphaseEditField.Value;
             tmp=zeros(numberphase,4);
@@ -4500,8 +4493,7 @@ classdef Segmentation_exported < matlab.apps.AppBase
             
         end
 
-        % Value changed function: 
-        % Segmentation_Highthreshold_SliceSlider, 
+        % Value changed function: Segmentation_Highthreshold_SliceSlider, 
         % Segmentation_Lowthreshold_SliceSlider
         function Segmentation_Lowthreshold_SliceSliderValueChanged(app, event)
             min_ = double(min(min(min( app.Microstructure ))));
@@ -4542,15 +4534,13 @@ classdef Segmentation_exported < matlab.apps.AppBase
             app.Segmentation_Highthreshold_SliceSpinner.Value = max_;
         end
 
-        % Value changed function: 
-        % Segmentation_Lowthreshold_SliceSpinner
+        % Value changed function: Segmentation_Lowthreshold_SliceSpinner
         function Segmentation_Lowthreshold_SliceSpinnerValueChanged(app, event)
             app.Segmentation_Lowthreshold_SliceSlider.Value = app.Segmentation_Lowthreshold_SliceSpinner.Value;
             app.Segmentation_Lowthreshold_SliceSliderValueChanged
         end
 
-        % Value changed function: 
-        % Segmentation_Highthreshold_SliceSpinner
+        % Value changed function: Segmentation_Highthreshold_SliceSpinner
         function Segmentation_Highthreshold_SliceSpinnerValueChanged(app, event)
             app.Segmentation_Highthreshold_SliceSlider.Value = app.Segmentation_Highthreshold_SliceSpinner.Value;
             app.Segmentation_Lowthreshold_SliceSliderValueChanged
@@ -4577,7 +4567,7 @@ classdef Segmentation_exported < matlab.apps.AppBase
 
             % Create ROIfilteringandsegmentationmoduleUIFigure and hide until all components are created
             app.ROIfilteringandsegmentationmoduleUIFigure = uifigure('Visible', 'off');
-            app.ROIfilteringandsegmentationmoduleUIFigure.Position = [100 100 998 776];
+            app.ROIfilteringandsegmentationmoduleUIFigure.Position = [100 100 930 776];
             app.ROIfilteringandsegmentationmoduleUIFigure.Name = 'ROI, filtering and segmentation module';
             app.ROIfilteringandsegmentationmoduleUIFigure.Icon = 'Icon_ROI.png';
 
@@ -4672,7 +4662,7 @@ classdef Segmentation_exported < matlab.apps.AppBase
             % Create TabGroup
             app.TabGroup = uitabgroup(app.ROIfilteringandsegmentationmoduleUIFigure);
             app.TabGroup.TabLocation = 'left';
-            app.TabGroup.Position = [1 1 998 776];
+            app.TabGroup.Position = [1 1 930 776];
 
             % Create InstructionsTab
             app.InstructionsTab = uitab(app.TabGroup);
@@ -4687,7 +4677,7 @@ classdef Segmentation_exported < matlab.apps.AppBase
             % Create Instructions1
             app.Instructions1 = uilabel(app.InstructionsTab);
             app.Instructions1.Position = [17 710 802 22];
-            app.Instructions1.Text = '- Start by loading a volume data file (.tif) with menu selection: Volume/Load volume. Then choose save/display options in the next tab.';
+            app.Instructions1.Text = '- Start by loading a volume data file (.tif or .tiff) with menu selection: Volume/Load volume. Then choose save/display options in the next tab.';
 
             % Create Instructions_Instructions
             app.Instructions_Instructions = uilabel(app.InstructionsTab);
@@ -4838,6 +4828,12 @@ classdef Segmentation_exported < matlab.apps.AppBase
             % Create RegionofInterestViewTab
             app.RegionofInterestViewTab = uitab(app.TabGroup);
             app.RegionofInterestViewTab.Title = 'Region of Interest / View';
+
+            % Create ROI_2Dslice
+            app.ROI_2Dslice = uiaxes(app.RegionofInterestViewTab);
+            xlabel(app.ROI_2Dslice, 'X')
+            ylabel(app.ROI_2Dslice, 'Y')
+            app.ROI_2Dslice.Position = [368 202 451 498];
 
             % Create ViewnormaltoDropDown_2Label
             app.ViewnormaltoDropDown_2Label = uilabel(app.RegionofInterestViewTab);
@@ -5292,12 +5288,6 @@ classdef Segmentation_exported < matlab.apps.AppBase
             app.ROI_background_OptionsDropDown.Position = [108 45 100 22];
             app.ROI_background_OptionsDropDown.Value = 'Cylindrical FOV';
 
-            % Create ROI_2Dslice
-            app.ROI_2Dslice = uiaxes(app.RegionofInterestViewTab);
-            xlabel(app.ROI_2Dslice, 'X')
-            ylabel(app.ROI_2Dslice, 'Y')
-            app.ROI_2Dslice.Position = [368 202 451 498];
-
             % Create FormatconversionTab
             app.FormatconversionTab = uitab(app.TabGroup);
             app.FormatconversionTab.Title = 'Format conversion';
@@ -5380,6 +5370,20 @@ classdef Segmentation_exported < matlab.apps.AppBase
             % Create UpdownscalingTab
             app.UpdownscalingTab = uitab(app.TabGroup);
             app.UpdownscalingTab.Title = 'Up/down scaling';
+
+            % Create Scaling_UIAxes_before
+            app.Scaling_UIAxes_before = uiaxes(app.UpdownscalingTab);
+            title(app.Scaling_UIAxes_before, 'Before scaling. View normal to Axe 3')
+            xlabel(app.Scaling_UIAxes_before, '2nd Axis')
+            ylabel(app.Scaling_UIAxes_before, '1st Axis')
+            app.Scaling_UIAxes_before.Position = [17 103 400 385];
+
+            % Create Scaling_UIAxes_after
+            app.Scaling_UIAxes_after = uiaxes(app.UpdownscalingTab);
+            title(app.Scaling_UIAxes_after, 'After scaling. View normal to Axe 3')
+            xlabel(app.Scaling_UIAxes_after, '2nd Axis')
+            ylabel(app.Scaling_UIAxes_after, '1st Axis')
+            app.Scaling_UIAxes_after.Position = [419 103 400 385];
 
             % Create Scale_text_2
             app.Scale_text_2 = uilabel(app.UpdownscalingTab);
@@ -5548,20 +5552,6 @@ classdef Segmentation_exported < matlab.apps.AppBase
             app.Scale_BackgroundvalueEditField.Tooltip = {'Only required for Data type being ''Label'''};
             app.Scale_BackgroundvalueEditField.Position = [779 547 40 22];
 
-            % Create Scaling_UIAxes_before
-            app.Scaling_UIAxes_before = uiaxes(app.UpdownscalingTab);
-            title(app.Scaling_UIAxes_before, 'Before scaling. View normal to Axe 3')
-            xlabel(app.Scaling_UIAxes_before, '2nd Axis')
-            ylabel(app.Scaling_UIAxes_before, '1st Axis')
-            app.Scaling_UIAxes_before.Position = [17 103 400 385];
-
-            % Create Scaling_UIAxes_after
-            app.Scaling_UIAxes_after = uiaxes(app.UpdownscalingTab);
-            title(app.Scaling_UIAxes_after, 'After scaling. View normal to Axe 3')
-            xlabel(app.Scaling_UIAxes_after, '2nd Axis')
-            ylabel(app.Scaling_UIAxes_after, '1st Axis')
-            app.Scaling_UIAxes_after.Position = [419 103 400 385];
-
             % Create ImagequalityTab
             app.ImagequalityTab = uitab(app.TabGroup);
             app.ImagequalityTab.Title = 'Image quality';
@@ -5603,6 +5593,20 @@ classdef Segmentation_exported < matlab.apps.AppBase
             % Create ContrastcorrectionTab
             app.ContrastcorrectionTab = uitab(app.TabGroup);
             app.ContrastcorrectionTab.Title = 'Contrast correction';
+
+            % Create Contrast_UIAxes_before
+            app.Contrast_UIAxes_before = uiaxes(app.ContrastcorrectionTab);
+            title(app.Contrast_UIAxes_before, 'Before contrast correction. View normal to Axe 3')
+            xlabel(app.Contrast_UIAxes_before, '2nd Axis')
+            ylabel(app.Contrast_UIAxes_before, '1st Axis')
+            app.Contrast_UIAxes_before.Position = [17 64 400 250];
+
+            % Create Contrast_UIAxes_after
+            app.Contrast_UIAxes_after = uiaxes(app.ContrastcorrectionTab);
+            title(app.Contrast_UIAxes_after, 'After contrast correction. View normal to Axe 3')
+            xlabel(app.Contrast_UIAxes_after, '2nd Axis')
+            ylabel(app.Contrast_UIAxes_after, '1st Axis')
+            app.Contrast_UIAxes_after.Position = [419 64 400 250];
 
             % Create VolumepercentthresholdforthehighvaluesEditFieldLabel
             app.VolumepercentthresholdforthehighvaluesEditFieldLabel = uilabel(app.ContrastcorrectionTab);
@@ -5831,24 +5835,24 @@ classdef Segmentation_exported < matlab.apps.AppBase
             app.Contrast_Method_DropDown.Position = [458 424 100 22];
             app.Contrast_Method_DropDown.Value = 'Adjust contrast';
 
-            % Create Contrast_UIAxes_before
-            app.Contrast_UIAxes_before = uiaxes(app.ContrastcorrectionTab);
-            title(app.Contrast_UIAxes_before, 'Before contrast correction. View normal to Axe 3')
-            xlabel(app.Contrast_UIAxes_before, '2nd Axis')
-            ylabel(app.Contrast_UIAxes_before, '1st Axis')
-            app.Contrast_UIAxes_before.Position = [17 64 400 250];
-
-            % Create Contrast_UIAxes_after
-            app.Contrast_UIAxes_after = uiaxes(app.ContrastcorrectionTab);
-            title(app.Contrast_UIAxes_after, 'After contrast correction. View normal to Axe 3')
-            xlabel(app.Contrast_UIAxes_after, '2nd Axis')
-            ylabel(app.Contrast_UIAxes_after, '1st Axis')
-            app.Contrast_UIAxes_after.Position = [419 64 400 250];
-
             % Create FilteringTab
             app.FilteringTab = uitab(app.TabGroup);
             app.FilteringTab.Tooltip = {''};
             app.FilteringTab.Title = 'Filtering';
+
+            % Create Filtering_UIAxes_before
+            app.Filtering_UIAxes_before = uiaxes(app.FilteringTab);
+            title(app.Filtering_UIAxes_before, 'Before filtering. View normal to Axe 3')
+            xlabel(app.Filtering_UIAxes_before, '2nd Axis')
+            ylabel(app.Filtering_UIAxes_before, '1st Axis')
+            app.Filtering_UIAxes_before.Position = [17 64 400 250];
+
+            % Create Filetring_UIAxes_after
+            app.Filetring_UIAxes_after = uiaxes(app.FilteringTab);
+            title(app.Filetring_UIAxes_after, 'After filtering. View normal to Axe 3')
+            xlabel(app.Filetring_UIAxes_after, '2nd Axis')
+            ylabel(app.Filetring_UIAxes_after, '1st Axis')
+            app.Filetring_UIAxes_after.Position = [419 64 400 250];
 
             % Create Filtering_instructions
             app.Filtering_instructions = uilabel(app.FilteringTab);
@@ -6093,23 +6097,16 @@ classdef Segmentation_exported < matlab.apps.AppBase
             app.Filtering_Anisotropy_EstimateCheckBox.Position = [18 426 299 22];
             app.Filtering_Anisotropy_EstimateCheckBox.Value = true;
 
-            % Create Filtering_UIAxes_before
-            app.Filtering_UIAxes_before = uiaxes(app.FilteringTab);
-            title(app.Filtering_UIAxes_before, 'Before filtering. View normal to Axe 3')
-            xlabel(app.Filtering_UIAxes_before, '2nd Axis')
-            ylabel(app.Filtering_UIAxes_before, '1st Axis')
-            app.Filtering_UIAxes_before.Position = [17 64 400 250];
-
-            % Create Filetring_UIAxes_after
-            app.Filetring_UIAxes_after = uiaxes(app.FilteringTab);
-            title(app.Filetring_UIAxes_after, 'After filtering. View normal to Axe 3')
-            xlabel(app.Filetring_UIAxes_after, '2nd Axis')
-            ylabel(app.Filetring_UIAxes_after, '1st Axis')
-            app.Filetring_UIAxes_after.Position = [419 64 400 250];
-
             % Create SegmentationTab
             app.SegmentationTab = uitab(app.TabGroup);
             app.SegmentationTab.Title = 'Segmentation';
+
+            % Create Segmentation_UIAxes
+            app.Segmentation_UIAxes = uiaxes(app.SegmentationTab);
+            title(app.Segmentation_UIAxes, 'View normal to Axe 3')
+            xlabel(app.Segmentation_UIAxes, '2nd Axis')
+            ylabel(app.Segmentation_UIAxes, '1st Axis')
+            app.Segmentation_UIAxes.Position = [353 179 466 527];
 
             % Create Segmentation_instructions
             app.Segmentation_instructions = uilabel(app.SegmentationTab);
@@ -6354,13 +6351,6 @@ classdef Segmentation_exported < matlab.apps.AppBase
             app.Segmentation_MovingaveragefilterrangeEditField.RoundFractionalValues = 'on';
             app.Segmentation_MovingaveragefilterrangeEditField.Position = [183 166 52 22];
             app.Segmentation_MovingaveragefilterrangeEditField.Value = 10;
-
-            % Create Segmentation_UIAxes
-            app.Segmentation_UIAxes = uiaxes(app.SegmentationTab);
-            title(app.Segmentation_UIAxes, 'View normal to Axe 3')
-            xlabel(app.Segmentation_UIAxes, '2nd Axis')
-            ylabel(app.Segmentation_UIAxes, '1st Axis')
-            app.Segmentation_UIAxes.Position = [353 179 466 527];
 
             % Create SegmentationsensitivityTab
             app.SegmentationsensitivityTab = uitab(app.TabGroup);

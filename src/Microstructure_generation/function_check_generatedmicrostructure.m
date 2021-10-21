@@ -1,4 +1,4 @@
-function [] = function_check_generatedmicrostructure(microstructure3D,phase,voxel_size_nm,OPTIONS)
+function [] = function_check_generatedmicrostructure(microstructure3D,phase,OPTIONS)
 
 OPTIONS.fontname = 'Times New Roman';
 OPTIONS.grid = 'on';
@@ -45,7 +45,7 @@ sub_axes = axes('Parent',Fig); % Create axes
 % h_title=title (' ','FontName',OPTIONS.fontname,'FontSize',OPTIONS.size); % Set title font
 % h_title.String= 'Volume fractions'; % Title string
 % Plot graphs
-x_ = [1:1:domain_size(3)] * voxel_size_nm;
+x_ = [1:1:domain_size(3)];
 
 for k = 1:1:2
     for current_phase=1:1:number_phase % Loop over phases

@@ -3,16 +3,21 @@ function [Otsu_result]=Function_otsu_algorithm(histogram,number_of_class)
 % The same notation is used in this program, so please refer to the article for a detailed parameter definition
 
 %% CONTINUM HISTOGRAM
-x_min=1;
+x_min=min(histogram(:,1));
 x_max=max(histogram(:,1));
-new_histogram=zeros(x_max,2);
-new_histogram(:,1)=1:1:x_max;
+N = x_max-x_min+1;
+new_histogram=zeros(N,2);
+new_histogram(:,1)=x_min:1:x_max;
 
 %unique_histogram=unique(histogram(:,1));
 %n_=length(unique_histogram);
 [n_,~] = size(histogram);
+a = (N-1)/(x_max-x_min);
+b = N-a*x_max;
 for k=1:1:n_
-    kk=round(histogram(k,1));
+    %kk = round(histogram(k,1));
+    x = round(histogram(k,1));
+    kk = round(a*x + b);
     new_histogram(kk,2)=histogram(k,2);
 end
 histogram=new_histogram;

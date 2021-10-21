@@ -1606,9 +1606,9 @@ classdef Microstructure_generation_stochastic_exported < matlab.apps.AppBase
             if ~isempty(idx)
                 if length(idx)==1 % One volume to visualize
                     if scaled(idx)
-                        microstructure_visualization_slices(app.generation_result(runs(idx)).microstructure3D_phaselabel_scaled, ['Generated volume #' num2str(runs(idx))], 1, 'voxel', [])
+                        microstructure_visualization_slices(app.generation_result(runs(idx)).microstructure3D_phaselabel_scaled, ['Generated volume #' num2str(runs(idx)) ', scaled'], 1, 'voxel', [])
                     else
-                        microstructure_visualization_slices(app.generation_result(runs(idx)).microstructure3D_phaselabel, ['Generated volume #' num2str(runs(idx)) ', scaled'], 1, 'voxel', [])
+                        microstructure_visualization_slices(app.generation_result(runs(idx)).microstructure3D_phaselabel, ['Generated volume #' num2str(runs(idx))], 1, 'voxel', [])
                     end
                 else % Several volumes to visualize
                     str = 'Microstructure_comparison_visualization_interface(';
