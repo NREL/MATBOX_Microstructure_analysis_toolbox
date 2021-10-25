@@ -40,45 +40,45 @@ is_installed_imagetoolbox = license('test','Image_Toolbox');
 is_installed_reportgenerator = license('test','MATLAB_Report_Gen');
 
 %% INITIALIZE ERROR REPORT (BETA)
-if OPTIONS.report.todo == 1 && is_installed_reportgenerator == 1
-    import mlreportgen.dom.*; % Import the DOM API
-    errorreport_path = [main_folder 'Error_Report']; % Save path of the error report
-    OPTIONS.errorreportdoc = Document(errorreport_path, OPTIONS.report.rpt_type); % Create an empty document with the specified type
-    open(OPTIONS.errorreportdoc); % Open file    
-   
-    % Title
-    title = append(OPTIONS.errorreportdoc, Paragraph('Microstructure characterization: Error report'));
-    title.Style = OPTIONS.report.style.title;
-    % Title 2
-    str = sprintf ('%s',INFO.filename_input);
-    title = append(OPTIONS.errorreportdoc, Paragraph(str));
-    title.Style = OPTIONS.report.style.title2;
-    % Empty text
-    standard_text = append(OPTIONS.errorreportdoc, Paragraph('-')); standard_text.Style = OPTIONS.report.style.standardtext; standard_text.HAlign='Center';
-     % Volume basic information
-    str1 = sprintf ('File loaded from: %s', OPTIONS.loadingpath);
-    str2 = sprintf ('Results saved in: %s', main_folder);
-    cellstr = {str1, str2};
-    for k=1:1:length(cellstr) % Loop over all strings contained in the cell
-        text = append(OPTIONS.errorreportdoc, Paragraph( char(cellstr(k))) ); % Append string
-        text.Style = OPTIONS.report.style.standardtext; % Set style
-    end        
-    % Empty text
-    standard_text = append(OPTIONS.errorreportdoc, Paragraph('-')); standard_text.Style = OPTIONS.report.style.standardtext; standard_text.HAlign='Center';
-    % Date, username, machine and version
-    str1 = sprintf ('Started %s',date_start);
-    str2 = sprintf ('By user %s, on machine %s, with the OS %s',username,computername,os);    
-    str3 = sprintf ('Matlab version: %s',version);
-    str4 = sprintf ('Microstructure analysis tool, characterization module version: %s',MAT_charac_version);
-    str5 = 'Developed by F. Usseglio-Viretta, NREL';
-    cellstr = {str1, str2, str3, str4, str5};
-    for k=1:1:length(cellstr) % Loop over all strings contained in the cell
-        text = append(OPTIONS.errorreportdoc, Paragraph( char(cellstr(k))) ); % Append string
-        text.Style = OPTIONS.report.style.standardtext; % Set style
-    end        
-    % Close report
-    close(OPTIONS.errorreportdoc)
-end
+% if OPTIONS.report.todo == 1 && is_installed_reportgenerator == 1
+%     import mlreportgen.dom.*; % Import the DOM API
+%     errorreport_path = [main_folder 'Error_Report']; % Save path of the error report
+%     OPTIONS.errorreportdoc = Document(errorreport_path, OPTIONS.report.rpt_type); % Create an empty document with the specified type
+%     open(OPTIONS.errorreportdoc); % Open file    
+%    
+%     % Title
+%     title = append(OPTIONS.errorreportdoc, Paragraph('Microstructure characterization: Error report'));
+%     title.Style = OPTIONS.report.style.title;
+%     % Title 2
+%     str = sprintf ('%s',INFO.filename_input);
+%     title = append(OPTIONS.errorreportdoc, Paragraph(str));
+%     title.Style = OPTIONS.report.style.title2;
+%     % Empty text
+%     standard_text = append(OPTIONS.errorreportdoc, Paragraph('-')); standard_text.Style = OPTIONS.report.style.standardtext; standard_text.HAlign='Center';
+%      % Volume basic information
+%     str1 = sprintf ('File loaded from: %s', OPTIONS.loadingpath);
+%     str2 = sprintf ('Results saved in: %s', main_folder);
+%     cellstr = {str1, str2};
+%     for k=1:1:length(cellstr) % Loop over all strings contained in the cell
+%         text = append(OPTIONS.errorreportdoc, Paragraph( char(cellstr(k))) ); % Append string
+%         text.Style = OPTIONS.report.style.standardtext; % Set style
+%     end        
+%     % Empty text
+%     standard_text = append(OPTIONS.errorreportdoc, Paragraph('-')); standard_text.Style = OPTIONS.report.style.standardtext; standard_text.HAlign='Center';
+%     % Date, username, machine and version
+%     str1 = sprintf ('Started %s',date_start);
+%     str2 = sprintf ('By user %s, on machine %s, with the OS %s',username,computername,os);    
+%     str3 = sprintf ('Matlab version: %s',version);
+%     str4 = sprintf ('Microstructure analysis tool, characterization module version: %s',MAT_charac_version);
+%     str5 = 'Developed by F. Usseglio-Viretta, NREL';
+%     cellstr = {str1, str2, str3, str4, str5};
+%     for k=1:1:length(cellstr) % Loop over all strings contained in the cell
+%         text = append(OPTIONS.errorreportdoc, Paragraph( char(cellstr(k))) ); % Append string
+%         text.Style = OPTIONS.report.style.standardtext; % Set style
+%     end        
+%     % Close report
+%     close(OPTIONS.errorreportdoc)
+% end
 
 %% LOAD FILE
 % Call function
@@ -87,13 +87,17 @@ if outcome.success==false
     str1 = sprintf ('Error during loading file');
     str2 = sprintf ('Error message: %s', outcome.reason);
     cellstr = {str1, str2};
-    if is_installed_reportgenerator == 1 % Write error report
-        open(OPTIONS.errorreportdoc); % Open file
-        for k=1:1:length(cellstr) % Loop over all strings contained in the cell
-            text = append(OPTIONS.errorreportdoc, Paragraph( char(cellstr(k))) ); % Append string
-            text.Style = OPTIONS.report.style.standardtext; % Set style
-        end
-    elseif OPTIONS.displaytext
+%     if is_installed_reportgenerator == 1 % Write error report
+%         open(OPTIONS.errorreportdoc); % Open file
+%         for k=1:1:length(cellstr) % Loop over all strings contained in the cell
+%             text = append(OPTIONS.errorreportdoc, Paragraph( char(cellstr(k))) ); % Append string
+%             text.Style = OPTIONS.report.style.standardtext; % Set style
+%         end
+%     elseif OPTIONS.displaytext
+%         fprintf('%s. %s\n',str1, str2);
+%         pause(5); % Time to read the error
+%     end
+    if OPTIONS.displaytext
         fprintf('%s. %s\n',str1, str2);
         pause(5); % Time to read the error
     end
@@ -209,71 +213,71 @@ if OPTIONS.save_xls
 end
 
 %% INITIALIZE REPORT (BETA)
-if OPTIONS.report.todo == 1 && is_installed_reportgenerator == 1
-    report_path = [main_folder 'Report']; % Save path of the report
-    OPTIONS.reportdoc = Document(report_path, OPTIONS.report.rpt_type); % Create an empty document with the specified type
-    open(OPTIONS.reportdoc); % Open file
-    
-    % Title
-    title = append(OPTIONS.reportdoc, Paragraph('Microstructure characterization'));
-    title.Style = OPTIONS.report.style.title;
-    % Title 2
-    str = sprintf ('%s',INFO.filename_input);
-    title = append(OPTIONS.reportdoc, Paragraph(str));
-    title.Style = OPTIONS.report.style.title2;
-    
-    % Decription
-    str1 = sprintf ('Source  : %s', INFO.volume_source);
-    str2 = sprintf ('Material: %s', INFO.volume_material);
-    str3 = sprintf ('Material group: %s', INFO.volume_groupmaterial);
-    str4 = sprintf ('Obversation method: %s', INFO.volume_experimental);
-    str5 = sprintf ('%s', INFO.volume_description);
-    str6 = sprintf ('%s', INFO.analysis_description);   
-    cellstr = {str1, str2, str3, str4, str5, str6};
-    for k=1:1:length(cellstr) % Loop over all strings contained in the cell
-        text = append(OPTIONS.reportdoc, Paragraph( char(cellstr(k))) ); % Append string
-        text.Style = OPTIONS.report.style.standardtext; % Set style
-    end    
-    
-    % Empty text
-    standard_text = append(OPTIONS.reportdoc, Paragraph('-')); standard_text.Style = OPTIONS.report.style.standardtext; standard_text.HAlign='Center';
-     % Volume basic information
-    str1 = sprintf ('File loaded from: %s', INFO.loadingpath);
-    str2 = sprintf ('Results saved in: %s', main_folder);
-    cellstr = {str1, str2};
-    for k=1:1:length(cellstr) % Loop over all strings contained in the cell
-        text = append(OPTIONS.reportdoc, Paragraph( char(cellstr(k))) ); % Append string
-        text.Style = OPTIONS.report.style.standardtext; % Set style
-    end        
-     
-    % Empty text
-    standard_text = append(OPTIONS.reportdoc, Paragraph('-')); standard_text.Style = OPTIONS.report.style.standardtext; standard_text.HAlign='Center';
-    % Date, username
-    str1 = sprintf ('Started %s',date_start);
-    str2 = sprintf ('By user %s, on machine %s, with the OS %s',username,computername,os);    
-    cellstr = {str1, str2};
-    for k=1:1:length(cellstr) % Loop over all strings contained in the cell
-        text = append(OPTIONS.reportdoc, Paragraph( char(cellstr(k))) ); % Append string
-        text.Style = OPTIONS.report.style.standardtext; % Set style
-    end    
-    
-    % Empty text
-    standard_text = append(OPTIONS.reportdoc, Paragraph('-')); standard_text.Style = OPTIONS.report.style.standardtext; standard_text.HAlign='Center';
-    % machine and version
-    str1 = sprintf ('Matlab version: %s',version);
-    str2 = sprintf ('Microstructure analysis tool, characterization module version: %s',MAT_charac_version);
-    str3 = '   Developed by F. Usseglio-Viretta, NREL';
-    str4 = 'This report has been programmatically generated';
-    cellstr = {str1, str2, str3, str4};
-    for k=1:1:length(cellstr) % Loop over all strings contained in the cell
-        text = append(OPTIONS.reportdoc, Paragraph( char(cellstr(k))) ); % Append string
-        text.Style = OPTIONS.report.style.standardtext; % Set style
-        text.WhiteSpace='preserve';
-    end
-    
-    % Close report
-    close(OPTIONS.reportdoc)    
-end
+% if OPTIONS.report.todo == 1 && is_installed_reportgenerator == 1
+%     report_path = [main_folder 'Report']; % Save path of the report
+%     OPTIONS.reportdoc = Document(report_path, OPTIONS.report.rpt_type); % Create an empty document with the specified type
+%     open(OPTIONS.reportdoc); % Open file
+%     
+%     % Title
+%     title = append(OPTIONS.reportdoc, Paragraph('Microstructure characterization'));
+%     title.Style = OPTIONS.report.style.title;
+%     % Title 2
+%     str = sprintf ('%s',INFO.filename_input);
+%     title = append(OPTIONS.reportdoc, Paragraph(str));
+%     title.Style = OPTIONS.report.style.title2;
+%     
+%     % Decription
+%     str1 = sprintf ('Source  : %s', INFO.volume_source);
+%     str2 = sprintf ('Material: %s', INFO.volume_material);
+%     str3 = sprintf ('Material group: %s', INFO.volume_groupmaterial);
+%     str4 = sprintf ('Obversation method: %s', INFO.volume_experimental);
+%     str5 = sprintf ('%s', INFO.volume_description);
+%     str6 = sprintf ('%s', INFO.analysis_description);   
+%     cellstr = {str1, str2, str3, str4, str5, str6};
+%     for k=1:1:length(cellstr) % Loop over all strings contained in the cell
+%         text = append(OPTIONS.reportdoc, Paragraph( char(cellstr(k))) ); % Append string
+%         text.Style = OPTIONS.report.style.standardtext; % Set style
+%     end    
+%     
+%     % Empty text
+%     standard_text = append(OPTIONS.reportdoc, Paragraph('-')); standard_text.Style = OPTIONS.report.style.standardtext; standard_text.HAlign='Center';
+%      % Volume basic information
+%     str1 = sprintf ('File loaded from: %s', INFO.loadingpath);
+%     str2 = sprintf ('Results saved in: %s', main_folder);
+%     cellstr = {str1, str2};
+%     for k=1:1:length(cellstr) % Loop over all strings contained in the cell
+%         text = append(OPTIONS.reportdoc, Paragraph( char(cellstr(k))) ); % Append string
+%         text.Style = OPTIONS.report.style.standardtext; % Set style
+%     end        
+%      
+%     % Empty text
+%     standard_text = append(OPTIONS.reportdoc, Paragraph('-')); standard_text.Style = OPTIONS.report.style.standardtext; standard_text.HAlign='Center';
+%     % Date, username
+%     str1 = sprintf ('Started %s',date_start);
+%     str2 = sprintf ('By user %s, on machine %s, with the OS %s',username,computername,os);    
+%     cellstr = {str1, str2};
+%     for k=1:1:length(cellstr) % Loop over all strings contained in the cell
+%         text = append(OPTIONS.reportdoc, Paragraph( char(cellstr(k))) ); % Append string
+%         text.Style = OPTIONS.report.style.standardtext; % Set style
+%     end    
+%     
+%     % Empty text
+%     standard_text = append(OPTIONS.reportdoc, Paragraph('-')); standard_text.Style = OPTIONS.report.style.standardtext; standard_text.HAlign='Center';
+%     % machine and version
+%     str1 = sprintf ('Matlab version: %s',version);
+%     str2 = sprintf ('Microstructure analysis tool, characterization module version: %s',MAT_charac_version);
+%     str3 = '   Developed by F. Usseglio-Viretta, NREL';
+%     str4 = 'This report has been programmatically generated';
+%     cellstr = {str1, str2, str3, str4};
+%     for k=1:1:length(cellstr) % Loop over all strings contained in the cell
+%         text = append(OPTIONS.reportdoc, Paragraph( char(cellstr(k))) ); % Append string
+%         text.Style = OPTIONS.report.style.standardtext; % Set style
+%         text.WhiteSpace='preserve';
+%     end
+%     
+%     % Close report
+%     close(OPTIONS.reportdoc)    
+% end
 
 %% TIME
 time_cpu_start = cputime; % CPU start
@@ -530,9 +534,9 @@ end
 
 
 %% CLOSE REPORT
-if OPTIONS.report.todo == 1 && is_installed_reportgenerator==1
-      close(OPTIONS.reportdoc)
-end
+% if OPTIONS.report.todo == 1 && is_installed_reportgenerator==1
+%       close(OPTIONS.reportdoc)
+% end
 
 end
 

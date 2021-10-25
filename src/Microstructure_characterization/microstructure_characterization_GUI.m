@@ -3269,12 +3269,12 @@ Text_tab_import = uicontrol('Parent', tab_savedisplayoptions, 'Style', 'text','U
 
 %% REPORT GENERATOR OPTIONS (BETA)
 % Report options
-import mlreportgen.dom.*;
-OPTIONS.report.todo = true;
-OPTIONS.report.rpt_type = 'docx';
-OPTIONS.report.style.title = {Color('black'), FontFamily('Times'), FontSize('28pt'), Bold(true),  HAlign('Center'), LineSpacing(2)};
-OPTIONS.report.style.title2 = {Color('blue'), FontFamily('Times'), FontSize('22pt'), Bold(false), HAlign('Center'), LineSpacing(1.5)};
-OPTIONS.report.style.standardtext = {Color('black'), FontFamily('Times'), FontSize('12pt')};
+% import mlreportgen.dom.*;
+% OPTIONS.report.todo = true;
+% OPTIONS.report.rpt_type = 'docx';
+% OPTIONS.report.style.title = {Color('black'), FontFamily('Times'), FontSize('28pt'), Bold(true),  HAlign('Center'), LineSpacing(2)};
+% OPTIONS.report.style.title2 = {Color('blue'), FontFamily('Times'), FontSize('22pt'), Bold(false), HAlign('Center'), LineSpacing(1.5)};
+% OPTIONS.report.style.standardtext = {Color('black'), FontFamily('Times'), FontSize('12pt')};
 
 %% HARDCODED
 OPTIONS.arrayformat = 'uint8';
