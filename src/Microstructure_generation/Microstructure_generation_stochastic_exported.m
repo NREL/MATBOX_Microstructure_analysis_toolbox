@@ -1352,8 +1352,21 @@ classdef Microstructure_generation_stochastic_exported < matlab.apps.AppBase
             save_options.save_verification = app.SaveinputsoutpuscomparisonifselectedCheckBox.Value;
             
             % Save inputs
-            save_input_mat = app.SaveinmatinputsofthegenerationalgorithmfunctionCheckBox.Value;
- 
+            if ~isempty(app.Savefolder)
+                if app.SaveinmatinputsofthegenerationalgorithmfunctionCheckBox.Value
+                    domain_size = app.domain_size;
+                    phase = app.phase;
+                    Maximum_overlapping = app.Maximum_overlapping;
+                    Minimum_particle_volume_conservated = app.Minimum_particle_volume_conservated;
+                    check_contiguity = ~app.disable_contiguituy_check;
+                    stopingconditions = stoping_conditions;
+                    stopingconditions.plot = true; % Overwritte
+                    doverification = true; % Overwritte
+                    saveoptions.folder = []; % Overwritte
+                    save([app.Savefolder 'Inputs.mat'],'domain_size','phase','Maximum_overlapping','Minimum_particle_volume_conservated','check_contiguity','stopingconditions', 'doverification', 'saveoptions','-mat');
+                end
+            end
+
             % Save outputs
             save_phaselabel = app.Savephaselabelinformation3Dtifstackfileuint8formatCheckBox.Value;
             save_particlelabel = app.Saveparticlelabelinformation3Dtifstackfileuint16formatCheckBox.Value;
@@ -1551,22 +1564,6 @@ classdef Microstructure_generation_stochastic_exported < matlab.apps.AppBase
                 Function_Writetable(app.Savefolder,filename,DATA_writetable)
             end
 
-            % Save inputs
-            if ~isempty(app.Savefolder)
-                if save_input_mat
-                    domain_size = app.domain_size;
-                    phase = app.phase;
-                    Maximum_overlapping = app.Maximum_overlapping;
-                    Minimum_particle_volume_conservated = app.Minimum_particle_volume_conservated;
-                    check_contiguity = ~app.disable_contiguituy_check;
-                    stopingconditions = stoping_conditions;
-                    stopingconditions.plot = true; % Overwritte
-                    doverification = true; % Overwritte
-                    saveoptions.folder = []; % Overwritte
-                    save([app.Savefolder 'Inputs.mat'],'domain_size','phase','Maximum_overlapping','Minimum_particle_volume_conservated','check_contiguity','stopingconditions', 'doverification', 'saveoptions','-mat');
-                end
-            end
-            
             % Visualization tab
             app.Plot_phase_label.Enable = 'on';
             app.Plot_particle_label.Enable = 'on';
