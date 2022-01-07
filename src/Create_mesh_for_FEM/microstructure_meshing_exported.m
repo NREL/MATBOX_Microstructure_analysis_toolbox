@@ -3969,7 +3969,7 @@ classdef microstructure_meshing_exported < matlab.apps.AppBase
             app.About_Quotationinstructions = uitextarea(app.AboutTab);
             app.About_Quotationinstructions.Editable = 'off';
             app.About_Quotationinstructions.Position = [165 128 788 114];
-            app.About_Quotationinstructions.Value = {'- For any mesh created with this module:'; 'F. L. E. Usseglio-Viretta et al., MATBOX: An Open-source Microstructure Analysis Toolbox for microstructure generation, segmentation, characterization, visualization, correlation, and meshing, SoftwareX, in preparation'; ''; '- If you create a mesh using Iso2mesh, please ALSO quote:'; 'Q. Fang and D. A. Boas, Tetrahedral Mesh Generation From Volumetric Binary and Gray-scale Images, Proceedings of IEEE International Symposium on Biomedical Imaging 2009, 2009, Pages 1142-1145'};
+            app.About_Quotationinstructions.Value = {'- For any mesh created with this module:'; 'F. L. E. Usseglio-Viretta et al., MATBOX: An Open-source Microstructure Analysis Toolbox for microstructure generation, segmentation, characterization, visualization, correlation, and meshing, SoftwareX, 17, 2022, https://doi.org/10.1016/j.softx.2021.100915'; ''; '- If you create a mesh using Iso2mesh, please ALSO quote:'; 'Q. Fang and D. A. Boas, Tetrahedral Mesh Generation From Volumetric Binary and Gray-scale Images, Proceedings of IEEE International Symposium on Biomedical Imaging 2009, 2009, Pages 1142-1145, https://doi.org/10.1109/ISBI.2009.5193259'};
 
             % Create About_Logo_NREL
             app.About_Logo_NREL = uiimage(app.AboutTab);

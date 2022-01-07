@@ -3117,7 +3117,7 @@ classdef Microstructure_generation_stochastic_exported < matlab.apps.AppBase
             app.TextArea = uitextarea(app.HowtoquoteTab);
             app.TextArea.Editable = 'off';
             app.TextArea.Position = [11 644 978 60];
-            app.TextArea.Value = {'F. L. E. Usseglio-Viretta, P. Patel, E. Bernhardt, A Mistry, P. P. Mukherjee, J. Allen, S. J. Cooper, and K. Smith'; 'MATBOX: An Open-source Microstructure Analysis Toolbox for microstructure generation, segmentation, characterization, visualization, correlation, and meshing'; 'SoftwareX, in preparation'};
+            app.TextArea.Value = {'F. L. E. Usseglio-Viretta, P. Patel, E. Bernhardt, A Mistry, P. P. Mukherjee, J. Allen, S. J. Cooper, and K. Smith'; 'MATBOX: An Open-source Microstructure Analysis Toolbox for microstructure generation, segmentation, characterization, visualization, correlation, and meshing'; 'SoftwareX, 17, 2022, https://doi.org/10.1016/j.softx.2021.100915'};
 
             % Show the figure after all components are created
             app.EllipsoidbasedstochasticgenerationmoduleUIFigure.Visible = 'on';

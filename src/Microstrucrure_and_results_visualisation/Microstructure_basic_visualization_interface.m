@@ -1,9 +1,21 @@
-function [] = Microstructure_basic_visualization_interface(array, direction_name)
+function [] = Microstructure_basic_visualization_interface(array, p)
 
 nargin; % Number of input variable when the function is call
 
 if nargin == 1 % Set default name for the axis
     direction_name = {'Normal to axe 1','Normal to axe 2','Normal to axe 3'};
+    customcmap = [];
+else
+    if isfield(p,'direction_name')
+        direction_name=p.direction_name;
+    else
+        direction_name = {'Normal to axe 1','Normal to axe 2','Normal to axe 3'};
+    end
+    if isfield(p,'custom_colormap')
+        customcmap=p.custom_colormap;
+    else
+        customcmap = [];
+    end
 end
 
 
@@ -24,8 +36,14 @@ Phase_code=unique(array); % Get phase code
 number_phase=length(Phase_code); % Get number of phase
 Domain_size = size(array);
 % Default Colors
-for current_phase=1:1:number_phase
-    RGB_phase.index(current_phase).rgb = [color_phase_default(current_phase,1) color_phase_default(current_phase,2) color_phase_default(current_phase,3)];
+if nargin==2 && isfield(p,'custom_colormap')
+    for current_phase=1:1:number_phase
+        RGB_phase.index(current_phase).rgb = [customcmap(current_phase,1) customcmap(current_phase,2) customcmap(current_phase,3)];
+    end
+else
+    for current_phase=1:1:number_phase
+        RGB_phase.index(current_phase).rgb = [color_phase_default(current_phase,1) color_phase_default(current_phase,2) color_phase_default(current_phase,3)];
+    end
 end
 
 %% FIGURE
@@ -63,9 +81,13 @@ major_step = max([minor_step 0.1]);
 set(Slider_axes_2dview,'Min',1,'Max',Domain_size(direction),'SliderStep', [minor_step, major_step],'Value',1);
 
 % Colormap
+list_cmap = {'MATLAB default','gray','bone','copper','turbo','jet','parula','Random'};
+if ~isempty(customcmap)    
+    list_cmap = {'Custom','MATLAB default','gray','bone','copper','turbo','jet','parula','Random'};
+end
 Popup_colormap = uicontrol('Parent', Fig,'Style', 'popup','FontSize',font_size_GUI,'FontName',font_name_GUI,...
-    'String', {'MATLAB default','gray','bone','copper','jet','parula','Random'},'Value',1,'Units','normalized','Position', [0.725 0.05 0.215 0.04],'enable','on','Visible','on','Callback', @popup_colormap_Callback);
-    
+    'String',list_cmap ,'Value',1,'Units','normalized','Position', [0.725 0.05 0.215 0.04],'enable','on','Visible','on','Callback', @popup_colormap_Callback);
+
 % Slider
     function slider_axes2dview_Callback(source,~)
         % Get position value
@@ -94,9 +116,12 @@ Popup_colormap = uicontrol('Parent', Fig,'Style', 'popup','FontSize',font_size_G
                 RGB_phase.index(current_phase).rgb = [color_phase_random(current_phase,1) color_phase_random(current_phase,2) color_phase_random(current_phase,3)];
             end            
         else
-            custom_colormap = eval([color_map '(' num2str(number_phase) ')']);
+            if strcmp(color_map,'Custom')
+                custom_colormap = customcmap;
+            else
+                custom_colormap = eval([color_map '(' num2str(number_phase) ')']);
+            end
             for current_phase=1:1:number_phase
-                
                 RGB_phase.index(current_phase).rgb = [custom_colormap(current_phase,1) custom_colormap(current_phase,2) custom_colormap(current_phase,3)];
             end
         end

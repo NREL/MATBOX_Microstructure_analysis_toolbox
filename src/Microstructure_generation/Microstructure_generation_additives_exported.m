@@ -47,6 +47,27 @@ classdef Microstructure_generation_additives_exported < matlab.apps.AppBase
         PD_NewphaseparameterLabel       matlab.ui.control.Label
         PD_instructions                 matlab.ui.control.Label
         PD_title                        matlab.ui.control.Label
+        CoatingTab                      matlab.ui.container.Tab
+        Coating_AchievedEditField_2     matlab.ui.control.NumericEditField
+        AchievedEditFieldLabel_4        matlab.ui.control.Label
+        Coating_targetvolumefraction_2  matlab.ui.control.NumericEditField
+        TargetvolumefractionLabel_6     matlab.ui.control.Label
+        IfLabel_3                       matlab.ui.control.Label
+        Coating_TargetDropDown          matlab.ui.control.DropDown
+        TargetisDropDownLabel           matlab.ui.control.Label
+        Coating_statut                  matlab.ui.control.TextArea
+        Coating_generation              matlab.ui.control.Button
+        Coating_targetvolumefraction    matlab.ui.control.NumericEditField
+        TargetvolumefractionLabel_5     matlab.ui.control.Label
+        Coating_AchievedEditField       matlab.ui.control.NumericEditField
+        AchievedEditFieldLabel_3        matlab.ui.control.Label
+        Coating_DepositDropDown_2       matlab.ui.control.DropDown
+        IfLabel_2                       matlab.ui.control.Label
+        IfLabel                         matlab.ui.control.Label
+        Coating_DepositDropDown         matlab.ui.control.DropDown
+        DepositDropDownLabel            matlab.ui.control.Label
+        Coating_instructions            matlab.ui.control.Label
+        Coating_title                   matlab.ui.control.Label
         OutcomeTab                      matlab.ui.container.Tab
         O_savefolderLabel               matlab.ui.control.Label
         O_savefolderButton              matlab.ui.control.Button
@@ -61,6 +82,7 @@ classdef Microstructure_generation_additives_exported < matlab.apps.AppBase
         O_title                         matlab.ui.control.Label
         AboutTab                        matlab.ui.container.Tab
         Mistry_article                  matlab.ui.control.Button
+        MATBOX_article                  matlab.ui.control.Button
         LinksLabel                      matlab.ui.control.Label
         Github_ushbutton                matlab.ui.control.Button
         OpendocumentationButton         matlab.ui.control.Button
@@ -109,7 +131,8 @@ classdef Microstructure_generation_additives_exported < matlab.apps.AppBase
             end
             app.Turn_on_off(statut_tab,app.BetweenneighboursparticlesTab)
             app.Turn_on_off(statut_tab,app.EnergycriterionTab)    
-            app.Turn_on_off(statut_tab,app.OutcomeTab) 
+            app.Turn_on_off(statut_tab,app.CoatingTab)
+            app.Turn_on_off(statut_tab,app.OutcomeTab)            
         end
         
         function [] = finished_generation(app)
@@ -151,6 +174,7 @@ classdef Microstructure_generation_additives_exported < matlab.apps.AppBase
             app.Turn_on_off('off',app.BetweenneighboursparticlesTab)
             app.Turn_on_off('off',app.EnergycriterionTab)
             app.Turn_on_off('off',app.OutcomeTab)
+            app.Turn_on_off('off',app.CoatingTab)
         end
 
         % Button pushed function: Load_LoadvolumeButton
@@ -168,6 +192,7 @@ classdef Microstructure_generation_additives_exported < matlab.apps.AppBase
                 app.filesave_ini=[];
                 app.Turn_on_off('off',app.BetweenneighboursparticlesTab)
                 app.Turn_on_off('off',app.EnergycriterionTab)
+                app.Turn_on_off('off',app.CoatingTab)
                 app.Turn_on_off('off',app.OutcomeTab)
                 app.Load_ExistingphasesUITable.Data = [];
                 
@@ -193,6 +218,7 @@ classdef Microstructure_generation_additives_exported < matlab.apps.AppBase
                     app.filesave_ini = tmp;
                     app.Turn_on_off('on',app.BetweenneighboursparticlesTab)
                     app.Turn_on_off('on',app.EnergycriterionTab)
+                    app.Turn_on_off('on',app.CoatingTab)
                     % Volume fraction and background
                     phases = unique(Microstructure_local);
                     number_phase = length(phases);
@@ -222,13 +248,28 @@ classdef Microstructure_generation_additives_exported < matlab.apps.AppBase
                     tabledata(2,:)={'Fraction of additive phase, relative to target volume fraction, added at each step ','[0,1]',0.01};
                     app.PD_parameters_UITable.Data = tabledata;                    
                     
+                    %% Coating
+                    tmp=cell(number_phase-1,1);
+                    k=0;
+                    for current_phase=1:1:number_phase
+                        if phases(current_phase)~=0
+                            k=k+1;
+                            tmp(k,1)={num2str(phases(current_phase))};
+                        end
+                    end
+                    app.Coating_DepositDropDown_2.Items = tmp;
+                    app.Coating_DepositDropDown_2.Value = tmp(1);
+
+
+                    %% Load
                     app.VisualizeloadedmicrostructureButton.Enable = 'on';
                     app.Load_volumefraction_dense.Enable = 'on';  app.VolumefractiondenseLabel_3.Enable = 'on';
                     app.Load_nanoporosity.Enable = 'on'; app.NanoporosityLabel_3.Enable = 'on';
                     app.Load_Additive_id.Enable = 'on'; app.AdditiveidLabel.Enable = 'on';
                     app.Load_Additive_id.Value = double(max(phases)+1);
-                    
                     app.Load_volumefraction_denseValueChanged;
+
+
                     
                 else
                     app.Load_VolumeloaedLabel.Text ='Error: volume cannot be loaded! File is not a .tif file';
@@ -240,6 +281,7 @@ classdef Microstructure_generation_additives_exported < matlab.apps.AppBase
                     app.filesave_ini=[];
                     app.Turn_on_off('off',app.BetweenneighboursparticlesTab)
                     app.Turn_on_off('off',app.EnergycriterionTab)
+                    app.Turn_on_off('off',app.CoatingTab)
                     app.Turn_on_off('off',app.OutcomeTab)
                     app.Load_ExistingphasesUITable.Data = [];
                     app.VisualizeloadedmicrostructureButton.Enable = 'off';
@@ -261,10 +303,25 @@ classdef Microstructure_generation_additives_exported < matlab.apps.AppBase
                 tabledata(:,3) = {false};
                 if newData==1
                     tabledata(indices(1),3)={true};
+                    background = str2num(cell2mat(tabledata(indices(1),1)));
                 end
                 app.Load_ExistingphasesUITable.Data = tabledata;
             end
             app.Load_volumefraction_denseValueChanged;
+
+            phases=str2num(cell2mat(tabledata(:,1)));
+            number_phase=length(phases);
+            tmp=cell(number_phase-1,1);
+            k=0;
+            for current_phase=1:1:number_phase
+                if phases(current_phase) ~=background
+                    k=k+1;
+                    tmp(k,1)={num2str(phases(current_phase))};
+                end
+            end
+            app.Coating_DepositDropDown_2.Items = tmp;
+            app.Coating_DepositDropDown_2.Value = tmp(1);
+
         end
 
         % Button pushed function: Bridge_generation
@@ -501,6 +558,7 @@ classdef Microstructure_generation_additives_exported < matlab.apps.AppBase
             end
             app.Bridge_targetvolumefraction.Value = app.Load_targetvolumefraction.Value;
             app.PD_targetvolumefraction.Value = app.Load_targetvolumefraction.Value;
+            app.Coating_targetvolumefraction.Value = app.Load_targetvolumefraction.Value;
         end
 
         % Value changed function: Load_Additive_id
@@ -649,10 +707,71 @@ classdef Microstructure_generation_additives_exported < matlab.apps.AppBase
             web(url)
         end
 
-        % Button pushed function: Mistry_article
-        function Mistry_articlePushed(app, event)
-            url = 'https://doi.org/10.1021/acsami.7b17771';
+        % Button pushed function: MATBOX_article
+        function MATBOX_articlePushed(app, event)
+            url = 'https://doi.org/10.1016/j.softx.2021.100915';
             web(url)
+        end
+
+        % Button pushed function: Coating_generation
+        function Coating_generationButtonPushed(app, event)
+           app.Turn_on_off('off',app.OutcomeTab) 
+                        
+            % Prepare parameters
+            idx = find( cell2mat(app.Load_ExistingphasesUITable.Data(:,3))==1 );
+            app.Microstructure = app.Microstructure_initial; % Reset
+            background_id = str2num(cell2mat(app.Load_ExistingphasesUITable.Data(idx,1)));
+            target_volume_fraction = app.Load_targetvolumefraction.Value;
+            target_depth = app.Coating_targetvolumefraction_2.Value;
+            target_choice = app.Coating_TargetDropDown.Value;
+            deposit_sens = app.Coating_DepositDropDown.Value;
+            deposit_phase = str2num(app.Coating_DepositDropDown_2.Value);
+            additive_id = app.Load_Additive_id.Value;
+                   
+            time_cpu_start = cputime; % CPU start
+            tic; % Stopwatch start
+            app.Coating_statut.Value = {'Calculating...'}; pause(0.01);
+
+            % Call function
+            [app.Microstructure,achieved_volume_fraction,achieved_depth] = function_generate_coating(app.Microstructure,additive_id,deposit_sens,deposit_phase,target_volume_fraction,target_depth,target_choice);
+            
+            achieved_volume_fraction
+            achieved_depth
+
+
+            % CPU and stopwatch time - end
+            time_cpu_elapsed = cputime-time_cpu_start; % CPU elapsed time
+            time_stopwatch_elapsed = toc; % Stopwatch elapsed time
+
+            ntot = numel(app.Microstructure);
+            app.Coating_statut.Value = {[num2str(ntot,'%i'),' voxels (domain)'],['Stopwatch time:',num2str(time_stopwatch_elapsed,'%1.1f'), 's'],['CPU time:',num2str(time_cpu_elapsed,'%1.1f'), 's']}; pause(0.01);
+            app.Coating_AchievedEditField.Value = sum(sum(sum( app.Microstructure==additive_id  ))) / numel(app.Microstructure);
+            app.Coating_AchievedEditField_2.Value = achieved_depth;
+
+            % Done
+            app.O_filename_save.Value = [app.filesave_ini '_coating.tif'];
+            app.finished_generation
+        end
+
+        % Value changed function: Coating_TargetDropDown
+        function Coating_TargetDropDownValueChanged(app, event)
+            value = app.Coating_TargetDropDown.Value;
+            if strcmp(value,'Volume fraction')
+                app.TargetvolumefractionLabel_6.Enable = 'off';
+                app.TargetvolumefractionLabel_5.Enable = 'on';
+                app.Coating_targetvolumefraction_2.Editable = 'off';
+            elseif strcmp(value,'Coating depth in voxel')
+                app.TargetvolumefractionLabel_6.Enable = 'on';
+                app.TargetvolumefractionLabel_5.Enable = 'off';
+                app.Coating_targetvolumefraction_2.Editable = 'on';
+            end
+
+        end
+
+        % Button pushed function: Mistry_article
+        function Mistry_articleButtonPushed(app, event)
+            url = 'https://doi.org/10.1021/acsami.7b17771';
+            web(url)            
         end
     end
 
@@ -954,6 +1073,136 @@ classdef Microstructure_generation_additives_exported < matlab.apps.AppBase
             app.PD_ProgressionGauge.MajorTicks = [0 10 20 30 40 50 60 70 80 90 100];
             app.PD_ProgressionGauge.Position = [203 13 351 87];
 
+            % Create CoatingTab
+            app.CoatingTab = uitab(app.TabGroup);
+            app.CoatingTab.Title = 'Coating';
+            app.CoatingTab.ForegroundColor = [0 0 1];
+
+            % Create Coating_title
+            app.Coating_title = uilabel(app.CoatingTab);
+            app.Coating_title.BackgroundColor = [0.4667 0.6745 0.1882];
+            app.Coating_title.HorizontalAlignment = 'center';
+            app.Coating_title.FontWeight = 'bold';
+            app.Coating_title.Position = [13 557 718 22];
+            app.Coating_title.Text = 'Additive phase is a uniform layer at the surface of an existing phase';
+
+            % Create Coating_instructions
+            app.Coating_instructions = uilabel(app.CoatingTab);
+            app.Coating_instructions.FontAngle = 'italic';
+            app.Coating_instructions.Position = [13 525 718 22];
+            app.Coating_instructions.Text = 'Instructions: Choose algorithms parameters and click generate. Once done, you can go to the outcome tab for viusalization and saving.';
+
+            % Create DepositDropDownLabel
+            app.DepositDropDownLabel = uilabel(app.CoatingTab);
+            app.DepositDropDownLabel.HorizontalAlignment = 'right';
+            app.DepositDropDownLabel.Position = [13 494 46 22];
+            app.DepositDropDownLabel.Text = 'Deposit';
+
+            % Create Coating_DepositDropDown
+            app.Coating_DepositDropDown = uidropdown(app.CoatingTab);
+            app.Coating_DepositDropDown.Items = {'From particle surface to background', 'From particle surface to particle interior'};
+            app.Coating_DepositDropDown.Position = [74 494 249 22];
+            app.Coating_DepositDropDown.Value = 'From particle surface to background';
+
+            % Create IfLabel
+            app.IfLabel = uilabel(app.CoatingTab);
+            app.IfLabel.Position = [13 464 668 22];
+            app.IfLabel.Text = 'If ''From particle surface to particle interior'' is selected, new phase is generated within a solid phase, not within background';
+
+            % Create IfLabel_2
+            app.IfLabel_2 = uilabel(app.CoatingTab);
+            app.IfLabel_2.Position = [341 493 69 22];
+            app.IfLabel_2.Text = 'for phase Id';
+
+            % Create Coating_DepositDropDown_2
+            app.Coating_DepositDropDown_2 = uidropdown(app.CoatingTab);
+            app.Coating_DepositDropDown_2.Items = {'1'};
+            app.Coating_DepositDropDown_2.Position = [419 494 43 22];
+            app.Coating_DepositDropDown_2.Value = '1';
+
+            % Create AchievedEditFieldLabel_3
+            app.AchievedEditFieldLabel_3 = uilabel(app.CoatingTab);
+            app.AchievedEditFieldLabel_3.HorizontalAlignment = 'right';
+            app.AchievedEditFieldLabel_3.Position = [13 336 55 22];
+            app.AchievedEditFieldLabel_3.Text = 'Achieved';
+
+            % Create Coating_AchievedEditField
+            app.Coating_AchievedEditField = uieditfield(app.CoatingTab, 'numeric');
+            app.Coating_AchievedEditField.Editable = 'off';
+            app.Coating_AchievedEditField.Position = [158 336 71 22];
+
+            % Create TargetvolumefractionLabel_5
+            app.TargetvolumefractionLabel_5 = uilabel(app.CoatingTab);
+            app.TargetvolumefractionLabel_5.HorizontalAlignment = 'right';
+            app.TargetvolumefractionLabel_5.Position = [13 363 124 22];
+            app.TargetvolumefractionLabel_5.Text = 'Target volume fraction';
+
+            % Create Coating_targetvolumefraction
+            app.Coating_targetvolumefraction = uieditfield(app.CoatingTab, 'numeric');
+            app.Coating_targetvolumefraction.Limits = [0 1];
+            app.Coating_targetvolumefraction.Editable = 'off';
+            app.Coating_targetvolumefraction.Position = [158 363 71 22];
+            app.Coating_targetvolumefraction.Value = 0.1;
+
+            % Create Coating_generation
+            app.Coating_generation = uibutton(app.CoatingTab, 'push');
+            app.Coating_generation.ButtonPushedFcn = createCallbackFcn(app, @Coating_generationButtonPushed, true);
+            app.Coating_generation.BackgroundColor = [0.0745 0.6235 1];
+            app.Coating_generation.FontSize = 16;
+            app.Coating_generation.FontWeight = 'bold';
+            app.Coating_generation.FontColor = [1 1 1];
+            app.Coating_generation.Enable = 'off';
+            app.Coating_generation.Position = [13 13 96 87];
+            app.Coating_generation.Text = 'Generate';
+
+            % Create Coating_statut
+            app.Coating_statut = uitextarea(app.CoatingTab);
+            app.Coating_statut.Position = [573 13 158 87];
+            app.Coating_statut.Value = {'Not running'};
+
+            % Create TargetisDropDownLabel
+            app.TargetisDropDownLabel = uilabel(app.CoatingTab);
+            app.TargetisDropDownLabel.HorizontalAlignment = 'right';
+            app.TargetisDropDownLabel.Position = [13 424 51 22];
+            app.TargetisDropDownLabel.Text = 'Target is';
+
+            % Create Coating_TargetDropDown
+            app.Coating_TargetDropDown = uidropdown(app.CoatingTab);
+            app.Coating_TargetDropDown.Items = {'Volume fraction', 'Coating depth in voxel'};
+            app.Coating_TargetDropDown.ValueChangedFcn = createCallbackFcn(app, @Coating_TargetDropDownValueChanged, true);
+            app.Coating_TargetDropDown.Position = [79 424 162 22];
+            app.Coating_TargetDropDown.Value = 'Volume fraction';
+
+            % Create IfLabel_3
+            app.IfLabel_3 = uilabel(app.CoatingTab);
+            app.IfLabel_3.Position = [14 394 450 22];
+            app.IfLabel_3.Text = 'If ''Coating depth in voxel'' is selected, target volume fraction of first tab is not used.';
+
+            % Create TargetvolumefractionLabel_6
+            app.TargetvolumefractionLabel_6 = uilabel(app.CoatingTab);
+            app.TargetvolumefractionLabel_6.HorizontalAlignment = 'right';
+            app.TargetvolumefractionLabel_6.Position = [268 363 116 22];
+            app.TargetvolumefractionLabel_6.Text = 'Target depth in voxel';
+
+            % Create Coating_targetvolumefraction_2
+            app.Coating_targetvolumefraction_2 = uieditfield(app.CoatingTab, 'numeric');
+            app.Coating_targetvolumefraction_2.Limits = [1 Inf];
+            app.Coating_targetvolumefraction_2.RoundFractionalValues = 'on';
+            app.Coating_targetvolumefraction_2.Editable = 'off';
+            app.Coating_targetvolumefraction_2.Position = [405 363 71 22];
+            app.Coating_targetvolumefraction_2.Value = 1;
+
+            % Create AchievedEditFieldLabel_4
+            app.AchievedEditFieldLabel_4 = uilabel(app.CoatingTab);
+            app.AchievedEditFieldLabel_4.HorizontalAlignment = 'right';
+            app.AchievedEditFieldLabel_4.Position = [265 337 55 22];
+            app.AchievedEditFieldLabel_4.Text = 'Achieved';
+
+            % Create Coating_AchievedEditField_2
+            app.Coating_AchievedEditField_2 = uieditfield(app.CoatingTab, 'numeric');
+            app.Coating_AchievedEditField_2.Editable = 'off';
+            app.Coating_AchievedEditField_2.Position = [405 337 71 22];
+
             % Create OutcomeTab
             app.OutcomeTab = uitab(app.TabGroup);
             app.OutcomeTab.Title = 'Outcome';
@@ -1060,7 +1309,7 @@ classdef Microstructure_generation_additives_exported < matlab.apps.AppBase
             % Create About_Quotationinstructions
             app.About_Quotationinstructions = uitextarea(app.AboutTab);
             app.About_Quotationinstructions.Position = [162 240 569 148];
-            app.About_Quotationinstructions.Value = {'- For any additive generated with this module:'; 'F. L. E. Usseglio-Viretta et al., MATBOX: An Open-source Microstructure Analysis Toolbox for microstructure generation, segmentation, characterization, visualization, correlation, and meshing, SoftwareX, in preparation'; ''; '- If you generate the phase using the energy criterion, please ALSO quote:'; 'A. N. Mistry, K. Smith, and P. P. Mukherjee, Secondary Phase Stochastics in Lithium-Ion Battery Electrodes, ACS Appl. Mater. Interfaces 10(7) pp. 6317-6326 (2018), https://doi.org/10.1021/acsami.7b17771'; ''};
+            app.About_Quotationinstructions.Value = {'- For any additive generated with this module:'; 'F. L. E. Usseglio-Viretta et al., MATBOX: An Open-source Microstructure Analysis Toolbox for microstructure generation, segmentation, characterization, visualization, correlation, and meshing, SoftwareX, 17, 2022, https://doi.org/10.1016/j.softx.2021.100915'; ''; '- If you generate the phase using the energy criterion, please ALSO quote:'; 'A. N. Mistry, K. Smith, and P. P. Mukherjee, Secondary Phase Stochastics in Lithium-Ion Battery Electrodes, ACS Appl. Mater. Interfaces 10(7) pp. 6317-6326 (2018), https://doi.org/10.1021/acsami.7b17771'; ''};
 
             % Create About_Logo_NREL
             app.About_Logo_NREL = uiimage(app.AboutTab);
@@ -1080,7 +1329,7 @@ classdef Microstructure_generation_additives_exported < matlab.apps.AppBase
             app.Github_ushbutton.ButtonPushedFcn = createCallbackFcn(app, @Github_ushbuttonPushed, true);
             app.Github_ushbutton.HorizontalAlignment = 'left';
             app.Github_ushbutton.BackgroundColor = [0.8 0.8 0.8];
-            app.Github_ushbutton.Position = [295 84 441 40];
+            app.Github_ushbutton.Position = [295 102 441 30];
             app.Github_ushbutton.Text = 'Github repository: MATBOX';
 
             % Create LinksLabel
@@ -1089,12 +1338,20 @@ classdef Microstructure_generation_additives_exported < matlab.apps.AppBase
             app.LinksLabel.Position = [13 134 37 22];
             app.LinksLabel.Text = 'Links';
 
+            % Create MATBOX_article
+            app.MATBOX_article = uibutton(app.AboutTab, 'push');
+            app.MATBOX_article.ButtonPushedFcn = createCallbackFcn(app, @MATBOX_articlePushed, true);
+            app.MATBOX_article.HorizontalAlignment = 'left';
+            app.MATBOX_article.BackgroundColor = [0.8 0.8 0.8];
+            app.MATBOX_article.Position = [295 67 441 30];
+            app.MATBOX_article.Text = 'Journal article: MATBOX';
+
             % Create Mistry_article
             app.Mistry_article = uibutton(app.AboutTab, 'push');
-            app.Mistry_article.ButtonPushedFcn = createCallbackFcn(app, @Mistry_articlePushed, true);
+            app.Mistry_article.ButtonPushedFcn = createCallbackFcn(app, @Mistry_articleButtonPushed, true);
             app.Mistry_article.HorizontalAlignment = 'left';
             app.Mistry_article.BackgroundColor = [0.8 0.8 0.8];
-            app.Mistry_article.Position = [295 39 441 40];
+            app.Mistry_article.Position = [295 32 441 30];
             app.Mistry_article.Text = 'Journal article: Secondary Phase Stochastics in Lithium-Ion Battery Electrodes';
 
             % Show the figure after all components are created
