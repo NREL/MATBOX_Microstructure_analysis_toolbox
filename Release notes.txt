@@ -1,5 +1,10 @@
 Release version notes:
 
+01/07/2022
+Generation module, additive submodule: added third generation choice: coating
+Updated author's list (welcome to Dr. Jerome Laurencin from CEA Grenoble, France)
+Added instructions to change Iso2mesh temp folder to avoid right permission issue.
+
 10/21/2021
 All app files updated to MATLAB 2021b. If you have truncated interfaces, you should update to 2021b.
 Stochastic particle generation algorithm documentation has been updated.
