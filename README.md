@@ -41,8 +41,8 @@ Contributions (excluding third-party software):
 If you produce results using the toolbox, or use some or parts of the algorithms contained within the toolbox, please quote them accordingly:
 * For any results produced with the toolbox, please quote: F. L. E. Usseglio-Viretta et al., MATBOX: An Open-source Microstructure Analysis Toolbox for microstructure generation, segmentation, characterization, visualization, correlation, and meshing, SoftwareX, 17, 2022, https://doi.org/10.1016/j.softx.2021.100915
 * If you are generating additive phase with the energy criterion method, then please **also** quote: A. N. Mistry, K. Smith, and P. P. Mukherjee, Secondary Phase Stochastics in Lithium-Ion Battery Electrodes, ACS Appl. Mater. Interfaces 10(7) pp. 6317-6326 (2018), https://doi.org/10.1021/acsami.7b17771
-* If you are calculating tortuosity factor, then please **also** quote: S.J. Cooper, A. Bertei, P.R. Shearing, J.A. Kilner, and N.P. Brandon, TauFactor: An open-source application for calculating tortuosity factors from tomographic data, SoftwareX, Volume 5, 2016, Pages 203-210
-* If you are generating unstructured meshes, then please **also** quote: Q. Fang and D. A. Boas, Tetrahedral Mesh Generation From Volumetric Binary and Gray-scale Images, Proceedings of IEEE International Symposium on Biomedical Imaging 2009, 2009, Pages 1142-1145
+* If you are calculating tortuosity factor, then please **also** quote: S.J. Cooper, A. Bertei, P.R. Shearing, J.A. Kilner, and N.P. Brandon, TauFactor: An open-source application for calculating tortuosity factors from tomographic data, SoftwareX, Volume 5, 2016, Pages 203-210, https://doi.org/10.1016/j.softx.2016.09.002
+* If you are generating unstructured meshes, then please **also** quote: Q. Fang and D. A. Boas, Tetrahedral Mesh Generation From Volumetric Binary and Gray-scale Images, Proceedings of IEEE International Symposium on Biomedical Imaging 2009, 2009, Pages 1142-1145, https://doi.org/10.1109/ISBI.2009.5193259
 
 ## What's next?
 - Re-work the characterization and correlation module.
@@ -52,10 +52,10 @@ If you produce results using the toolbox, or use some or parts of the algorithms
 MATBOX already includes third-party open source algorithms (full list in documentation). If you wish to add algorithm(s) in MATBOX, please contact the author at francois.usseglioviretta@nrel.gov or let a message in the discussion section of this repository.
 All the same if you have suggestions, feedbacks, or want to report a bug.
 
-**IMPORTANT NOTES**
+## Important notes
 * I got some feedbacks from MAC users the GUI does not initialize well, while there is no issue for Windows Users. Therefore, currently Windows is recommended over other OS.
-* Some module built with app designer required MATLAB 2021a. A simple workaround is to open the mlapp file with app designer as it will automatically convert the file to your MATLAB version (but you may loss some functionnality).
-* Matlab app designer does not have a consistent behavior from version to version about the tab (left side of the interface). It may be truncated or not. If not truncated, it may truncate the right side of the GUI. If that happens to you, open the mlapp file with app designer and increase the width of the GUI (both the figure and the tab container). It should fix your issue.
+* Some modules built with app designer require MATLAB 2021a. A simple workaround is to open the mlapp file with app designer as it will automatically convert the file to your MATLAB version (but you may loss some functionnality).
+* Matlab app designer does not have a consistent behavior from version to version about the GUI tab (left side of the interface). It may be truncated or not. If not truncated, it may truncate the right side of the GUI. If that happens to you, open the mlapp file with app designer and increase the width of the GUI (both the figure and the tab container). It should fix your issue.
 
 ## License
 This toolbox uses BSD license. NREL Software Record number SWR-20-76. License file is in this folder. Third-party licenses are available in the third-party licences folder.
