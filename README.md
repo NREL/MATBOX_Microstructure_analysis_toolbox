@@ -7,7 +7,7 @@ See release_notes.txt for a change log.
 
 ## MATBOX's Publication
 **MATBOX has been published in an peer-reviewed journal article**\
-F.L.E.Usseglio-Viretta, P.Patel, E.Bernhardt, A.Mistry, P.P.Mukherjee, J.Allen, S.J.Cooper, J.Laurencin, K.Smith, MATBOX: An Open-source Microstructure Analysis Toolbox for microstructure generation, segmentation, characterization, visualization, correlation, and meshing, SoftwareX, Volume 17, January 2022, 100915\
+F.L.E.Usseglio-Viretta, P.Patel, E.Bernhardt, A.Mistry, P.P.Mukherjee, J.Allen, S.J.Cooper, J.Laurencin, K.Smith, *MATBOX: An Open-source Microstructure Analysis Toolbox for microstructure generation, segmentation, characterization, visualization, correlation, and meshing*, SoftwareX, Volume 17, January 2022, 100915\
 https://doi.org/10.1016/j.softx.2021.100915
 
 ## What is MATBOX?
@@ -39,10 +39,10 @@ Contributions (excluding third-party software):
 
 ## How to cite
 If you produce results using the toolbox, or use some or parts of the algorithms contained within the toolbox, please quote them accordingly:
-* For any results produced with the toolbox, please quote: F. L. E. Usseglio-Viretta et al., MATBOX: An Open-source Microstructure Analysis Toolbox for microstructure generation, segmentation, characterization, visualization, correlation, and meshing, SoftwareX, 17, 2022, https://doi.org/10.1016/j.softx.2021.100915
-* If you are generating additive phase with the energy criterion method, then please **also** quote: A. N. Mistry, K. Smith, and P. P. Mukherjee, Secondary Phase Stochastics in Lithium-Ion Battery Electrodes, ACS Appl. Mater. Interfaces 10(7) pp. 6317-6326 (2018), https://doi.org/10.1021/acsami.7b17771
-* If you are calculating tortuosity factor, then please **also** quote: S.J. Cooper, A. Bertei, P.R. Shearing, J.A. Kilner, and N.P. Brandon, TauFactor: An open-source application for calculating tortuosity factors from tomographic data, SoftwareX, Volume 5, 2016, Pages 203-210, https://doi.org/10.1016/j.softx.2016.09.002
-* If you are generating unstructured meshes, then please **also** quote: Q. Fang and D. A. Boas, Tetrahedral Mesh Generation From Volumetric Binary and Gray-scale Images, Proceedings of IEEE International Symposium on Biomedical Imaging 2009, 2009, Pages 1142-1145, https://doi.org/10.1109/ISBI.2009.5193259
+* For any results produced with the toolbox, please quote: F. L. E. Usseglio-Viretta et al., *MATBOX: An Open-source Microstructure Analysis Toolbox for microstructure generation, segmentation, characterization, visualization, correlation, and meshing*, SoftwareX, 17, 2022, https://doi.org/10.1016/j.softx.2021.100915
+* If you are generating additive phase with the energy criterion method, then please **also** quote: A. N. Mistry, K. Smith, and P. P. Mukherjee, *Secondary Phase Stochastics in Lithium-Ion Battery Electrodes*, ACS Appl. Mater. Interfaces 10(7) pp. 6317-6326 (2018), https://doi.org/10.1021/acsami.7b17771
+* If you are calculating tortuosity factor, then please **also** quote: S.J. Cooper, A. Bertei, P.R. Shearing, J.A. Kilner, and N.P. Brandon, *TauFactor: An open-source application for calculating tortuosity factors from tomographic data*, SoftwareX, Volume 5, 2016, Pages 203-210, https://doi.org/10.1016/j.softx.2016.09.002
+* If you are generating unstructured meshes, then please **also** quote: Q. Fang and D. A. Boas, *Tetrahedral Mesh Generation From Volumetric Binary and Gray-scale Images*, Proceedings of IEEE International Symposium on Biomedical Imaging 2009, 2009, Pages 1142-1145, https://doi.org/10.1109/ISBI.2009.5193259
 
 ## What's next?
 - Re-work the characterization and correlation module.
