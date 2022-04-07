@@ -1,8 +1,8 @@
 # MATBOX: Microstructure Analysis Toolbox
 **MATLAB open source microstructure analysis code embedded with a graphic user interface**\
 *v1.0b May 19, 2021*\
-See release_notes.txt for a change log.
-Next version (re-work of characterization module) is underway.
+See release_notes.txt for a change log.\
+**Next version (re-work of characterization module) is underway.**
 
 ![MATBOX](https://github.com/NREL/MATBOX_Microstructure_analysis_toolbox/blob/master/MATBOX_logo.png)
 
