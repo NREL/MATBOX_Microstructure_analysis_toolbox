@@ -2,6 +2,7 @@
 **MATLAB open source microstructure analysis code embedded with a graphic user interface**\
 *v1.0b May 19, 2021*\
 See release_notes.txt for a change log.
+Next version (re-work of characterization module) is underway.
 
 ![MATBOX](https://github.com/NREL/MATBOX_Microstructure_analysis_toolbox/blob/master/MATBOX_logo.png)
 
@@ -9,6 +10,11 @@ See release_notes.txt for a change log.
 **MATBOX has been published in an peer-reviewed journal article**\
 F.L.E.Usseglio-Viretta, P.Patel, E.Bernhardt, A.Mistry, P.P.Mukherjee, J.Allen, S.J.Cooper, J.Laurencin, K.Smith, *MATBOX: An Open-source Microstructure Analysis Toolbox for microstructure generation, segmentation, characterization, visualization, correlation, and meshing*, SoftwareX, Volume 17, January 2022, 100915\
 https://doi.org/10.1016/j.softx.2021.100915
+
+## Official webpage
+**MATBOX has now its official webpage!**\
+You can find it in the data and tools/energy storage/ section of the NREL transportation site at https://www.nrel.gov/transportation/matbox.html
+From the same author, you can also find a library of electrode microstructures (NMC/graphite) at https://www.nrel.gov/transportation/microstructure.html
 
 ## What is MATBOX?
 MATBOX is a MATLAB application for performing various microstructure-related tasks including **microstructure numerical generation**, **image filtering** and **microstructure segmentation**, **microstructure characterization**, **three-dimensional visualization**, **result correlation**, and **microstructure meshing**. \
