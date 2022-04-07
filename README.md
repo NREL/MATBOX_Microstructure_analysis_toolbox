@@ -13,8 +13,8 @@ https://doi.org/10.1016/j.softx.2021.100915
 
 ## Official webpage
 **MATBOX has now its official webpage!**\
-You can find it in the data and tools/energy storage/ section of the NREL transportation site at https://www.nrel.gov/transportation/matbox.html
-From the same author, you can also find a library of electrode microstructures (NMC/graphite) at https://www.nrel.gov/transportation/microstructure.html
+You can find it in the data and tools/energy storage/ section of the NREL transportation site at: https://www.nrel.gov/transportation/matbox.html \
+From the same author, you can also find a library of electrode microstructures (NMC/graphite) at: https://www.nrel.gov/transportation/microstructure.html
 
 ## What is MATBOX?
 MATBOX is a MATLAB application for performing various microstructure-related tasks including **microstructure numerical generation**, **image filtering** and **microstructure segmentation**, **microstructure characterization**, **three-dimensional visualization**, **result correlation**, and **microstructure meshing**. \
