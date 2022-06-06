@@ -1,5 +1,8 @@
 Release version notes:
 
+06/06/2022
+Bug fix (generation module/stochastic algorithm): generated volumes with phases with low or zero volume fractions locally should now match the target volume fractions.
+
 01/07/2022
 Generation module, additive submodule: added third generation choice: coating
 Updated author's list (welcome to Dr. Jerome Laurencin from CEA Grenoble, France)
