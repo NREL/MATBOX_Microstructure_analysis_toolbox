@@ -567,6 +567,7 @@ for current_pass=1:1:number_pass
                 particle_id = particle_id+1; % Update
                 % Update volume fractions
                 phase(current_phase).current_volumefraction.along_3rd_axis_allslices(z_update_min:z_update_max) = sum(sum(microstructure3D.phase(:,:,z_update_min:z_update_max)==phase(current_phase).code))/area_xy;
+
                 % Update particle size histogram
                 for k_diameter=1:1:length(unique_diameter)
                     current_section = zeros(z_update_max-z_update_min+1,1);
@@ -621,7 +622,7 @@ for current_pass=1:1:number_pass
             y_center = Coordinates_all_voxels(idx_center,2);
             z_center = Coordinates_all_voxels(idx_center,3);
             
-            remaining_volume_fraction_currentphase_z = phase(current_phase).volumefraction.along_3rd_axis_allslices(z_center) - phase(current_phase).current_volumefraction.along_3rd_axis_allslices(z_center); % volume fraction of the current phase at z_center
+            remaining_volume_fraction_currentphase_z = max(0, phase(current_phase).volumefraction.along_3rd_axis_allslices(z_center) - phase(current_phase).current_volumefraction.along_3rd_axis_allslices(z_center)); % volume fraction of the current phase at z_center
             
             normalized_term = 0;
             for kk=1:1:number_phase
