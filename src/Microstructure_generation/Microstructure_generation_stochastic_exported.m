@@ -169,6 +169,7 @@ classdef Microstructure_generation_stochastic_exported < matlab.apps.AppBase
         SelectasolidphaseandsetthenumberofLabel_21  matlab.ui.control.Label
         Instructions_characterization   matlab.ui.control.Label
         GenerationTab                   matlab.ui.container.Tab
+        WarningdonotresizefigureswhilegenerationisongoingLabel  matlab.ui.control.Label
         outcometime_UITable             matlab.ui.control.Table
         AlgothmisfasterforLabel_16      matlab.ui.control.Label
         AlgothmisfasterforLabel_15      matlab.ui.control.Label
@@ -609,8 +610,8 @@ classdef Microstructure_generation_stochastic_exported < matlab.apps.AppBase
                 app.phase(k).name = char(phase_name(k));
                 app.phase(k).code = cell2mat(phase_label(k));
                 app.phase(k).volumefraction.along_3rd_axis = [pos_ vf_solid(:,k)]';
-            end                    
-            
+            end 
+
             app.domain_size = cell2mat(app.Phase_domainUITable.Data(:,2)');
             % % Diameter tab
             % Prepare diameter main tab
@@ -1771,15 +1772,15 @@ classdef Microstructure_generation_stochastic_exported < matlab.apps.AppBase
             app.SetpropertiesdefinedwithascalarLabel = uilabel(app.Instructions);
             app.SetpropertiesdefinedwithascalarLabel.FontWeight = 'bold';
             app.SetpropertiesdefinedwithascalarLabel.FontColor = [0.2902 0.451 0.0863];
-            app.SetpropertiesdefinedwithascalarLabel.Position = [11 349 219 22];
-            app.SetpropertiesdefinedwithascalarLabel.Text = '   Set properties defined with a scalar';
+            app.SetpropertiesdefinedwithascalarLabel.Position = [11 349 544 22];
+            app.SetpropertiesdefinedwithascalarLabel.Text = '   Set properties defined with a scalar per slice along thickness (though-plane heterogeneity)';
 
             % Create SetpropertiesdefinedwithanhistogramdistributionLabel
             app.SetpropertiesdefinedwithanhistogramdistributionLabel = uilabel(app.Instructions);
             app.SetpropertiesdefinedwithanhistogramdistributionLabel.FontWeight = 'bold';
             app.SetpropertiesdefinedwithanhistogramdistributionLabel.FontColor = [0 0 1];
-            app.SetpropertiesdefinedwithanhistogramdistributionLabel.Position = [11 327 331 22];
-            app.SetpropertiesdefinedwithanhistogramdistributionLabel.Text = '   Set properties defined with an histogram (distribution)';
+            app.SetpropertiesdefinedwithanhistogramdistributionLabel.Position = [11 327 656 22];
+            app.SetpropertiesdefinedwithanhistogramdistributionLabel.Text = '   Set properties defined with an histogram per slice along thickness (in-plane and through-plane heterogeneity)';
 
             % Create SetalgorithmadditionalparametersLabel
             app.SetalgorithmadditionalparametersLabel = uilabel(app.Instructions);
@@ -1992,7 +1993,7 @@ classdef Microstructure_generation_stochastic_exported < matlab.apps.AppBase
             app.VolumefractionsTab = uitab(app.TabGroup);
             app.VolumefractionsTab.Tooltip = {'Phase and volume fractions'};
             app.VolumefractionsTab.Title = 'Volume fractions';
-            app.VolumefractionsTab.ForegroundColor = [0.2431 0.4118 0.0275];
+            app.VolumefractionsTab.ForegroundColor = [0.2392 0.4118 0.0314];
 
             % Create Label
             app.Label = uilabel(app.VolumefractionsTab);
@@ -2488,7 +2489,7 @@ classdef Microstructure_generation_stochastic_exported < matlab.apps.AppBase
 
             % Create OverlappingTab
             app.OverlappingTab = uitab(app.TabGroup);
-            app.OverlappingTab.Tooltip = {'Particle overlapping'};
+            app.OverlappingTab.Tooltip = {'With mono-size sphere randomly distributed, the theoretical density limit is 63.4% (porosity 36.6%). You can expect to reach density limit sooner with a numerical algorithm. From previous runs, you can generate 40% spheres without overlapping. For higher density, an overlapping of 0.1 (45%), 0.175 (50%), 0.25 (55%) and 0.3 (60%) was required. To increase particle density, you can also use particle size and elongation distribution instead of mono-size ideal spheres.'};
             app.OverlappingTab.Title = 'Overlapping';
             app.OverlappingTab.ForegroundColor = [1 0.302 0];
 
@@ -2502,7 +2503,8 @@ classdef Microstructure_generation_stochastic_exported < matlab.apps.AppBase
 
             % Create Label_2
             app.Label_2 = uilabel(app.OverlappingTab);
-            app.Label_2.Position = [11 675 977 56];
+            app.Label_2.Tooltip = {''};
+            app.Label_2.Position = [11 675 721 56];
             app.Label_2.Text = {'Theoretical maximum density for unisize sphere packing is 74% [1], and for random spatial distribution of unisize spheres 63.4% [2].'; 'Overlapping enables to overcome this packing density limit.'; '[1] A. Bezdek and W. Kuperberg, Arxiv (2010).'; '[2] C. Song, P. Wang, and H. A. Makse, Nature, 453, 629–632 (2008).'};
 
             % Create Label_3
@@ -2513,6 +2515,7 @@ classdef Microstructure_generation_stochastic_exported < matlab.apps.AppBase
 
             % Create Overlapping_Image
             app.Overlapping_Image = uiimage(app.OverlappingTab);
+            app.Overlapping_Image.Tooltip = {''};
             app.Overlapping_Image.Position = [11 258 550 374];
             app.Overlapping_Image.ImageSource = 'Particle_overlapping.png';
 
@@ -2903,6 +2906,7 @@ classdef Microstructure_generation_stochastic_exported < matlab.apps.AppBase
             app.Instructions_generation.BackgroundColor = [0.4667 0.6745 0.1882];
             app.Instructions_generation.HorizontalAlignment = 'center';
             app.Instructions_generation.FontWeight = 'bold';
+            app.Instructions_generation.FontAngle = 'italic';
             app.Instructions_generation.Position = [11 746 977 22];
             app.Instructions_generation.Text = 'Once all parameters have been set, run the generation algorithm';
 
@@ -2984,6 +2988,13 @@ classdef Microstructure_generation_stochastic_exported < matlab.apps.AppBase
             app.outcometime_UITable.ColumnName = {'Outcome'; 'Generation'; 'Scaling'; 'Characterization'};
             app.outcometime_UITable.RowName = {};
             app.outcometime_UITable.Position = [611 352 377 260];
+
+            % Create WarningdonotresizefigureswhilegenerationisongoingLabel
+            app.WarningdonotresizefigureswhilegenerationisongoingLabel = uilabel(app.GenerationTab);
+            app.WarningdonotresizefigureswhilegenerationisongoingLabel.HorizontalAlignment = 'right';
+            app.WarningdonotresizefigureswhilegenerationisongoingLabel.FontAngle = 'italic';
+            app.WarningdonotresizefigureswhilegenerationisongoingLabel.Position = [629 706 359 28];
+            app.WarningdonotresizefigureswhilegenerationisongoingLabel.Text = {'Warning: do not resize figures while generation is on-going'; '(MATLAB expects each frame of the video to have the same size)'};
 
             % Create VisualizationTab
             app.VisualizationTab = uitab(app.TabGroup);
@@ -3117,7 +3128,7 @@ classdef Microstructure_generation_stochastic_exported < matlab.apps.AppBase
             app.TextArea = uitextarea(app.HowtoquoteTab);
             app.TextArea.Editable = 'off';
             app.TextArea.Position = [11 644 978 60];
-            app.TextArea.Value = {'F. L. E. Usseglio-Viretta, P. Patel, E. Bernhardt, A Mistry, P. P. Mukherjee, J. Allen, S. J. Cooper, and K. Smith'; 'MATBOX: An Open-source Microstructure Analysis Toolbox for microstructure generation, segmentation, characterization, visualization, correlation, and meshing'; 'SoftwareX, 17, 2022, https://doi.org/10.1016/j.softx.2021.100915'};
+            app.TextArea.Value = {'F. L. E. Usseglio-Viretta, P. Patel, E. Bernhardt, A Mistry, P. P. Mukherjee, J. Allen, S. J. Cooper, J. Laurencin, and K. Smith'; 'MATBOX: An Open-source Microstructure Analysis Toolbox for microstructure generation, segmentation, characterization, visualization, correlation, and meshing'; 'SoftwareX, 17, 2022, https://doi.org/10.1016/j.softx.2021.100915'};
 
             % Show the figure after all components are created
             app.EllipsoidbasedstochasticgenerationmoduleUIFigure.Visible = 'on';

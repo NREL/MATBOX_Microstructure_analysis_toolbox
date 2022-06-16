@@ -216,7 +216,7 @@ end
 
 
 if stoping_conditions.plot
-    c_ = colororder;
+    c_ = [colororder; rand(1000,3)];
     
     Fig_global_progression = figure; % Create figure
     Fig_global_progression.Name= 'Algorithm generation progression and rate'; % Figure name
@@ -552,7 +552,16 @@ for current_pass=1:1:number_pass
                         hold(ax_video,'off');
                         pause(0.01); % Force refresh of the graph
                         stored_frame(frame_number) = getframe(Fig_progression_video);
-                        writeVideo(video_handle,stored_frame(frame_number))
+
+                        try
+                            writeVideo(video_handle,stored_frame(frame_number))
+                        catch ME
+                            if (strcmp(ME.identifier,'MATLAB:audiovideo:VideoWriter:invalidDimensions'))
+                                error('User has manually resized figure. Video file cannot be saved! Until algorithm finishes, please do not resize figures.')
+                            end
+                        end
+                        %writeVideo(video_handle,stored_frame(frame_number))
+
                     end
                 end
             end
