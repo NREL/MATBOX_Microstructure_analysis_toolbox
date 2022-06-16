@@ -1,5 +1,13 @@
 Release version notes:
 
+Note: characterization module major re-work is still on-going, but still need more time before being releases.
+
+06/16/2022
+Stochastic generation algorithm minor fix
+- Add a warning in the GUI for the user not to resize figure otherwise video creation will fail. If user does, there is now also a catch error to notify the user the reason of the error
+- More than 7 phases can be now generated (was simply limited by 'colororder' having 7 rows be default)
+- Some tooltips addition in the GUI
+
 06/06/2022
 Bug fix (generation module/stochastic algorithm): generated volumes with phases with low or zero volume fractions locally should now match the target volume fractions.
 
