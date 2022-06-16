@@ -1,6 +1,6 @@
 Release version notes:
 
-Note: characterization module major re-work is still on-going, but still need more time before being releases.
+Note: characterization module major re-work is still on-going, but still need more time before being released.
 
 06/16/2022
 Stochastic generation algorithm minor fix
