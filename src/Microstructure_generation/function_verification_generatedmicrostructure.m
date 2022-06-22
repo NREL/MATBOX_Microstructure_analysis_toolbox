@@ -1,4 +1,4 @@
-function [] = function_verification_generatedmicrostructure(microstructure3D,phase,save_options)
+function [] = function_verification_generatedmicrostructure(microstructure3D,phase,input_porosity, current_porosity, save_options)
 
 domain_size = size(microstructure3D.phase);
 x_ = [1:1:domain_size(3)];
@@ -6,7 +6,7 @@ number_phase = length(phase);
 voxel_number = prod(domain_size);
 area_xy= domain_size(1)*domain_size(2);
 scrsz = get(0,'ScreenSize'); % Screen resolution
-c_ = colororder;
+c_ = [colororder; rand(1000,3)];
 
 %% VOLUME FRACTIONS
 % Total
@@ -36,15 +36,22 @@ for id_axe=1:1:2
         hold(sub_axes,'on'); % Active subplot
         for current_phase = 1:1:number_phase
             plot(x_/x_(end), phase(current_phase).volumefraction.along_3rd_axis_allslices,'DisplayName',[phase(current_phase).name ' (inputs)'],'Color', c_(current_phase,:),'LineWidth',2,'LineStyle','--');
-            plot(x_/x_(end), phase(current_phase).volumefraction.along_3rd_axis_allslice_calculatedaftergeneration,'DisplayName',[phase(current_phase).name ', (generated)'],'Color', c_(current_phase,:),'LineWidth',2,'LineStyle','-');
+            plot(x_/x_(end), phase(current_phase).volumefraction.along_3rd_axis_allslice_calculatedaftergeneration,'DisplayName',[phase(current_phase).name ' (generated)'],'Color', c_(current_phase,:),'LineWidth',2,'LineStyle','-');
         end
+        %if plot_porosity
+            plot(current_porosity(1,:), input_porosity,'DisplayName','Porosity (inputs)','Color', 'k','LineWidth',2,'LineStyle','--');
+            plot(current_porosity(1,:), current_porosity(2,:),'DisplayName','Porosity (generated)','Color', 'k','LineWidth',2,'LineStyle','-');
+        %end
         ylabel('Volume fractions');
     elseif id_axe==2
         sub_axes=subplot(2,1,id_axe,'Parent',Fig);
         hold(sub_axes,'on'); % Active subplot        
         for current_phase = 1:1:number_phase
-            plot(x_/x_(end),(phase(current_phase).volumefraction.along_3rd_axis_allslice_calculatedaftergeneration - phase(current_phase).volumefraction.along_3rd_axis_allslices),'DisplayName',[phase(current_phase).name ', (error)'],'LineWidth',2,'Color', c_(current_phase,:));
+            plot(x_/x_(end),(phase(current_phase).volumefraction.along_3rd_axis_allslice_calculatedaftergeneration - phase(current_phase).volumefraction.along_3rd_axis_allslices),'DisplayName',[phase(current_phase).name ' (error)'],'LineWidth',2,'Color', c_(current_phase,:));
         end
+        %if plot_porosity
+            plot(current_porosity(1,:),(current_porosity(2,:) - input_porosity),'DisplayName','Porosity (error)','LineWidth',2,'Color', 'k');
+        %end
         ylabel('Volume fraction errors');
     end
     xlabel('Normalized position along direction 3 (thickness)');

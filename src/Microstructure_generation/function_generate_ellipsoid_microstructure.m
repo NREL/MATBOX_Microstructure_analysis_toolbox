@@ -1,16 +1,15 @@
-function [microstructure3D, phase, outcome] = function_generate_ellipsoid_microstructure(domain_size,phase,Maximum_overlapping,Minimum_particle_volume_conservated,check_contiguity, stoping_conditions, do_verification, save_options)
+function [microstructure3D, phase, particle_data, outcome] = function_generate_ellipsoid_microstructure(domain_size,phase,tolerance_vf,overlapping,check_contiguity, stoping_conditions, do_verification, save_options)
 % Generate ellipsoids-based microstructrures
 % Francois Usseglio-Viretta, NREL
 
-refresh_time_for_progression_figure = 5;% s
+refresh_time_for_progression_figure = stoping_conditions.refresheachs;% s
 have_stop_conditions = ~strcmp(stoping_conditions.action,'Ignore (no stoping condition)');
 
 %tic
 
 %% PARAMETERS
-simulate_calendering = false; % Useful to set it true to achieve high density
+simulate_calendering = false; % Useful to set it true to achieve high density (Ignore it and keep it false it is outdated)
 %check_contiguity = true; % Default, true. False useful for very elongated particles
-
 
 %% DEDUCE MICROSTRUCTURE INFORMATION
 %% VOLUME FRACTIONS
@@ -22,6 +21,7 @@ for dir_=1:1:3 % Nornalized domain's length (one value per slice)
 end
 
 total_vf = 0; % Volume fraction
+porosity.along_3rd_axis_allslices = ones(1,domain_size(dir_));
 for current_phase=1:1:number_phase
     x = phase(current_phase).volumefraction.along_3rd_axis(1,:);
     y = phase(current_phase).volumefraction.along_3rd_axis(2,:);
@@ -29,7 +29,10 @@ for current_phase=1:1:number_phase
     phase(current_phase).voxel_number = round( phase(current_phase).volumefraction.total*voxel_number ); % number of voxel of current phase
     total_vf = total_vf + phase(current_phase).volumefraction.total; % Sum of all volume fraction
     phase(current_phase).volumefraction.along_3rd_axis_allslices = interp1(x,y,direction(3).normalized_coordinates,'linear'); % Volume fraction per slice
+    porosity.along_3rd_axis_allslices = porosity.along_3rd_axis_allslices - phase(current_phase).volumefraction.along_3rd_axis_allslices; 
 end
+porosity.total = mean(porosity.along_3rd_axis_allslices);
+
 if total_vf<=0
     error('microstructure_generation: sum of the volume fractions is <0 while it should be >0, <=1.')
 elseif total_vf<1
@@ -49,13 +52,13 @@ for current_phase=1:1:number_phase % Check particle size
             error('microstructure_generation: sum of the particle size histogram is ~= 100% while it should be 100%.')
         end
     end
-    is_odd = mod(phase(current_phase).size_histogram.along_3rd_axis(1,2:end),2);
-    if sum(is_odd)~=numel(is_odd) % Some particle diameter is odd.
-        idx = find(is_odd==0);
-        phase(current_phase).size_histogram.along_3rd_axis(1,idx) = phase(current_phase).size_histogram.along_3rd_axis(1,idx)+1; % odd -> even number
-        is_odd(idx) = is_odd(idx)+1; % Convert in a odd integer.
-        warning('Even particle diameter (expressed in voxel length) have been converted to odd number.')
-    end
+%     is_odd = mod(phase(current_phase).size_histogram.along_3rd_axis(1,2:end),2);
+%     if sum(is_odd)~=numel(is_odd) % Some particle diameter is odd.
+%         idx = find(is_odd==0);
+%         phase(current_phase).size_histogram.along_3rd_axis(1,idx) = phase(current_phase).size_histogram.along_3rd_axis(1,idx)+1; % odd -> even number
+%         is_odd(idx) = is_odd(idx)+1; % Convert in a odd integer.
+%         warning('Even particle diameter (expressed in voxel length) have been converted to odd number.')
+%     end
 end
 % Histogram per slice
 for current_phase=1:1:number_phase
@@ -117,7 +120,7 @@ end
 
 %% PARTICLE SIZE ORIENTATION (ROTATION)
 
-tolerance = 1e-3;
+tolerance_hist = 1e-3;
 for current_phase=1:1:number_phase % Check rotation
     [tmp1, ~] = size(phase(current_phase).orientation_histogram_angledeg_x.along_3rd_axis);
     [tmp2, ~] = size(phase(current_phase).orientation_histogram_angledeg_y.along_3rd_axis);
@@ -126,17 +129,17 @@ for current_phase=1:1:number_phase % Check rotation
     phase(current_phase).number_rotation_y_histogram.along_3rd_axis = tmp2-1; clear tmp2;  % Number of histogram
     phase(current_phase).number_rotation_z_histogram.along_3rd_axis = tmp3-1; clear tmp3;  % Number of histogram
     for k=1:1:phase(current_phase).number_rotation_x_histogram.along_3rd_axis
-        if abs(sum(phase(current_phase).orientation_histogram_angledeg_x.along_3rd_axis(k+1,2:end))-100)>tolerance % Sum of histogram should be 100
+        if abs(sum(phase(current_phase).orientation_histogram_angledeg_x.along_3rd_axis(k+1,2:end))-100)>tolerance_hist % Sum of histogram should be 100
             error('Incorrect input data: sum of the particle rotation histogram is ~= 100% while it should be 100%.')
         end
     end
     for k=1:1:phase(current_phase).number_rotation_y_histogram.along_3rd_axis
-        if abs(sum(phase(current_phase).orientation_histogram_angledeg_y.along_3rd_axis(k+1,2:end))-100)>tolerance % Sum of histogram should be 100
+        if abs(sum(phase(current_phase).orientation_histogram_angledeg_y.along_3rd_axis(k+1,2:end))-100)>tolerance_hist % Sum of histogram should be 100
             error('Incorrect input data: sum of the particle rotation histogram is ~= 100% while it should be 100%.')
         end
     end   
     for k=1:1:phase(current_phase).number_rotation_z_histogram.along_3rd_axis
-        if abs(sum(phase(current_phase).orientation_histogram_angledeg_z.along_3rd_axis(k+1,2:end))-100)>tolerance % Sum of histogram should be 100
+        if abs(sum(phase(current_phase).orientation_histogram_angledeg_z.along_3rd_axis(k+1,2:end))-100)>tolerance_hist % Sum of histogram should be 100
             error('Incorrect input data: sum of the particle rotation histogram is ~= 100% while it should be 100%.')
         end
     end        
@@ -190,6 +193,8 @@ for current_phase=1:1:number_phase
     phase(current_phase).current_rotation_y.along_3rd_axis_allslices =  zeros(domain_size(3), length(phase(current_phase).unique_rotation_y)); % Initialize
     phase(current_phase).current_rotation_z.along_3rd_axis_allslices =  zeros(domain_size(3), length(phase(current_phase).unique_rotation_z)); % Initialize
 end
+current_porosity.along_3rd_axis_allslices = ones(1,domain_size(dir_)); % Initialize
+
 
 %%
 %%  MICROSTRUCTURE GENERATION
@@ -198,7 +203,8 @@ end
 %% PROGRESSION RATE
 if stoping_conditions.plot || have_stop_conditions
     time_progression = [0];
-    volumefraction_progression = zeros(number_phase,1);  
+    volumefraction_progression = zeros(number_phase,1);
+    porosity_progression = ones(1,1);
     particle_progression = zeros(number_phase,1); 
     
     phase_being_generated = [];
@@ -231,6 +237,10 @@ if stoping_conditions.plot
     for current_phase = 1:1:number_phase
         plot([0,1],[phase(current_phase).volumefraction.total phase(current_phase).volumefraction.total],'LineWidth',2,'LineStyle','--','Color',c_(current_phase,:),'DisplayName',[phase(current_phase).name ' (inputs)']);
     end
+    if stoping_conditions.plotporosity
+        plot([0,1],[porosity.total porosity.total],'LineWidth',2,'LineStyle','--','Color','k','DisplayName','Porosity (inputs)');
+    end
+
     ylim(sub_axes_progression_1,[0 +Inf])
     xlabel(sub_axes_progression_1,'Wallclock time (s)');
     ylabel(sub_axes_progression_1,'Volume fraction');
@@ -274,7 +284,7 @@ if stoping_conditions.plot
     frame_number = 1;
     Fig_progression_video = figure; % Create figure
     Fig_progression_video.Name= 'Algorithm generation progression (volume fractions along thickness)'; % Figure name
-    set(Fig_progression_video,'position',[scrsz(1) scrsz(2) scrsz(3)*1/2 scrsz(4)*1/2]); % Full screen figure
+    set(Fig_progression_video,'position',[scrsz(1) scrsz(2) scrsz(3)*2/3 scrsz(4)*4/5]); % Full screen figure
     Fig_progression_video.Color='white'; % Background colour
     ax_video = axes('Parent',Fig_progression_video);
     hold(ax_video,'on'); % Active subplot
@@ -282,8 +292,14 @@ if stoping_conditions.plot
     for current_phase = 1:1:number_phase
         plot(phase(current_phase).volumefraction.along_3rd_axis(1,:), phase(current_phase).volumefraction.along_3rd_axis(2,:),'DisplayName',[phase(current_phase).name ' (inputs)'],'Color', c_(current_phase,:),'LineWidth',2,'LineStyle','--');
     end
+    if stoping_conditions.plotporosity
+        plot(direction(3).normalized_coordinates, porosity.along_3rd_axis_allslices,'DisplayName','Porosity (inputs)','Color', 'k','LineWidth',2,'LineStyle','--');
+    end
     for current_phase = 1:1:number_phase
         plot([0,1], [0,0],'DisplayName',[phase(current_phase).name ', (generated)'],'Color', c_(current_phase,:),'LineWidth',2,'LineStyle','-');
+    end   
+    if stoping_conditions.plotporosity
+        plot([0,1], [1,1],'DisplayName','Porosity (generated)','Color', 'k','LineWidth',2,'LineStyle','-');
     end    
     ylim(ax_video,[0 +Inf])
     xlabel('Normalized position along direction 3 (thickness)');
@@ -297,6 +313,7 @@ if stoping_conditions.plot
     pause(0.01); % Force refresh of the graph
     hold(ax_video,'off');
 end
+
 
 %%
 start_generation_time = tic; % Start clockwatch
@@ -355,7 +372,10 @@ particle_info = struct('Center_xyz',zeros(preallocating_particle,3),...
                        'Phase_number',zeros(preallocating_particle,1),...
                        'Extremities',zeros(preallocating_particle,6));                   
 particle_index(1:preallocating_particle) = struct('Index',0);
-                
+
+
+particle_data = zeros(preallocating_particle,11); % Id / phase label / x / y / z / dx / dy / dz / Rx / Ry / Rz
+
 % loop pass (each new pass phase_volume_target is larger: one value per pass)
 %   loop phase
 % Then, distance map to fill the remaining, with competition between phase for zone attibuted to multiple phase
@@ -366,8 +386,14 @@ number_iteration = 0;
 complete_stop = false;
 outcome = 'Success !'; % Default
 first_continue = true;
+new_particle_hasbeen_generated = false;
 for current_pass=1:1:number_pass
     for current_phase=1:1:number_phase
+
+        % Reset counter for overlapping relaxation
+        tol_overlaping = 0;
+        n_fail = 0;
+
         stop_condition_not_reached = true;
         if complete_stop
             break
@@ -388,8 +414,6 @@ for current_pass=1:1:number_pass
         histogram_currentphase_z_rotation_z = phase(current_phase).orientation_histogram_angledeg_z.along_3rd_axis_allslices(1,:); % elongation dx/dz histogram (x) of the current phase
     
         phase_volume_target = phase(current_phase).voxel_number * phase(current_phase).fillratio(current_pass); % Number of voxel to assign for this phase before moving forward
-
-        new_particle_hasbeen_generated = false;
 
         % Wait bar
         generation_progress = phase_volume_filled(current_phase,1)/phase_volume_target; % 0-1
@@ -414,6 +438,7 @@ for current_pass=1:1:number_pass
                 % Update array for figure
                 time_progression = [time_progression time_since_start];
                 volumefraction_progression = [volumefraction_progression phase_volume_filled(:,1)/voxel_number];
+                porosity_progression = [porosity_progression 1-sum(volumefraction_progression(:,end))];
                 particle_progression = [particle_progression  phase_number_particle(:,1)];
                 
                 if number_iteration>1
@@ -489,6 +514,11 @@ for current_pass=1:1:number_pass
                             plot(sub_axes_progression_1,[0,time_since_start],[phase(current_phase_figure).volumefraction.total phase(current_phase_figure).volumefraction.total],'LineWidth',2,'LineStyle','--','Color',c_(current_phase_figure,:),'DisplayName',[phase(current_phase_figure).name ' (inputs)']);
                             plot(sub_axes_progression_1,time_progression,volumefraction_progression(current_phase_figure,:),'LineWidth',2,'LineStyle','-','Color',c_(current_phase_figure,:),'DisplayName',[phase(current_phase_figure).name ' (generated)']);
                         end
+                        if stoping_conditions.plotporosity
+                            plot(sub_axes_progression_1,[0,time_since_start],[porosity.total porosity.total],'LineWidth',2,'LineStyle','--','Color','k','DisplayName','Porosity (inputs)');
+                            plot(sub_axes_progression_1,time_progression,porosity_progression,'LineWidth',2,'LineStyle','-','Color','k','DisplayName','Porosity (generated)');
+                        end
+
                         ylim(sub_axes_progression_1,[0 +Inf])
                         xlim(sub_axes_progression_1,[0 time_since_start])
                         legend(sub_axes_progression_1,'Location','southoutside');
@@ -532,6 +562,11 @@ for current_pass=1:1:number_pass
                         for current_phase_fig = 1:1:number_phase
                             plot(ax_video,phase(current_phase_fig).volumefraction.along_3rd_axis(1,:), phase(current_phase_fig).volumefraction.along_3rd_axis(2,:),'DisplayName',[phase(current_phase_fig).name ' (inputs)'],'Color', c_(current_phase_fig,:),'LineWidth',2,'LineStyle','--');
                         end
+                        if stoping_conditions.plotporosity 
+                            plot(ax_video,linspace(0,1,domain_size(3)), porosity.along_3rd_axis_allslices,'DisplayName','Porosity (inputs)','Color', 'k','LineWidth',2,'LineStyle','--');
+                        end
+
+                        current_porosity.along_3rd_axis_allslices = ones(1,domain_size(3));
                         for current_phase_fig = 1:1:number_phase
                             % Along direction
                             vf_position = zeros(2,domain_size(3));
@@ -541,7 +576,12 @@ for current_pass=1:1:number_pass
                             vf_position(2,:) = vf_position(2,:)/area_xy;
                             vf_position(1,:) = [1:1:domain_size(3)]/domain_size(3);
                             plot(ax_video,vf_position(1,:), vf_position(2,:),'DisplayName',[phase(current_phase_fig).name ', (generated)'],'Color', c_(current_phase_fig,:),'LineWidth',2,'LineStyle','-');
+                            current_porosity.along_3rd_axis_allslices = current_porosity.along_3rd_axis_allslices - vf_position(2,:); 
                         end
+                        if stoping_conditions.plotporosity  
+                            plot(ax_video,vf_position(1,:), current_porosity.along_3rd_axis_allslices,'DisplayName','Porosity (generated)','Color', 'k','LineWidth',2,'LineStyle','-');
+                        end
+
                         ylim(ax_video,[0 +Inf])
                         xlabel(ax_video,'Normalized position along direction 3 (thickness)');
                         ylabel(ax_video,'Volume fraction');
@@ -573,6 +613,7 @@ for current_pass=1:1:number_pass
             end
             
             if new_particle_hasbeen_generated
+                n_fail = 0; % reset counter for overlapping relaxation
                 particle_id = particle_id+1; % Update
                 % Update volume fractions
                 phase(current_phase).current_volumefraction.along_3rd_axis_allslices(z_update_min:z_update_max) = sum(sum(microstructure3D.phase(:,:,z_update_min:z_update_max)==phase(current_phase).code))/area_xy;
@@ -622,6 +663,13 @@ for current_pass=1:1:number_pass
                 % Note that you may use a simpler explicit method, such as I=find(microstructure3D.phase==unassigned_id), but it is much more slower.
                 [all_Idx_assigned_voxels, Idx_assigned_voxels, Idx_unassigned_voxels_pickfrom] = update_unassigned_index(all_Idx_assigned_voxels, linear_indices, Idx_assigned_voxels, Idx_all_voxels, number_unassigned_voxels, Idx_unassigned_voxels_pickfrom);
                 new_particle_hasbeen_generated = false; % Reset
+            else
+                n_fail = n_fail +1;
+                if n_fail > overlapping.relax_nfail
+                    tol_overlaping = tol_overlaping + overlapping.relax_increment;
+                    n_fail = 0;
+                    fprintf('Pass %i, Phase %i, overlapping relaxation = %1.3f\n',current_pass, current_phase, tol_overlaping);
+                end
             end
             
             % Particle center position
@@ -632,19 +680,19 @@ for current_pass=1:1:number_pass
             z_center = Coordinates_all_voxels(idx_center,3);
             
             remaining_volume_fraction_currentphase_z = max(0, phase(current_phase).volumefraction.along_3rd_axis_allslices(z_center) - phase(current_phase).current_volumefraction.along_3rd_axis_allslices(z_center)); % volume fraction of the current phase at z_center
-            
+
             normalized_term = 0;
             for kk=1:1:number_phase
                 normalized_term = normalized_term + phase(kk).volumefraction.along_3rd_axis_allslices(z_center) - phase(kk).current_volumefraction.along_3rd_axis_allslices(z_center);
             end
             
             rn = rand; % Pick a random number from 0 to 1
-            if rn < remaining_volume_fraction_currentphase_z/normalized_term % Check volume fraction
+            if rn < (remaining_volume_fraction_currentphase_z+tolerance_vf)/normalized_term % Check volume fraction
                 % Particle diameter
                 new_probability = update_probability(phase(current_phase).size_histogram.along_3rd_axis_allslices(z_center+1,:), phase(current_phase).current_diameter_dx.along_3rd_axis_allslices(z_center,:));
                 idx = choose_randomly_from_histogramprobability( new_probability ); % Diameter histogram (y) of the current phase at z_center
                 current_diameter = histogram_currentphase_z_diameter(idx);
-                if current_diameter==1 % One-voxel particle
+                if current_diameter==1 || current_diameter==2  % One-voxel particle
                     z_update_min = z_center; z_update_max = z_center; % Specify bounds where to update probabilities
                     number_voxel_assigned = 1; % Number of new voxel for the current phase
                     number_voxel_idealshape = 1;
@@ -656,6 +704,29 @@ for current_pass=1:1:number_pass
                     % Update
                     new_particle_hasbeen_generated = true;
                     particle_xyz_min_max = [x_center y_center z_center x_center y_center z_center];
+
+                    % Below code is required for particle_data
+                    dx = current_diameter; % Particle lenght along axe 1
+
+                    new_probability = update_probability(phase(current_phase).elongation_histogram_dx_over_dy.along_3rd_axis_allslices(z_center+1,:), phase(current_phase).current_elongation_dxdy.along_3rd_axis_allslices(z_center,:));
+                    idx = choose_randomly_from_histogramprobability( new_probability ); % Elongation dx/dy histogram (y) of the current phase at z_center
+                    current_elongation_dx_over_dy = histogram_currentphase_z_elongation_dx_over_dy(idx); % Particle elongation
+                    new_probability = update_probability(phase(current_phase).elongation_histogram_dx_over_dz.along_3rd_axis_allslices(z_center+1,:), phase(current_phase).current_elongation_dxdz.along_3rd_axis_allslices(z_center,:));
+                    idx = choose_randomly_from_histogramprobability( new_probability ); % Elongation dx/dz histogram (y) of the current phase at z_center
+                    current_elongation_dx_over_dz = histogram_currentphase_z_elongation_dx_over_dz(idx); % Particle elongation                    
+                    dy = dx * (1/current_elongation_dx_over_dy); % Particle lenght along axe 2
+                    dz = dx * (1/current_elongation_dx_over_dz); % Particle lenght along axe 3
+
+                    new_probability = update_probability(phase(current_phase).orientation_histogram_angledeg_x.along_3rd_axis_allslices(z_center+1,:), phase(current_phase).current_rotation_x.along_3rd_axis_allslices(z_center,:));
+                    idx = choose_randomly_from_histogramprobability( new_probability ); % Rotation x histogram (y) of the current phase at z_center
+                    angle_x_deg = histogram_currentphase_z_rotation_x(idx); % Particle rotation
+                    new_probability = update_probability(phase(current_phase).orientation_histogram_angledeg_y.along_3rd_axis_allslices(z_center+1,:), phase(current_phase).current_rotation_y.along_3rd_axis_allslices(z_center,:));
+                    idx = choose_randomly_from_histogramprobability( new_probability ); % Rotation y histogram (y) of the current phase at z_center
+                    angle_y_deg = histogram_currentphase_z_rotation_y(idx); % Particle rotation
+                    new_probability = update_probability(phase(current_phase).orientation_histogram_angledeg_z.along_3rd_axis_allslices(z_center+1,:), phase(current_phase).current_rotation_z.along_3rd_axis_allslices(z_center,:));
+                    idx = choose_randomly_from_histogramprobability( new_probability ); % Rotation z histogram (y) of the current phase at z_center
+                    angle_z_deg = histogram_currentphase_z_rotation_z(idx); % Particle rotation
+
                     
                 else % n-voxel particle
                     % Particle elongation
@@ -721,6 +792,7 @@ for current_pass=1:1:number_pass
                         subdomain_binary(subdomain_binary~=unassigned_id)=1;
                         union_subdomain_ellipsoid = subdomain_binary + subdomain_ellipsoid;
                         idx_interpenetration = find(union_subdomain_ellipsoid==2);
+
                         if isempty(idx_interpenetration) % There is no overlapping
                             if simulate_calendering==true && particle_id>1
                                 new_particle_hasbeen_generated = false;  % Not necessary. For clarification sake.
@@ -749,7 +821,7 @@ for current_pass=1:1:number_pass
                             for k_other = 1:1:n_otherparticles % Loop over all existing particles
                                 other_id = particles_id_subdomain(k_other); % Get code of the other particle
                                 other_phasenumber =  particle_info.Phase_number(other_id);
-                                current_maximum_interpenetration = Maximum_overlapping(current_phase, other_phasenumber);
+                                current_maximum_interpenetration = overlapping.max(current_phase, other_phasenumber) + tol_overlaping;
                                 if current_maximum_interpenetration<=0 % No need to continue
                                     new_particle_hasbeen_generated = false;  % Not necessary. For clarification sake.
                                     continue_whileloop_and_go_to_next_randcenter = true;
@@ -801,7 +873,7 @@ for current_pass=1:1:number_pass
                                     d_max_overlapping_to_othercentre = max(distance_overlapping_to_othercenter);
                                     ratio_overlapping_other = (d_max_overlapping_to_othercentre-d_min_overlapping_to_othercentre)/d_max_overlapping_to_centre;
                                     
-                                    current_maximum_interpenetration = Maximum_overlapping(current_phase, other_phasenumber);
+                                    current_maximum_interpenetration = overlapping.max(current_phase, other_phasenumber) + tol_overlaping;
                                     if max(ratio_overlapping, ratio_overlapping_other)<=current_maximum_interpenetration % Check overlapping
                                         
                                         % In case the overlapping is allowed, each particle will loose this number of voxels (which them impact its original shape)
@@ -813,7 +885,7 @@ for current_pass=1:1:number_pass
                                         loss_voxels_fromidealshape = loss_voxels_fromidealshape + estimation_numbervoxel_foreach_particle;
                                         ratio_ = (number_voxel_idealshape-loss_voxels_fromidealshape)/number_voxel_idealshape;
                                         % Check ratio of original volume is still high enough
-                                        if ratio_other<=Minimum_particle_volume_conservated(other_phasenumber) || ratio_<=Minimum_particle_volume_conservated(current_phase)
+                                        if ratio_other <= overlapping.minvolume(other_phasenumber) - tol_overlaping || ratio_ <= overlapping.minvolume(current_phase) - tol_overlaping;
                                             new_particle_hasbeen_generated = false;  % Not necessary. For clarification sake.
                                             continue_whileloop_and_go_to_next_randcenter = true;
                                             break
@@ -937,6 +1009,19 @@ for current_pass=1:1:number_pass
                 particle_info.Number_voxel_currently_assigned(particle_id) = number_voxel_assigned; % May change after particle creation, due to overlapping
                 particle_info.Extremities(particle_id,:) = particle_xyz_min_max; % May change after particle creation, due to overlapping
                 particle_index(particle_id).Index = uint32(linear_indices); % May change after particle creation, due to overlapping
+
+                particle_data(particle_id,1) = particle_id;
+                particle_data(particle_id,2) = phase(current_phase).code;
+                particle_data(particle_id,3) = x_center;
+                particle_data(particle_id,4) = y_center;
+                particle_data(particle_id,5) = z_center;                  
+                particle_data(particle_id,6) = dx;
+                particle_data(particle_id,7) = dy;
+                particle_data(particle_id,8) = dz;       
+                particle_data(particle_id,9) = angle_x_deg;
+                particle_data(particle_id,10) = angle_y_deg;
+                particle_data(particle_id,11) = angle_z_deg;                                   
+
             end
         end % While phase not filled enough
         delete(h_waitbar); % Close the progess bar
@@ -945,6 +1030,7 @@ end % Loop over pass
 time_generation = toc(start_generation_time);
 fprintf('Generation terminated. Elapsed time: %1.1fs\n',time_generation)
 
+particle_data(particle_id+1:end,:)=[]; % Remove zeros rows
 
 % Progression figure
 if stoping_conditions.plot
@@ -952,6 +1038,7 @@ if stoping_conditions.plot
     time_since_start = toc(start_generation_time);
     time_progression = [time_progression time_since_start];
     volumefraction_progression = [volumefraction_progression phase_volume_filled(:,1)/voxel_number];
+    porosity_progression = [porosity_progression 1-sum(volumefraction_progression(:,end))];
     particle_progression = [particle_progression  phase_number_particle(:,1)];
     
     time_progression_generationrate = [time_progression_generationrate time_progression(end-1)+((time_progression(end)-time_progression(end-1))/2)];;
@@ -973,6 +1060,11 @@ if stoping_conditions.plot
         plot(sub_axes_progression_1,[0,time_since_start],[phase(current_phase_figure).volumefraction.total phase(current_phase_figure).volumefraction.total],'LineWidth',2,'LineStyle','--','Color',c_(current_phase_figure,:),'DisplayName',[phase(current_phase_figure).name ' (inputs)']);
         plot(sub_axes_progression_1,time_progression,volumefraction_progression(current_phase_figure,:),'LineWidth',2,'LineStyle','-','Color',c_(current_phase_figure,:),'DisplayName',[phase(current_phase_figure).name ' (generated)']);
     end
+    if stoping_conditions.plotporosity
+        plot(sub_axes_progression_1,[0,time_since_start],[porosity.total porosity.total],'LineWidth',2,'LineStyle','--','Color','k','DisplayName','Porosity (inputs)');
+        plot(sub_axes_progression_1,time_progression,porosity_progression,'LineWidth',2,'LineStyle','-','Color','k','DisplayName','Porosity (generated)');
+    end
+
     ylim(sub_axes_progression_1,[0 +Inf])
     xlim(sub_axes_progression_1,[0 time_since_start])
     legend(sub_axes_progression_1,'Location','southoutside');
@@ -1011,6 +1103,11 @@ if stoping_conditions.plot
     for current_phase_fig = 1:1:number_phase
         plot(phase(current_phase_fig).volumefraction.along_3rd_axis(1,:), phase(current_phase_fig).volumefraction.along_3rd_axis(2,:),'DisplayName',[phase(current_phase_fig).name ' (inputs)'],'Color', c_(current_phase_fig,:),'LineWidth',2,'LineStyle','--');
     end
+    if stoping_conditions.plotporosity
+        plot(ax_video,linspace(0,1,domain_size(3)), porosity.along_3rd_axis_allslices,'DisplayName','Porosity (inputs)','Color', 'k','LineWidth',2,'LineStyle','--');
+    end
+
+    current_porosity.along_3rd_axis_allslices = ones(1,domain_size(3));
     for current_phase_fig = 1:1:number_phase
         % Along direction
         vf_position = zeros(2,domain_size(3));
@@ -1020,7 +1117,11 @@ if stoping_conditions.plot
         vf_position(2,:) = vf_position(2,:)/area_xy;
         vf_position(1,:) = [1:1:domain_size(3)]/domain_size(3);
         plot(vf_position(1,:), vf_position(2,:),'DisplayName',[phase(current_phase_fig).name ', (generated)'],'Color', c_(current_phase_fig,:),'LineWidth',2,'LineStyle','-');
+        current_porosity.along_3rd_axis_allslices = current_porosity.along_3rd_axis_allslices - vf_position(2,:); 
     end    
+    if stoping_conditions.plotporosity
+        plot(ax_video,vf_position(1,:), current_porosity.along_3rd_axis_allslices,'DisplayName','Porosity (generated)','Color', 'k','LineWidth',2,'LineStyle','-');
+    end
     ylim(ax_video,[0 +Inf])
     xlabel(ax_video,'Normalized position along direction 3 (thickness)');
     ylabel(ax_video,'Volume fraction');
@@ -1039,9 +1140,12 @@ end
 
 % Verification
 if do_verification
-    function_verification_generatedmicrostructure(microstructure3D,phase,save_options)
+    input_porosity = [linspace(0,1,domain_size(3)); porosity.along_3rd_axis_allslices];
+    current_porosity = [vf_position(1,:); current_porosity.along_3rd_axis_allslices];
+    input_porosity = interp1(input_porosity(1,:),input_porosity(2,:),vf_position(1,:));
+    %plot_porosity = stoping_conditions.plotporosity;
+    function_verification_generatedmicrostructure(microstructure3D,phase, input_porosity, current_porosity, save_options)
 end
-
 
 
 %%

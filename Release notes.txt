@@ -2,6 +2,14 @@ Release version notes:
 
 Note: characterization module major re-work is still on-going, but still need more time before being released.
 
+06/22/2022
+Stochastic generation algorithm improvment
+- Upscale from particle information (centroid, diameters, rotations) instead of 3D volumes. Faster and preserve ellipsoid geomety which allow for high scaling, thus performing the generation on a very coarse grid and thus upscale.
+With new upscale method, user can now force particle separation.
+- Added user-control tolerance on target volume fraction to help achieving generation.
+- Added user-control overlapping relaxation parameters to help achieving generation
+- fix minor bug, particle id was not incremented when switching to one phase to the next, resuling in two particles sharing the same id
+
 06/16/2022
 Stochastic generation algorithm minor fix
 - Add a warning in the GUI for the user not to resize figure otherwise video creation will fail. If user does, there is now also a catch error to notify the user the reason of the error

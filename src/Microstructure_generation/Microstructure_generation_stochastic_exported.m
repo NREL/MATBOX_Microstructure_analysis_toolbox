@@ -107,6 +107,12 @@ classdef Microstructure_generation_stochastic_exported < matlab.apps.AppBase
         SelectasolidphaseandsetthenumberofLabel_5  matlab.ui.control.Label
         Instructions_Visualization      matlab.ui.control.Label
         OverlappingTab                  matlab.ui.container.Tab
+        OverlappingrelaxationparametersLabel  matlab.ui.control.Label
+        particlegenerationfailduetooverlappingLabel  matlab.ui.control.Label
+        eachtimeEditField               matlab.ui.control.NumericEditField
+        eachtimeEditFieldLabel          matlab.ui.control.Label
+        IncreaseoverlappingmatrixbyEditField  matlab.ui.control.NumericEditField
+        IncreaseoverlappingmatrixbyEditFieldLabel  matlab.ui.control.Label
         Overlapping_save                matlab.ui.control.Button
         Label_5                         matlab.ui.control.Label
         DisableparticlecontiguitycheckCheckBox  matlab.ui.control.CheckBox
@@ -130,6 +136,9 @@ classdef Microstructure_generation_stochastic_exported < matlab.apps.AppBase
         SelectasolidphaseandsetthenumberofLabel_6  matlab.ui.control.Label
         Instructions_order              matlab.ui.control.Label
         StopconditionsTab               matlab.ui.container.Tab
+        RefreshfigureseachsEditField    matlab.ui.control.NumericEditField
+        RefreshfigureseachsEditFieldLabel  matlab.ui.control.Label
+        PlotalsoporosityprogressionCheckBox  matlab.ui.control.CheckBox
         Label_8                         matlab.ui.control.Label
         MaximumwallclocktimesEditField  matlab.ui.control.NumericEditField
         MaximumwallclocktimesEditFieldLabel  matlab.ui.control.Label
@@ -149,8 +158,15 @@ classdef Microstructure_generation_stochastic_exported < matlab.apps.AppBase
         PlotalgorithmprogressionCheckBox  matlab.ui.control.CheckBox
         Instructions_order_2            matlab.ui.control.Label
         UpscaleoptionalTab              matlab.ui.container.Tab
-        ApplyscalingalsotoparticlelabelslowCheckBox  matlab.ui.control.CheckBox
-        ApplyscalingtophaselabelfastCheckBox  matlab.ui.control.CheckBox
+        DistanceseparationvoxellengthEditField  matlab.ui.control.NumericEditField
+        DistanceseparationvoxellengthEditFieldLabel  matlab.ui.control.Label
+        ForceseparationCheckBox         matlab.ui.control.CheckBox
+        DiameterscalingratioEditField   matlab.ui.control.NumericEditField
+        DiameterscalingratioEditFieldLabel  matlab.ui.control.Label
+        HowtoDropDown                   matlab.ui.control.DropDown
+        HowtoDropDownLabel              matlab.ui.control.Label
+        ApplyscalingalsotoparticlelabelCheckBox  matlab.ui.control.CheckBox
+        ApplyscalingtophaselabelCheckBox  matlab.ui.control.CheckBox
         Label_7                         matlab.ui.control.Label
         Image2                          matlab.ui.control.Image
         Scalingfactor1upscaling1downscaling1noscalingEditField  matlab.ui.control.NumericEditField
@@ -169,6 +185,8 @@ classdef Microstructure_generation_stochastic_exported < matlab.apps.AppBase
         SelectasolidphaseandsetthenumberofLabel_21  matlab.ui.control.Label
         Instructions_characterization   matlab.ui.control.Label
         GenerationTab                   matlab.ui.container.Tab
+        ToleranceEditField              matlab.ui.control.NumericEditField
+        ToleranceEditFieldLabel         matlab.ui.control.Label
         WarningdonotresizefigureswhilegenerationisongoingLabel  matlab.ui.control.Label
         outcometime_UITable             matlab.ui.control.Table
         AlgothmisfasterforLabel_16      matlab.ui.control.Label
@@ -1323,6 +1341,8 @@ classdef Microstructure_generation_stochastic_exported < matlab.apps.AppBase
             
             % Stop condition options
             stoping_conditions.plot = app.PlotalgorithmprogressionCheckBox.Value;
+            stoping_conditions.plotporosity = app.PlotalsoporosityprogressionCheckBox.Value;
+            stoping_conditions.refresheachs = app.RefreshfigureseachsEditField.Value;
             stoping_conditions.vfrate_threshold = app.Ifvolumefractions1goesbelowEditField.Value;
             stoping_conditions.andor = app.stopcondition_andor_DropDown.Value;
             stoping_conditions.particlerate_threshold = app.particles1goesbelowEditField.Value;
@@ -1340,8 +1360,12 @@ classdef Microstructure_generation_stochastic_exported < matlab.apps.AppBase
             
             % Scaling options
             scaling_factor = 1/app.Scalingfactor1upscaling1downscaling1noscalingEditField.Value;
-            scale_phaselabel = app.ApplyscalingtophaselabelfastCheckBox.Value;
-            scale_particlelabel = app.ApplyscalingalsotoparticlelabelslowCheckBox.Value;
+            scale_phaselabel = app.ApplyscalingtophaselabelCheckBox.Value;
+            scale_particlelabel = app.ApplyscalingalsotoparticlelabelCheckBox.Value;
+            scale_diameterratio = app.DiameterscalingratioEditField.Value;
+
+            % Numerical parameters
+            tolerance = app.ToleranceEditField.Value;
             
             % Visualization tab
             app.Plot_phase_label.Enable = 'off';
@@ -1352,19 +1376,25 @@ classdef Microstructure_generation_stochastic_exported < matlab.apps.AppBase
             save_options.save_progression = app.SavealgorithmprogressionplotifselectedCheckBox.Value;
             save_options.save_verification = app.SaveinputsoutpuscomparisonifselectedCheckBox.Value;
             
+            % Prepare parameters
+            overlapping.max = app.Maximum_overlapping;
+            overlapping.minvolume = app.Minimum_particle_volume_conservated;
+            overlapping.relax_increment = app.IncreaseoverlappingmatrixbyEditField.Value;            
+            overlapping.relax_nfail = app.eachtimeEditField.Value;            
+            
             % Save inputs
             if ~isempty(app.Savefolder)
                 if app.SaveinmatinputsofthegenerationalgorithmfunctionCheckBox.Value
                     domain_size = app.domain_size;
                     phase = app.phase;
-                    Maximum_overlapping = app.Maximum_overlapping;
-                    Minimum_particle_volume_conservated = app.Minimum_particle_volume_conservated;
                     check_contiguity = ~app.disable_contiguituy_check;
                     stopingconditions = stoping_conditions;
                     stopingconditions.plot = true; % Overwritte
+                    stopingconditions.plotporosity = true; % Overwritte
+                    stopingconditions.refresheachs = 5; % Overwritte
                     doverification = true; % Overwritte
                     saveoptions.folder = []; % Overwritte
-                    save([app.Savefolder 'Inputs.mat'],'domain_size','phase','Maximum_overlapping','Minimum_particle_volume_conservated','check_contiguity','stopingconditions', 'doverification', 'saveoptions','-mat');
+                    save([app.Savefolder 'Inputs.mat'],'domain_size','phase','tolerance','overlapping','check_contiguity','stopingconditions', 'doverification', 'saveoptions','-mat');
                 end
             end
 
@@ -1381,7 +1411,7 @@ classdef Microstructure_generation_stochastic_exported < matlab.apps.AppBase
 
                 tic
                 % Call generation algorithm
-                [microstructure3D, current_phaseinfo, outcome] = function_generate_ellipsoid_microstructure(app.domain_size,app.phase,app.Maximum_overlapping,app.Minimum_particle_volume_conservated,~app.disable_contiguituy_check, stoping_conditions, do_verification, save_options);
+                [microstructure3D, ~, particle_data, outcome] = function_generate_ellipsoid_microstructure(app.domain_size,app.phase,tolerance,overlapping,~app.disable_contiguituy_check, stoping_conditions, do_verification, save_options);
                 wallclocktime(k_run,1) = toc;
                 % Save for later visualization
                 app.generation_result(k_run).microstructure3D_phaselabel = microstructure3D.phase;
@@ -1390,16 +1420,28 @@ classdef Microstructure_generation_stochastic_exported < matlab.apps.AppBase
                 % Upscaling
                 if scaling_factor~=1
                     tic
-                    % Set parameters
-                    parameters_scaling.scaling_factor = scaling_factor;
-                    parameters_scaling.label_or_greylevel = 'Label';
-                    parameters_scaling.background = 0;
-                    % Scale
-                    if scale_phaselabel
-                        app.generation_result(k_run).microstructure3D_phaselabel_scaled = function_scaling(app.generation_result(k_run).microstructure3D_phaselabel,parameters_scaling);
-                    end
-                    if scale_particlelabel
-                        app.generation_result(k_run).microstructure3D_particlelabel_scaled = function_scaling(app.generation_result(k_run).microstructure3D_particlelabel,parameters_scaling);
+                    if strcmp(app.HowtoDropDown.Value,'Re-create from partice information (recommended)')
+                        domain_size_rescaled = app.domain_size*1/scaling_factor;
+                        particle_data_scaled = particle_data;
+                        particle_data_scaled(:,3) = min(round( 1/scaling_factor * particle_data(:,3) + 0.5 ), domain_size_rescaled(1));
+                        particle_data_scaled(:,4) = min(round( 1/scaling_factor * particle_data(:,4) + 0.5 ), domain_size_rescaled(2));
+                        particle_data_scaled(:,5) = min(round( 1/scaling_factor * particle_data(:,5) + 0.5 ), domain_size_rescaled(3));
+                        particle_data_scaled(:,6) = round(particle_data(:,6) * 1/scaling_factor);
+                        particle_data_scaled(:,7) = round(particle_data(:,7) * 1/scaling_factor);
+                        particle_data_scaled(:,8) = round(particle_data(:,8) * 1/scaling_factor);                        
+                        [app.generation_result(k_run).microstructure3D_phaselabel_scaled, app.generation_result(k_run).microstructure3D_particlelabel_scaled] = function_createvolume_fromparticledata(particle_data_scaled,domain_size_rescaled, scale_diameterratio, app.ForceseparationCheckBox.Value, app.DistanceseparationvoxellengthEditField.Value);                        
+                    else
+                        % Set parameters
+                        parameters_scaling.scaling_factor = scaling_factor;
+                        parameters_scaling.label_or_greylevel = 'Label';
+                        parameters_scaling.background = 0;
+                        % Scale
+                        if scale_phaselabel
+                            app.generation_result(k_run).microstructure3D_phaselabel_scaled = function_scaling(app.generation_result(k_run).microstructure3D_phaselabel,parameters_scaling);
+                        end
+                        if scale_particlelabel
+                            app.generation_result(k_run).microstructure3D_particlelabel_scaled = function_scaling(app.generation_result(k_run).microstructure3D_particlelabel,parameters_scaling);
+                        end 
                     end
                     wallclocktime(k_run,2) = toc;
                 end
@@ -1511,6 +1553,10 @@ classdef Microstructure_generation_stochastic_exported < matlab.apps.AppBase
                 if ~isempty(app.Savefolder)
                     if save_additionalinfo
                         save([app.Savefolder 'Additionalinfo_run_' num2str(k_run) '.mat'],'microstructure3D','-mat');
+                        save([app.Savefolder 'Additionalinfo_particle_run_' num2str(k_run) '.mat'],'particle_data','-mat');  
+                        if scaling_factor~=1 && strcmp(app.HowtoDropDown.Value,'Re-create from partice information (recommended)')
+                            save([app.Savefolder 'Additionalinfo_particle_scaled_run_' num2str(k_run) '.mat'],'particle_data_scaled','-mat');
+                        end
                     end
                 end
                 
@@ -1568,13 +1614,14 @@ classdef Microstructure_generation_stochastic_exported < matlab.apps.AppBase
             % Visualization tab
             app.Plot_phase_label.Enable = 'on';
             app.Plot_particle_label.Enable = 'on';
-            if number_run==1
-                app.Plot_phase_label_3D.Enable = 'on';
-                app.Plot_particle_label_3D.Enable = 'on';
-            else
-                app.Plot_phase_label_3D.Enable = 'off';
-                app.Plot_particle_label_3D.Enable = 'off';    
-            end
+            app.Visualization_UITableCellEdit;
+%             if number_run==1
+%                 app.Plot_phase_label_3D.Enable = 'on';
+%                 app.Plot_particle_label_3D.Enable = 'on';
+%             else
+%                 app.Plot_phase_label_3D.Enable = 'off';
+%                 app.Plot_particle_label_3D.Enable = 'off';    
+%             end
                         
         end
 
@@ -1735,6 +1782,54 @@ classdef Microstructure_generation_stochastic_exported < matlab.apps.AppBase
                 volshow(app.generation_result(runs(idx)).microstructure3D_particlelabel,'Parent', Fig_3D,'BackgroundColor','w','Colormap',col_,'Renderer','VolumeRendering');
             end            
         end
+
+        % Value changed function: HowtoDropDown
+        function HowtoDropDownValueChanged(app, event)
+            value = app.HowtoDropDown.Value;
+            if strcmp(value,'Re-create from partice information (recommended)')
+                app.ApplyscalingtophaselabelCheckBox.Value = true; app.ApplyscalingtophaselabelCheckBox.Enable = 'off';
+                app.ApplyscalingalsotoparticlelabelCheckBox.Value = true; app.ApplyscalingalsotoparticlelabelCheckBox.Enable = 'off';
+                app.Image2.ImageSource = 'Scaling_regen.png';
+                app.SelectasolidphaseandsetthenumberofLabel_13.Text = 'Particles are redrawn in a different grid, knowing their centroid, diameters, and rotation, with centroid and diameters scaled. Provides exact ellipsoid geometry';               
+                app.DiameterscalingratioEditField.Enable = 'on';
+                app.DiameterscalingratioEditFieldLabel.Enable = 'on';
+                app.ForceseparationCheckBox.Enable = 'on';
+                app.ForceseparationCheckBoxValueChanged;
+            else
+                app.ApplyscalingtophaselabelCheckBox.Value = true; app.ApplyscalingtophaselabelCheckBox.Enable = 'off';
+                app.ApplyscalingalsotoparticlelabelCheckBox.Value = false; app.ApplyscalingalsotoparticlelabelCheckBox.Enable = 'on';
+                app.Image2.ImageSource = 'Scaling_upscale.png';
+                app.SelectasolidphaseandsetthenumberofLabel_13.Text = 'In-house upscale algorithm limits aliasing, so interface will be better represented compared with a simple MATLAB "imresize3" with "neareast" option';
+                app.DiameterscalingratioEditField.Enable = 'off';
+                app.DiameterscalingratioEditFieldLabel.Enable = 'off';
+                app.ForceseparationCheckBox.Enable = 'off';
+                app.DistanceseparationvoxellengthEditField.Enable = 'off';
+                app.DistanceseparationvoxellengthEditFieldLabel.Enable = 'off';                
+            end            
+        end
+
+        % Value changed function: PlotalgorithmprogressionCheckBox
+        function PlotalgorithmprogressionCheckBoxValueChanged(app, event)
+            value = app.PlotalgorithmprogressionCheckBox.Value;
+            if ~value
+                app.PlotalsoporosityprogressionCheckBox.Value = 0;
+                app.RefreshfigureseachsEditField.Enable = 'off';
+            else
+                app.RefreshfigureseachsEditField.Enable = 'on';
+            end
+        end
+
+        % Value changed function: ForceseparationCheckBox
+        function ForceseparationCheckBoxValueChanged(app, event)
+            if app.ForceseparationCheckBox.Value
+                app.DistanceseparationvoxellengthEditField.Enable = 'on';
+                app.DistanceseparationvoxellengthEditFieldLabel.Enable = 'on';
+            else
+                app.DistanceseparationvoxellengthEditField.Enable = 'off';
+                app.DistanceseparationvoxellengthEditFieldLabel.Enable = 'off';
+           end
+            
+        end
     end
 
     % Component initialization
@@ -1742,6 +1837,9 @@ classdef Microstructure_generation_stochastic_exported < matlab.apps.AppBase
 
         % Create UIFigure and components
         function createComponents(app)
+
+            % Get the file path for locating images
+            pathToMLAPP = fileparts(mfilename('fullpath'));
 
             % Create EllipsoidbasedstochasticgenerationmoduleUIFigure and hide until all components are created
             app.EllipsoidbasedstochasticgenerationmoduleUIFigure = uifigure('Visible', 'off');
@@ -2489,7 +2587,7 @@ classdef Microstructure_generation_stochastic_exported < matlab.apps.AppBase
 
             % Create OverlappingTab
             app.OverlappingTab = uitab(app.TabGroup);
-            app.OverlappingTab.Tooltip = {'With mono-size sphere randomly distributed, the theoretical density limit is 63.4% (porosity 36.6%). You can expect to reach density limit sooner with a numerical algorithm. From previous runs, you can generate 40% spheres without overlapping. For higher density, an overlapping of 0.1 (45%), 0.175 (50%), 0.25 (55%) and 0.3 (60%) was required. To increase particle density, you can also use particle size and elongation distribution instead of mono-size ideal spheres.'};
+            app.OverlappingTab.Tooltip = {''};
             app.OverlappingTab.Title = 'Overlapping';
             app.OverlappingTab.ForegroundColor = [1 0.302 0];
 
@@ -2503,7 +2601,7 @@ classdef Microstructure_generation_stochastic_exported < matlab.apps.AppBase
 
             % Create Label_2
             app.Label_2 = uilabel(app.OverlappingTab);
-            app.Label_2.Tooltip = {''};
+            app.Label_2.Tooltip = {'With mono-size sphere randomly distributed, the theoretical density limit is 63.4% (porosity 36.6%). You can expect to reach density limit sooner with a numerical algorithm. From previous runs, you can generate 40% spheres without overlapping. For higher density, an overlapping of 0.1 (45%), 0.175 (50%), 0.25 (55%) and 0.3 (60%) was required. To increase particle density, you can also use particle size and elongation distribution instead of mono-size ideal spheres.'};
             app.Label_2.Position = [11 675 721 56];
             app.Label_2.Text = {'Theoretical maximum density for unisize sphere packing is 74% [1], and for random spatial distribution of unisize spheres 63.4% [2].'; 'Overlapping enables to overcome this packing density limit.'; '[1] A. Bezdek and W. Kuperberg, Arxiv (2010).'; '[2] C. Song, P. Wang, and H. A. Makse, Nature, 453, 629–632 (2008).'};
 
@@ -2526,13 +2624,13 @@ classdef Microstructure_generation_stochastic_exported < matlab.apps.AppBase
             app.overlapping_UITable.CellEditCallback = createCallbackFcn(app, @overlapping_UITableCellEdit, true);
             app.overlapping_UITable.Enable = 'off';
             app.overlapping_UITable.Visible = 'off';
-            app.overlapping_UITable.Position = [573 258 415 374];
+            app.overlapping_UITable.Position = [573 368 415 264];
 
             % Create Label_4
             app.Label_4 = uilabel(app.OverlappingTab);
             app.Label_4.FontWeight = 'bold';
             app.Label_4.Position = [8 187 995 56];
-            app.Label_4.Text = {'The above condition is checked for each new particle. However, cumulative overlapping may degrade too much particle morphology, even if each indidivual overlapping'; 'passes the above condition. You can specify below the (normalized) minimum volume each particle must preserve from its initial volume when generated for each phase.'; 'If an overlapping would remove particle volume so that its remaining volume would go below this value, the particle is not generated and the algorithm goes to the next'; 'iteration.'; ''};
+            app.Label_4.Text = {'The above condition is checked for each new particle. However, cumulative overlapping may degrade too much particle morphology, even if each indidivual overlapping'; 'passes the above condition. You can specify below the (normalized) minimum volume each particle must preserve from its initial volume when generated for each phase.'; 'If an overlapping would remove particle volume so that its remaining volume would go below this value, the particle is not generated and the algorithm goes to the next'; 'iteration. Unlike for the overlapping matrix, high value here indicates less overlapping allowed.'; ''};
 
             % Create Minimumvolume_overlapping_UITable
             app.Minimumvolume_overlapping_UITable = uitable(app.OverlappingTab);
@@ -2564,6 +2662,44 @@ classdef Microstructure_generation_stochastic_exported < matlab.apps.AppBase
             app.Overlapping_save.Enable = 'off';
             app.Overlapping_save.Position = [869 20 116 33];
             app.Overlapping_save.Text = 'Save';
+
+            % Create IncreaseoverlappingmatrixbyEditFieldLabel
+            app.IncreaseoverlappingmatrixbyEditFieldLabel = uilabel(app.OverlappingTab);
+            app.IncreaseoverlappingmatrixbyEditFieldLabel.HorizontalAlignment = 'right';
+            app.IncreaseoverlappingmatrixbyEditFieldLabel.Position = [573 312 169 22];
+            app.IncreaseoverlappingmatrixbyEditFieldLabel.Text = 'Increase overlapping matrix by';
+
+            % Create IncreaseoverlappingmatrixbyEditField
+            app.IncreaseoverlappingmatrixbyEditField = uieditfield(app.OverlappingTab, 'numeric');
+            app.IncreaseoverlappingmatrixbyEditField.Limits = [0 1];
+            app.IncreaseoverlappingmatrixbyEditField.Tooltip = {'Overlapping matrix is reset for each new pass, phase iteration (increment is not conserved). Increment is also applied (minus) on the normalized minimum volume criterion listed in the table below.'};
+            app.IncreaseoverlappingmatrixbyEditField.Position = [757 312 55 22];
+            app.IncreaseoverlappingmatrixbyEditField.Value = 0.05;
+
+            % Create eachtimeEditFieldLabel
+            app.eachtimeEditFieldLabel = uilabel(app.OverlappingTab);
+            app.eachtimeEditFieldLabel.HorizontalAlignment = 'right';
+            app.eachtimeEditFieldLabel.Position = [573 285 58 22];
+            app.eachtimeEditFieldLabel.Text = 'each time';
+
+            % Create eachtimeEditField
+            app.eachtimeEditField = uieditfield(app.OverlappingTab, 'numeric');
+            app.eachtimeEditField.Limits = [0 Inf];
+            app.eachtimeEditField.RoundFractionalValues = 'on';
+            app.eachtimeEditField.Tooltip = {'Counter reset each time a new particle is successfully generated, and each time algorithm moves to next pass/phase'};
+            app.eachtimeEditField.Position = [646 285 69 22];
+            app.eachtimeEditField.Value = 1000;
+
+            % Create particlegenerationfailduetooverlappingLabel
+            app.particlegenerationfailduetooverlappingLabel = uilabel(app.OverlappingTab);
+            app.particlegenerationfailduetooverlappingLabel.Position = [720 285 227 22];
+            app.particlegenerationfailduetooverlappingLabel.Text = 'particle generation fail due to overlapping';
+
+            % Create OverlappingrelaxationparametersLabel
+            app.OverlappingrelaxationparametersLabel = uilabel(app.OverlappingTab);
+            app.OverlappingrelaxationparametersLabel.FontWeight = 'bold';
+            app.OverlappingrelaxationparametersLabel.Position = [573 341 205 22];
+            app.OverlappingrelaxationparametersLabel.Text = 'Overlapping relaxation parameters';
 
             % Create OrderTab
             app.OrderTab = uitab(app.TabGroup);
@@ -2663,6 +2799,7 @@ classdef Microstructure_generation_stochastic_exported < matlab.apps.AppBase
 
             % Create PlotalgorithmprogressionCheckBox
             app.PlotalgorithmprogressionCheckBox = uicheckbox(app.StopconditionsTab);
+            app.PlotalgorithmprogressionCheckBox.ValueChangedFcn = createCallbackFcn(app, @PlotalgorithmprogressionCheckBoxValueChanged, true);
             app.PlotalgorithmprogressionCheckBox.Text = 'Plot algorithm progression';
             app.PlotalgorithmprogressionCheckBox.Position = [11 662 161 22];
             app.PlotalgorithmprogressionCheckBox.Value = true;
@@ -2764,6 +2901,23 @@ classdef Microstructure_generation_stochastic_exported < matlab.apps.AppBase
             app.Label_8.Position = [264 496 680 22];
             app.Label_8.Text = 'Algorithm will always stop after reaching this generation time. Use high value if you want to ignore this last stoping condition.';
 
+            % Create PlotalsoporosityprogressionCheckBox
+            app.PlotalsoporosityprogressionCheckBox = uicheckbox(app.StopconditionsTab);
+            app.PlotalsoporosityprogressionCheckBox.Text = 'Plot also porosity progression';
+            app.PlotalsoporosityprogressionCheckBox.Position = [192 662 179 22];
+
+            % Create RefreshfigureseachsEditFieldLabel
+            app.RefreshfigureseachsEditFieldLabel = uilabel(app.StopconditionsTab);
+            app.RefreshfigureseachsEditFieldLabel.HorizontalAlignment = 'right';
+            app.RefreshfigureseachsEditFieldLabel.Position = [390 662 134 22];
+            app.RefreshfigureseachsEditFieldLabel.Text = 'Refresh figures each (s)';
+
+            % Create RefreshfigureseachsEditField
+            app.RefreshfigureseachsEditField = uieditfield(app.StopconditionsTab, 'numeric');
+            app.RefreshfigureseachsEditField.Limits = [0 Inf];
+            app.RefreshfigureseachsEditField.Position = [539 662 39 22];
+            app.RefreshfigureseachsEditField.Value = 5;
+
             % Create UpscaleoptionalTab
             app.UpscaleoptionalTab = uitab(app.TabGroup);
             app.UpscaleoptionalTab.Tooltip = {'Upscale (optional)'};
@@ -2777,7 +2931,7 @@ classdef Microstructure_generation_stochastic_exported < matlab.apps.AppBase
             app.Instructions_upscaling.HorizontalAlignment = 'center';
             app.Instructions_upscaling.FontWeight = 'bold';
             app.Instructions_upscaling.Position = [11 746 977 22];
-            app.Instructions_upscaling.Text = 'Up(down) microstructure scaling';
+            app.Instructions_upscaling.Text = ' Microstructure up(down) scaling';
 
             % Create SelectasolidphaseandsetthenumberofLabel_12
             app.SelectasolidphaseandsetthenumberofLabel_12 = uilabel(app.UpscaleoptionalTab);
@@ -2788,8 +2942,8 @@ classdef Microstructure_generation_stochastic_exported < matlab.apps.AppBase
             % Create SelectasolidphaseandsetthenumberofLabel_13
             app.SelectasolidphaseandsetthenumberofLabel_13 = uilabel(app.UpscaleoptionalTab);
             app.SelectasolidphaseandsetthenumberofLabel_13.FontWeight = 'bold';
-            app.SelectasolidphaseandsetthenumberofLabel_13.Position = [11 580 938 22];
-            app.SelectasolidphaseandsetthenumberofLabel_13.Text = 'Note that in-house upscale algorithm limits aliasing, so interface will be better represented compared with a simple MATLAB "imresize3" with "neareast" option';
+            app.SelectasolidphaseandsetthenumberofLabel_13.Position = [11 580 932 22];
+            app.SelectasolidphaseandsetthenumberofLabel_13.Text = 'Particles are redrawn in a different grid, knowing their centroid, diameters, and rotation, with centroid and diameters scaled. Provides exact ellipsoid geometry';
 
             % Create Scalingfactor1upscaling1downscaling1noscalingEditFieldLabel
             app.Scalingfactor1upscaling1downscaling1noscalingEditFieldLabel = uilabel(app.UpscaleoptionalTab);
@@ -2805,7 +2959,7 @@ classdef Microstructure_generation_stochastic_exported < matlab.apps.AppBase
             % Create Image2
             app.Image2 = uiimage(app.UpscaleoptionalTab);
             app.Image2.Position = [11 25 974 550];
-            app.Image2.ImageSource = 'Scaling.png';
+            app.Image2.ImageSource = fullfile(pathToMLAPP, 'Scaling_regen.png');
 
             % Create Label_7
             app.Label_7 = uilabel(app.UpscaleoptionalTab);
@@ -2813,17 +2967,66 @@ classdef Microstructure_generation_stochastic_exported < matlab.apps.AppBase
             app.Label_7.Position = [423 676 423 22];
             app.Label_7.Text = 'Number of voxel (see "volume fraction tab") is multiplied by the scaling factor.';
 
-            % Create ApplyscalingtophaselabelfastCheckBox
-            app.ApplyscalingtophaselabelfastCheckBox = uicheckbox(app.UpscaleoptionalTab);
-            app.ApplyscalingtophaselabelfastCheckBox.Enable = 'off';
-            app.ApplyscalingtophaselabelfastCheckBox.Text = 'Apply scaling to phase label (fast)';
-            app.ApplyscalingtophaselabelfastCheckBox.Position = [11 649 202 22];
-            app.ApplyscalingtophaselabelfastCheckBox.Value = true;
+            % Create ApplyscalingtophaselabelCheckBox
+            app.ApplyscalingtophaselabelCheckBox = uicheckbox(app.UpscaleoptionalTab);
+            app.ApplyscalingtophaselabelCheckBox.Enable = 'off';
+            app.ApplyscalingtophaselabelCheckBox.Text = 'Apply scaling to phase label';
+            app.ApplyscalingtophaselabelCheckBox.Position = [406 638 171 22];
+            app.ApplyscalingtophaselabelCheckBox.Value = true;
 
-            % Create ApplyscalingalsotoparticlelabelslowCheckBox
-            app.ApplyscalingalsotoparticlelabelslowCheckBox = uicheckbox(app.UpscaleoptionalTab);
-            app.ApplyscalingalsotoparticlelabelslowCheckBox.Text = 'Apply scaling also to particle label (slow)';
-            app.ApplyscalingalsotoparticlelabelslowCheckBox.Position = [11 622 239 22];
+            % Create ApplyscalingalsotoparticlelabelCheckBox
+            app.ApplyscalingalsotoparticlelabelCheckBox = uicheckbox(app.UpscaleoptionalTab);
+            app.ApplyscalingalsotoparticlelabelCheckBox.Enable = 'off';
+            app.ApplyscalingalsotoparticlelabelCheckBox.Text = 'Apply scaling also to particle label';
+            app.ApplyscalingalsotoparticlelabelCheckBox.Position = [406 611 219 22];
+            app.ApplyscalingalsotoparticlelabelCheckBox.Value = true;
+
+            % Create HowtoDropDownLabel
+            app.HowtoDropDownLabel = uilabel(app.UpscaleoptionalTab);
+            app.HowtoDropDownLabel.HorizontalAlignment = 'right';
+            app.HowtoDropDownLabel.Position = [11 638 43 22];
+            app.HowtoDropDownLabel.Text = 'How to';
+
+            % Create HowtoDropDown
+            app.HowtoDropDown = uidropdown(app.UpscaleoptionalTab);
+            app.HowtoDropDown.Items = {'Re-create from partice information (recommended)', 'Up(down) scale'};
+            app.HowtoDropDown.ValueChangedFcn = createCallbackFcn(app, @HowtoDropDownValueChanged, true);
+            app.HowtoDropDown.Position = [69 638 314 22];
+            app.HowtoDropDown.Value = 'Re-create from partice information (recommended)';
+
+            % Create DiameterscalingratioEditFieldLabel
+            app.DiameterscalingratioEditFieldLabel = uilabel(app.UpscaleoptionalTab);
+            app.DiameterscalingratioEditFieldLabel.HorizontalAlignment = 'right';
+            app.DiameterscalingratioEditFieldLabel.Position = [634 638 122 22];
+            app.DiameterscalingratioEditFieldLabel.Text = 'Diameter scaling ratio';
+
+            % Create DiameterscalingratioEditField
+            app.DiameterscalingratioEditField = uieditfield(app.UpscaleoptionalTab, 'numeric');
+            app.DiameterscalingratioEditField.Limits = [0 Inf];
+            app.DiameterscalingratioEditField.Tooltip = {'Recommended value: 1, except for case discussed below.'; 'If you start with a very coarse grid and apply a high scaling factor,  the scale up particles will use significanly more volume than the coarse versions. Scaling the diameter (e.g. 0.75) will correct it.'};
+            app.DiameterscalingratioEditField.Position = [771 638 47 22];
+            app.DiameterscalingratioEditField.Value = 1;
+
+            % Create ForceseparationCheckBox
+            app.ForceseparationCheckBox = uicheckbox(app.UpscaleoptionalTab);
+            app.ForceseparationCheckBox.ValueChangedFcn = createCallbackFcn(app, @ForceseparationCheckBoxValueChanged, true);
+            app.ForceseparationCheckBox.Text = 'Force separation';
+            app.ForceseparationCheckBox.Position = [634 611 112 22];
+
+            % Create DistanceseparationvoxellengthEditFieldLabel
+            app.DistanceseparationvoxellengthEditFieldLabel = uilabel(app.UpscaleoptionalTab);
+            app.DistanceseparationvoxellengthEditFieldLabel.HorizontalAlignment = 'right';
+            app.DistanceseparationvoxellengthEditFieldLabel.Enable = 'off';
+            app.DistanceseparationvoxellengthEditFieldLabel.Position = [751 611 187 22];
+            app.DistanceseparationvoxellengthEditFieldLabel.Text = 'Distance separation (voxel length)';
+
+            % Create DistanceseparationvoxellengthEditField
+            app.DistanceseparationvoxellengthEditField = uieditfield(app.UpscaleoptionalTab, 'numeric');
+            app.DistanceseparationvoxellengthEditField.Limits = [1 Inf];
+            app.DistanceseparationvoxellengthEditField.RoundFractionalValues = 'on';
+            app.DistanceseparationvoxellengthEditField.Enable = 'off';
+            app.DistanceseparationvoxellengthEditField.Position = [953 611 35 22];
+            app.DistanceseparationvoxellengthEditField.Value = 1;
 
             % Create VerificationandCharacterizationTab
             app.VerificationandCharacterizationTab = uitab(app.TabGroup);
@@ -2995,6 +3198,19 @@ classdef Microstructure_generation_stochastic_exported < matlab.apps.AppBase
             app.WarningdonotresizefigureswhilegenerationisongoingLabel.FontAngle = 'italic';
             app.WarningdonotresizefigureswhilegenerationisongoingLabel.Position = [629 706 359 28];
             app.WarningdonotresizefigureswhilegenerationisongoingLabel.Text = {'Warning: do not resize figures while generation is on-going'; '(MATLAB expects each frame of the video to have the same size)'};
+
+            % Create ToleranceEditFieldLabel
+            app.ToleranceEditFieldLabel = uilabel(app.GenerationTab);
+            app.ToleranceEditFieldLabel.HorizontalAlignment = 'right';
+            app.ToleranceEditFieldLabel.Position = [178 682 58 22];
+            app.ToleranceEditFieldLabel.Text = 'Tolerance';
+
+            % Create ToleranceEditField
+            app.ToleranceEditField = uieditfield(app.GenerationTab, 'numeric');
+            app.ToleranceEditField.Limits = [0 1];
+            app.ToleranceEditField.Tooltip = {'A low tolerance on the volume fraction is sometimes requied to reach targe volume fraction.'};
+            app.ToleranceEditField.Position = [251 682 49 22];
+            app.ToleranceEditField.Value = 0.01;
 
             % Create VisualizationTab
             app.VisualizationTab = uitab(app.TabGroup);

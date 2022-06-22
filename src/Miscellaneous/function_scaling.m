@@ -44,15 +44,17 @@ if p.scaling_factor~=1
         end
         
         % -1 values are the voxels that refine the interface, but they still miss the phase information
-        assigned_resizedvolume = zeros(size(allphases));
-        assigned_resizedvolume(allphases>0)=1;
-        [~,Idx_distance_map] = bwdist(assigned_resizedvolume);
         unassigned_idx = find(allphases==-1);
-        Idx_distance_map(unassigned_idx);
-        allphases(unassigned_idx) = allphases(Idx_distance_map(unassigned_idx));
+        if ~isempty(unassigned_idx)
+            assigned_resizedvolume = zeros(size(allphases));
+            assigned_resizedvolume(allphases>0)=1;
+            [~,Idx_distance_map] = bwdist(assigned_resizedvolume);
+            %Idx_distance_map(unassigned_idx);
+            allphases(unassigned_idx) = allphases(Idx_distance_map(unassigned_idx));
+        end
         
         % And finally for the pore
-        allphases(idx_void)=0;
+        allphases(idx_void)=p.background;
         Microstructure_resized = allphases;
         clear allphases;
     
