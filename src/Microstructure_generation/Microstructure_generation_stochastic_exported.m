@@ -185,6 +185,7 @@ classdef Microstructure_generation_stochastic_exported < matlab.apps.AppBase
         SelectasolidphaseandsetthenumberofLabel_21  matlab.ui.control.Label
         Instructions_characterization   matlab.ui.control.Label
         GenerationTab                   matlab.ui.container.Tab
+        MakevideoCheckBox               matlab.ui.control.CheckBox
         ToleranceEditField              matlab.ui.control.NumericEditField
         ToleranceEditFieldLabel         matlab.ui.control.Label
         WarningdonotresizefigureswhilegenerationisongoingLabel  matlab.ui.control.Label
@@ -1206,8 +1207,8 @@ classdef Microstructure_generation_stochastic_exported < matlab.apps.AppBase
             Ry = cell2mat(app.Parameter_example_UITable.Data(5,2));
             Rz = cell2mat(app.Parameter_example_UITable.Data(6,2));
             % Generate ellipsoids
-            Dy = Dx/DxDy;
-            Dz = Dx/DxDz;
+            Dy = max(Dx/DxDy,1);
+            Dz = max(Dx/DxDz,1);
             [binary_ellipsoid] = create_ellipsoid(Dx,Dy,Dz);
             % Rotation
             if Rx~=180 || Ry~=180 || Rz~=180
@@ -1375,6 +1376,7 @@ classdef Microstructure_generation_stochastic_exported < matlab.apps.AppBase
             save_options.folder = app.Savefolder;
             save_options.save_progression = app.SavealgorithmprogressionplotifselectedCheckBox.Value;
             save_options.save_verification = app.SaveinputsoutpuscomparisonifselectedCheckBox.Value;
+            save_options.makevideo = app.MakevideoCheckBox.Value;
             
             % Prepare parameters
             overlapping.max = app.Maximum_overlapping;
@@ -1417,6 +1419,14 @@ classdef Microstructure_generation_stochastic_exported < matlab.apps.AppBase
                 app.generation_result(k_run).microstructure3D_phaselabel = microstructure3D.phase;
                 app.generation_result(k_run).microstructure3D_particlelabel = microstructure3D.particle_id;
 
+                % Save additional info
+                if ~isempty(app.Savefolder)
+                    if save_additionalinfo
+                        save([app.Savefolder 'Additionalinfo_run_' num2str(k_run) '.mat'],'microstructure3D','-mat');
+                        save([app.Savefolder 'Additionalinfo_particle_run_' num2str(k_run) '.mat'],'particle_data','-mat');  
+                    end
+                end
+
                 % Upscaling
                 if scaling_factor~=1
                     tic
@@ -1430,6 +1440,29 @@ classdef Microstructure_generation_stochastic_exported < matlab.apps.AppBase
                         particle_data_scaled(:,7) = round(particle_data(:,7) * 1/scaling_factor);
                         particle_data_scaled(:,8) = round(particle_data(:,8) * 1/scaling_factor);                        
                         [app.generation_result(k_run).microstructure3D_phaselabel_scaled, app.generation_result(k_run).microstructure3D_particlelabel_scaled] = function_createvolume_fromparticledata(particle_data_scaled,domain_size_rescaled, scale_diameterratio, app.ForceseparationCheckBox.Value, app.DistanceseparationvoxellengthEditField.Value);                        
+
+
+%                         %tmp = [0.6 0.625 0.65 0.675 0.7 0.725 0.75 0.775 0.8 0.825 0.850; 0 0 0 0 0 0 0 0 0 0 0;0 0 0 0 0 0 0 0 0 0 0;0 0 0 0 0 0 0 0 0 0 0];
+%                         tmp = [0.7 0.725 0.75 0.775 0.7875 0.8 0.825 0.850; 0 0 0 0 0 0 0 0;0 0 0 0 0 0 0 0;0 0 0 0 0 0 0 0];
+%                         for kk=1:1:8
+%                             [Phaselabel_scaled, ~] = function_createvolume_fromparticledata(particle_data_scaled,domain_size_rescaled, tmp(1,kk), app.ForceseparationCheckBox.Value, app.DistanceseparationvoxellengthEditField.Value);
+%                             tmp(2,kk) = sum(sum(sum( Phaselabel_scaled==0 )))/numel(Phaselabel_scaled);
+%                             aaa = Phaselabel_scaled(10:end-10,10:end-10,10:end-10);
+%                             tmp(3,kk) = sum(sum(sum( aaa==0 )))/numel(aaa);
+% 
+%                             M = zeros(size(Phaselabel_scaled));
+%                             M(Phaselabel_scaled~=0)=1;
+%                             density_fct_parameters.round_value = 3;
+%                             density_fct_parameters.smooth_cumulative_fct = true;
+%                             [~, fitted_diameter, ~, ~, ~] = Function_particle_size_distancemap_Algorithm(M, 1, false, 0, 0.5, density_fct_parameters);
+%                             tmp(4,kk) = fitted_diameter;
+% 
+%                         end
+%                         tmp
+
+
+
+
                     else
                         % Set parameters
                         parameters_scaling.scaling_factor = scaling_factor;
@@ -1552,8 +1585,8 @@ classdef Microstructure_generation_stochastic_exported < matlab.apps.AppBase
                 % Save additional info
                 if ~isempty(app.Savefolder)
                     if save_additionalinfo
-                        save([app.Savefolder 'Additionalinfo_run_' num2str(k_run) '.mat'],'microstructure3D','-mat');
-                        save([app.Savefolder 'Additionalinfo_particle_run_' num2str(k_run) '.mat'],'particle_data','-mat');  
+                        %save([app.Savefolder 'Additionalinfo_run_' num2str(k_run) '.mat'],'microstructure3D','-mat');
+                        %save([app.Savefolder 'Additionalinfo_particle_run_' num2str(k_run) '.mat'],'particle_data','-mat');  
                         if scaling_factor~=1 && strcmp(app.HowtoDropDown.Value,'Re-create from partice information (recommended)')
                             save([app.Savefolder 'Additionalinfo_particle_scaled_run_' num2str(k_run) '.mat'],'particle_data_scaled','-mat');
                         end
@@ -2050,7 +2083,7 @@ classdef Microstructure_generation_stochastic_exported < matlab.apps.AppBase
             app.ForphaseandparticlelablelsaveforDropDown.Items = {'volume before upscaling', 'volume after upscaling', 'both'};
             app.ForphaseandparticlelablelsaveforDropDown.Enable = 'off';
             app.ForphaseandparticlelablelsaveforDropDown.Position = [250 435 172 22];
-            app.ForphaseandparticlelablelsaveforDropDown.Value = 'volume before upscaling';
+            app.ForphaseandparticlelablelsaveforDropDown.Value = 'both';
 
             % Create Save_folder_button
             app.Save_folder_button = uibutton(app.SaveTab, 'push');
@@ -3211,6 +3244,12 @@ classdef Microstructure_generation_stochastic_exported < matlab.apps.AppBase
             app.ToleranceEditField.Tooltip = {'A low tolerance on the volume fraction is sometimes requied to reach targe volume fraction.'};
             app.ToleranceEditField.Position = [251 682 49 22];
             app.ToleranceEditField.Value = 0.01;
+
+            % Create MakevideoCheckBox
+            app.MakevideoCheckBox = uicheckbox(app.GenerationTab);
+            app.MakevideoCheckBox.Text = 'Make video';
+            app.MakevideoCheckBox.Position = [905 679 83 22];
+            app.MakevideoCheckBox.Value = true;
 
             % Create VisualizationTab
             app.VisualizationTab = uitab(app.TabGroup);

@@ -5,6 +5,9 @@ function [microstructure3D, phase, particle_data, outcome] = function_generate_e
 refresh_time_for_progression_figure = stoping_conditions.refresheachs;% s
 have_stop_conditions = ~strcmp(stoping_conditions.action,'Ignore (no stoping condition)');
 
+make_video = save_options.makevideo;
+% Set to false for extremly large volume (that takes days to generate) for which the video may end corrupted
+
 %tic
 
 %% PARAMETERS
@@ -274,44 +277,46 @@ if stoping_conditions.plot
     
     sgtitle(Fig_global_progression,'Algorithm generation progression and rate','FontWeight','bold','FontSize',16,'FontName','Times new roman');
 
-    video_format = 'mpeg-4';
-    video_handle = VideoWriter([save_options.folder 'Algorithm_progression_video_run_' num2str(save_options.run_number)],video_format);
-    set(video_handle,'Quality',100); % Set video quality
-    % Set video framerate
-    set(video_handle,'FrameRate',5);
-    % Open video
-    open(video_handle)
-    frame_number = 1;
-    Fig_progression_video = figure; % Create figure
-    Fig_progression_video.Name= 'Algorithm generation progression (volume fractions along thickness)'; % Figure name
-    set(Fig_progression_video,'position',[scrsz(1) scrsz(2) scrsz(3)*2/3 scrsz(4)*4/5]); % Full screen figure
-    Fig_progression_video.Color='white'; % Background colour
-    ax_video = axes('Parent',Fig_progression_video);
-    hold(ax_video,'on'); % Active subplot
-    h_title=title ({'Volume fraction along thickness','Wall clock time = 0 s'});
-    for current_phase = 1:1:number_phase
-        plot(phase(current_phase).volumefraction.along_3rd_axis(1,:), phase(current_phase).volumefraction.along_3rd_axis(2,:),'DisplayName',[phase(current_phase).name ' (inputs)'],'Color', c_(current_phase,:),'LineWidth',2,'LineStyle','--');
+    if make_video
+        video_format = 'mpeg-4';
+        video_handle = VideoWriter([save_options.folder 'Algorithm_progression_video_run_' num2str(save_options.run_number)],video_format);
+        set(video_handle,'Quality',100); % Set video quality
+        % Set video framerate
+        set(video_handle,'FrameRate',5);
+        % Open video
+        open(video_handle)
+        frame_number = 1;
+        Fig_progression_video = figure; % Create figure
+        Fig_progression_video.Name= 'Algorithm generation progression (volume fractions along thickness)'; % Figure name
+        set(Fig_progression_video,'position',[scrsz(1) scrsz(2) scrsz(3)*2/3 scrsz(4)*4/5]); % Full screen figure
+        Fig_progression_video.Color='white'; % Background colour
+        ax_video = axes('Parent',Fig_progression_video);
+        hold(ax_video,'on'); % Active subplot
+        h_title=title ({'Volume fraction along thickness','Wall clock time = 0 s'});
+        for current_phase = 1:1:number_phase
+            plot(phase(current_phase).volumefraction.along_3rd_axis(1,:), phase(current_phase).volumefraction.along_3rd_axis(2,:),'DisplayName',[phase(current_phase).name ' (inputs)'],'Color', c_(current_phase,:),'LineWidth',2,'LineStyle','--');
+        end
+        if stoping_conditions.plotporosity
+            plot(direction(3).normalized_coordinates, porosity.along_3rd_axis_allslices,'DisplayName','Porosity (inputs)','Color', 'k','LineWidth',2,'LineStyle','--');
+        end
+        for current_phase = 1:1:number_phase
+            plot([0,1], [0,0],'DisplayName',[phase(current_phase).name ', (generated)'],'Color', c_(current_phase,:),'LineWidth',2,'LineStyle','-');
+        end
+        if stoping_conditions.plotporosity
+            plot([0,1], [1,1],'DisplayName','Porosity (generated)','Color', 'k','LineWidth',2,'LineStyle','-');
+        end
+        ylim(ax_video,[0 +Inf])
+        xlabel('Normalized position along direction 3 (thickness)');
+        ylabel(ax_video,'Volume fraction');
+        grid(ax_video,'on');
+        legend(ax_video,'Location','southoutside','NumColumns',2);
+        set(ax_video,'FontName','Times new roman','FontSize',12); % Fontname and fontsize
+        set(h_title,'FontSize',14)
+        stored_frame(frame_number) = getframe(Fig_progression_video);
+        writeVideo(video_handle,stored_frame(frame_number))
+        pause(0.01); % Force refresh of the graph
+        hold(ax_video,'off');
     end
-    if stoping_conditions.plotporosity
-        plot(direction(3).normalized_coordinates, porosity.along_3rd_axis_allslices,'DisplayName','Porosity (inputs)','Color', 'k','LineWidth',2,'LineStyle','--');
-    end
-    for current_phase = 1:1:number_phase
-        plot([0,1], [0,0],'DisplayName',[phase(current_phase).name ', (generated)'],'Color', c_(current_phase,:),'LineWidth',2,'LineStyle','-');
-    end   
-    if stoping_conditions.plotporosity
-        plot([0,1], [1,1],'DisplayName','Porosity (generated)','Color', 'k','LineWidth',2,'LineStyle','-');
-    end    
-    ylim(ax_video,[0 +Inf])
-    xlabel('Normalized position along direction 3 (thickness)');
-    ylabel(ax_video,'Volume fraction');
-    grid(ax_video,'on');
-    legend(ax_video,'Location','southoutside','NumColumns',2);
-    set(ax_video,'FontName','Times new roman','FontSize',12); % Fontname and fontsize
-    set(h_title,'FontSize',14)
-    stored_frame(frame_number) = getframe(Fig_progression_video);
-    writeVideo(video_handle,stored_frame(frame_number))
-    pause(0.01); % Force refresh of the graph
-    hold(ax_video,'off');
 end
 
 
@@ -555,52 +560,66 @@ for current_pass=1:1:number_pass
                         hold(sub_axes_progression_3,'off');
                         pause(0.01); % Force refresh of the graph
 
-                        frame_number = frame_number+1;
-                        cla(ax_video);
-                        hold(ax_video,'on'); % Active subplot
-                        h_title=title(ax_video,{'Volume fraction along thickness',['Wall clock time = ' num2str(time_since_start,'%1.1f') ' s']});
-                        for current_phase_fig = 1:1:number_phase
-                            plot(ax_video,phase(current_phase_fig).volumefraction.along_3rd_axis(1,:), phase(current_phase_fig).volumefraction.along_3rd_axis(2,:),'DisplayName',[phase(current_phase_fig).name ' (inputs)'],'Color', c_(current_phase_fig,:),'LineWidth',2,'LineStyle','--');
-                        end
-                        if stoping_conditions.plotporosity 
-                            plot(ax_video,linspace(0,1,domain_size(3)), porosity.along_3rd_axis_allslices,'DisplayName','Porosity (inputs)','Color', 'k','LineWidth',2,'LineStyle','--');
-                        end
-
-                        current_porosity.along_3rd_axis_allslices = ones(1,domain_size(3));
-                        for current_phase_fig = 1:1:number_phase
-                            % Along direction
-                            vf_position = zeros(2,domain_size(3));
-                            for current_position=1:1:domain_size(3) % Loop over postion
-                                vf_position(2,current_position) = sum(sum(microstructure3D.phase(:,:,current_position)==phase(current_phase_fig).code));
+                        if make_video
+                            frame_number = frame_number+1;
+                            cla(ax_video);
+                            hold(ax_video,'on'); % Active subplot
+                            h_title=title(ax_video,{'Volume fraction along thickness',['Wall clock time = ' num2str(time_since_start,'%1.1f') ' s']});
+                            for current_phase_fig = 1:1:number_phase
+                                plot(ax_video,phase(current_phase_fig).volumefraction.along_3rd_axis(1,:), phase(current_phase_fig).volumefraction.along_3rd_axis(2,:),'DisplayName',[phase(current_phase_fig).name ' (inputs)'],'Color', c_(current_phase_fig,:),'LineWidth',2,'LineStyle','--');
                             end
-                            vf_position(2,:) = vf_position(2,:)/area_xy;
-                            vf_position(1,:) = [1:1:domain_size(3)]/domain_size(3);
-                            plot(ax_video,vf_position(1,:), vf_position(2,:),'DisplayName',[phase(current_phase_fig).name ', (generated)'],'Color', c_(current_phase_fig,:),'LineWidth',2,'LineStyle','-');
-                            current_porosity.along_3rd_axis_allslices = current_porosity.along_3rd_axis_allslices - vf_position(2,:); 
-                        end
-                        if stoping_conditions.plotporosity  
-                            plot(ax_video,vf_position(1,:), current_porosity.along_3rd_axis_allslices,'DisplayName','Porosity (generated)','Color', 'k','LineWidth',2,'LineStyle','-');
-                        end
+                            if stoping_conditions.plotporosity
+                                plot(ax_video,linspace(0,1,domain_size(3)), porosity.along_3rd_axis_allslices,'DisplayName','Porosity (inputs)','Color', 'k','LineWidth',2,'LineStyle','--');
+                            end
 
-                        ylim(ax_video,[0 +Inf])
-                        xlabel(ax_video,'Normalized position along direction 3 (thickness)');
-                        ylabel(ax_video,'Volume fraction');
-                        grid(ax_video,'on');
-                        legend(ax_video,'Location','southoutside','NumColumns',2);
-                        set(ax_video,'FontName','Times new roman','FontSize',12); % Fontname and fontsize
-                        set(h_title,'FontSize',14)
-                        hold(ax_video,'off');
-                        pause(0.01); % Force refresh of the graph
-                        stored_frame(frame_number) = getframe(Fig_progression_video);
+                            current_porosity.along_3rd_axis_allslices = ones(1,domain_size(3));
+                            for current_phase_fig = 1:1:number_phase
+                                % Along direction
+                                vf_position = zeros(2,domain_size(3));
+                                for current_position=1:1:domain_size(3) % Loop over postion
+                                    vf_position(2,current_position) = sum(sum(microstructure3D.phase(:,:,current_position)==phase(current_phase_fig).code));
+                                end
+                                vf_position(2,:) = vf_position(2,:)/area_xy;
+                                vf_position(1,:) = [1:1:domain_size(3)]/domain_size(3);
+                                plot(ax_video,vf_position(1,:), vf_position(2,:),'DisplayName',[phase(current_phase_fig).name ', (generated)'],'Color', c_(current_phase_fig,:),'LineWidth',2,'LineStyle','-');
+                                current_porosity.along_3rd_axis_allslices = current_porosity.along_3rd_axis_allslices - vf_position(2,:);
+                            end
+                            if stoping_conditions.plotporosity
+                                plot(ax_video,vf_position(1,:), current_porosity.along_3rd_axis_allslices,'DisplayName','Porosity (generated)','Color', 'k','LineWidth',2,'LineStyle','-');
+                            end
 
-                        try
-                            writeVideo(video_handle,stored_frame(frame_number))
-                        catch ME
-                            if (strcmp(ME.identifier,'MATLAB:audiovideo:VideoWriter:invalidDimensions'))
-                                error('User has manually resized figure. Video file cannot be saved! Until algorithm finishes, please do not resize figures.')
+                            ylim(ax_video,[0 +Inf])
+                            xlabel(ax_video,'Normalized position along direction 3 (thickness)');
+                            ylabel(ax_video,'Volume fraction');
+                            grid(ax_video,'on');
+                            legend(ax_video,'Location','southoutside','NumColumns',2);
+                            set(ax_video,'FontName','Times new roman','FontSize',12); % Fontname and fontsize
+                            set(h_title,'FontSize',14)
+                            hold(ax_video,'off');
+                            pause(0.01); % Force refresh of the graph
+                            stored_frame(frame_number) = getframe(Fig_progression_video);
+
+                            try
+                                writeVideo(video_handle,stored_frame(frame_number))
+                            catch ME
+                                if (strcmp(ME.identifier,'MATLAB:audiovideo:VideoWriter:invalidDimensions'))
+                                    error('User has manually resized figure. Video file cannot be saved! Until algorithm finishes, please do not resize figures.')
+                                end
+                            end
+                            %writeVideo(video_handle,stored_frame(frame_number))
+                        else
+                            current_porosity.along_3rd_axis_allslices = ones(1,domain_size(3));
+                            for current_phase_fig = 1:1:number_phase
+                                % Along direction
+                                vf_position = zeros(2,domain_size(3));
+                                for current_position=1:1:domain_size(3) % Loop over postion
+                                    vf_position(2,current_position) = sum(sum(microstructure3D.phase(:,:,current_position)==phase(current_phase_fig).code));
+                                end
+                                vf_position(2,:) = vf_position(2,:)/area_xy;
+                                vf_position(1,:) = [1:1:domain_size(3)]/domain_size(3);
+                                current_porosity.along_3rd_axis_allslices = current_porosity.along_3rd_axis_allslices - vf_position(2,:);
                             end
                         end
-                        %writeVideo(video_handle,stored_frame(frame_number))
 
                     end
                 end
@@ -1096,17 +1115,61 @@ if stoping_conditions.plot
         function_savefig(Fig_global_progression, save_options.folder, ['Algorithm_progression_run_' num2str(save_options.run_number)]);
     end
 
-    frame_number = frame_number+1;
-    cla(ax_video);
-    hold(ax_video,'on'); % Active subplot
-    h_title=title(ax_video,{'Volume fraction along thickness',['Wall clock time = ' num2str(time_since_start,'%1.1f') ' s']});
-    for current_phase_fig = 1:1:number_phase
-        plot(phase(current_phase_fig).volumefraction.along_3rd_axis(1,:), phase(current_phase_fig).volumefraction.along_3rd_axis(2,:),'DisplayName',[phase(current_phase_fig).name ' (inputs)'],'Color', c_(current_phase_fig,:),'LineWidth',2,'LineStyle','--');
-    end
-    if stoping_conditions.plotporosity
-        plot(ax_video,linspace(0,1,domain_size(3)), porosity.along_3rd_axis_allslices,'DisplayName','Porosity (inputs)','Color', 'k','LineWidth',2,'LineStyle','--');
+    if make_video
+        frame_number = frame_number+1;
+        cla(ax_video);
+        hold(ax_video,'on'); % Active subplot
+        h_title=title(ax_video,{'Volume fraction along thickness',['Wall clock time = ' num2str(time_since_start,'%1.1f') ' s']});
+        for current_phase_fig = 1:1:number_phase
+            plot(phase(current_phase_fig).volumefraction.along_3rd_axis(1,:), phase(current_phase_fig).volumefraction.along_3rd_axis(2,:),'DisplayName',[phase(current_phase_fig).name ' (inputs)'],'Color', c_(current_phase_fig,:),'LineWidth',2,'LineStyle','--');
+        end
+        if stoping_conditions.plotporosity
+            plot(ax_video,linspace(0,1,domain_size(3)), porosity.along_3rd_axis_allslices,'DisplayName','Porosity (inputs)','Color', 'k','LineWidth',2,'LineStyle','--');
+        end
+
+        current_porosity.along_3rd_axis_allslices = ones(1,domain_size(3));
+        for current_phase_fig = 1:1:number_phase
+            % Along direction
+            vf_position = zeros(2,domain_size(3));
+            for current_position=1:1:domain_size(3) % Loop over postion
+                vf_position(2,current_position) = sum(sum(microstructure3D.phase(:,:,current_position)==phase(current_phase_fig).code));
+            end
+            vf_position(2,:) = vf_position(2,:)/area_xy;
+            vf_position(1,:) = [1:1:domain_size(3)]/domain_size(3);
+            plot(vf_position(1,:), vf_position(2,:),'DisplayName',[phase(current_phase_fig).name ', (generated)'],'Color', c_(current_phase_fig,:),'LineWidth',2,'LineStyle','-');
+            current_porosity.along_3rd_axis_allslices = current_porosity.along_3rd_axis_allslices - vf_position(2,:);
+        end
+        if stoping_conditions.plotporosity
+            plot(ax_video,vf_position(1,:), current_porosity.along_3rd_axis_allslices,'DisplayName','Porosity (generated)','Color', 'k','LineWidth',2,'LineStyle','-');
+        end
+        ylim(ax_video,[0 +Inf])
+        xlabel(ax_video,'Normalized position along direction 3 (thickness)');
+        ylabel(ax_video,'Volume fraction');
+        grid(ax_video,'on');
+        legend(ax_video,'Location','southoutside','NumColumns',2);
+        set(ax_video,'FontName','Times new roman','FontSize',12); % Fontname and fontsize
+        set(h_title,'FontSize',14)
+        hold(ax_video,'off');
+        stored_frame(frame_number) = getframe(Fig_progression_video);
+        writeVideo(video_handle,stored_frame(frame_number))
+        pause(0.01); % Force refresh of the graph
+        close(video_handle) % Close video
+        hold(ax_video,'off'); % Active subplot
+    else
+        current_porosity.along_3rd_axis_allslices = ones(1,domain_size(3));
+        for current_phase_fig = 1:1:number_phase
+            % Along direction
+            vf_position = zeros(2,domain_size(3));
+            for current_position=1:1:domain_size(3) % Loop over postion
+                vf_position(2,current_position) = sum(sum(microstructure3D.phase(:,:,current_position)==phase(current_phase_fig).code));
+            end
+            vf_position(2,:) = vf_position(2,:)/area_xy;
+            vf_position(1,:) = [1:1:domain_size(3)]/domain_size(3);
+            current_porosity.along_3rd_axis_allslices = current_porosity.along_3rd_axis_allslices - vf_position(2,:);
+        end
     end
 
+else
     current_porosity.along_3rd_axis_allslices = ones(1,domain_size(3));
     for current_phase_fig = 1:1:number_phase
         % Along direction
@@ -1116,26 +1179,8 @@ if stoping_conditions.plot
         end
         vf_position(2,:) = vf_position(2,:)/area_xy;
         vf_position(1,:) = [1:1:domain_size(3)]/domain_size(3);
-        plot(vf_position(1,:), vf_position(2,:),'DisplayName',[phase(current_phase_fig).name ', (generated)'],'Color', c_(current_phase_fig,:),'LineWidth',2,'LineStyle','-');
-        current_porosity.along_3rd_axis_allslices = current_porosity.along_3rd_axis_allslices - vf_position(2,:); 
-    end    
-    if stoping_conditions.plotporosity
-        plot(ax_video,vf_position(1,:), current_porosity.along_3rd_axis_allslices,'DisplayName','Porosity (generated)','Color', 'k','LineWidth',2,'LineStyle','-');
+        current_porosity.along_3rd_axis_allslices = current_porosity.along_3rd_axis_allslices - vf_position(2,:);
     end
-    ylim(ax_video,[0 +Inf])
-    xlabel(ax_video,'Normalized position along direction 3 (thickness)');
-    ylabel(ax_video,'Volume fraction');
-    grid(ax_video,'on');
-    legend(ax_video,'Location','southoutside','NumColumns',2);
-    set(ax_video,'FontName','Times new roman','FontSize',12); % Fontname and fontsize
-    set(h_title,'FontSize',14)
-    hold(ax_video,'off');
-    stored_frame(frame_number) = getframe(Fig_progression_video);
-    writeVideo(video_handle,stored_frame(frame_number))
-    pause(0.01); % Force refresh of the graph
-    close(video_handle) % Close video
-    hold(ax_video,'off'); % Active subplot
-
 end
 
 % Verification
@@ -1203,7 +1248,14 @@ Rx = (dx)/2; Ry = (dy)/2; Rz = (dz)/2; % Three radius
 [X,Y,Z] = ndgrid(linspace(-Rx,Rx,dx),linspace(-Ry,Ry,dy),linspace(-Rz,Rz,dz));
 R = sqrt((X/Rx).^2 + (Y/Ry).^2 + (Z/Rz).^2);
 binary_ellipsoid = zeros(size(X));
-binary_ellipsoid(R <= 1 ) = 1; % Assign 1 for ellipsoid, 0 for complementary volume
+%binary_ellipsoid(R <= 1 ) = 1; % Assign 1 for ellipsoid, 0 for complementary volume
+idr = find(R<=1);
+if isempty(idr)
+    idr = find(R==min(min(min(R))));
+end
+binary_ellipsoid(idr) = 1; % Assign 1 for ellipsoid, 0 for complementary volume
+
+
 % Remove one voxel tip, if any?
 
 % Visualization
