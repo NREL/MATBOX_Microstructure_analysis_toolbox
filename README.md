@@ -4,6 +4,9 @@
 See release_notes.txt for a change log.\
 **Next version (re-work of characterization module) is underway.**
 
+**Update: March 16 2023. There has not been an update for a while. The next version is still in development, just with more changes than initially expected.
+If you are NREL and want to have access to the current version, please contact me (especially if you are doing characterization, as the new version of the module is much better than the one in the public repository).**
+
 ![MATBOX](https://github.com/NREL/MATBOX_Microstructure_analysis_toolbox/blob/master/MATBOX_logo.png)
 
 ## MATBOX's Publication
