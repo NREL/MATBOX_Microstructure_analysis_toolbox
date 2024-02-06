@@ -1,14 +1,14 @@
 # MATBOX: Microstructure Analysis Toolbox
 **MATLAB open source microstructure analysis code embedded with a graphic user interface**\
 *v1.0b May 19, 2021*\
-See release_notes.txt for a change log.\
+See release_notes.txt for a change log.
 
 **Update: February 2024**\
 Progress toward 2.0 public release (planned for early-mid 2024)
 * **Microstructure generation module: done**\
   NEW: tube-based generation submodule (e.g. carbon nanotubes with curvature and non-overlapping)\
   NEW: web-based generation submodule (e.g. PTFE fibrils)\
-  NEW: surface roughness generation submodule (stochastic and grains-based)\
+  NEW: surface roughness generation submodule (stochastic or grains-based)\
   UPDATED: ellipsoids-based stochastic particle generation submodule: faster generation and masks
 
 * **ROI, filtering and segmentation module: active development, near finished**\
@@ -27,7 +27,7 @@ Progress toward 2.0 public release (planned for early-mid 2024)
   UPDATED: revamped  GUI
   
 * **Microstructure visualization: done**\
-  NEW: create video\
+  NEW: create video animation of your 3D microstructure\
   UPDATED: revamped visualization and better segmentation inspection
 
 Some articles will be published concomitantly with the public release. Then I will work on revamping the documentation, starting with tutorial videos.
