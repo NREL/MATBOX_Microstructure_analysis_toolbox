@@ -2,7 +2,35 @@
 **MATLAB open source microstructure analysis code embedded with a graphic user interface**\
 *v1.0b May 19, 2021*\
 See release_notes.txt for a change log.\
-**Next version (re-work of characterization module) is underway.**
+
+**Update: February 2024**\
+Progress toward 2.0 public release (planned for early-mid 2024)
+* **Microstructure generation module: done**\
+  NEW: tube-based generation submodule (e.g. carbon nanotubes with curvature and non-overlapping)\
+  NEW: web-based generation submodule (e.g. PTFE fibrils)\
+  NEW: surface roughness generation submodule (stochastic and grains-based)\
+  UPDATED: ellipsoids-based stochastic particle generation submodule: faster generation and masks
+
+* **ROI, filtering and segmentation module: active development, near finished**\
+  NEW: multiple files segmentation\
+  NEW: create and use macros for automated segmentation\
+  NEW: parallel segmentation workflows with workflow merging\
+  NEW: local erosion and dilation\
+  NEW: instance segmentation\
+  UPDATED: revamped  GUI
+  
+* **Microstructure characterization: well advanced**\
+  NEW: TPBL for fuel cell and electrolyzer\
+  NEW: chord length particle size method\
+  UPDATED: improved RVE calculations  
+  UPDATED: more different type of connectivity  
+  UPDATED: revamped  GUI
+  
+* **Microstructure visualization: done**\
+  NEW: create video\
+  UPDATED: revamped visualization and better segmentation inspection
+
+Some articles will be published concomitantly with the public release. Then I will work on revamping the documentation, starting with tutorial videos.
 
 **Update: March 16 2023. There has not been an update for a while. The next version is still in development, just with more changes than initially expected.
 If you are NREL and want to have access to the current version, please contact me (especially if you are doing characterization, as the new version of the module is much better than the one in the public repository).**
