@@ -27,7 +27,7 @@ end
 
 % Figure
 Fig = figure; % Create figure
-Fig.Name= 'Volume fractions along thickness'; % Figure name
+Fig.Name= 'Volume fractions along thickness (no cropping)'; % Figure name
 set(Fig,'position',[scrsz(1) scrsz(2) scrsz(3)*2/3 scrsz(4)*2/3]);
 Fig.Color='white'; % Background colour
 for id_axe=1:1:2
@@ -317,11 +317,21 @@ for current_phase=1:1:number_phase % Loop over phases
         set(h_mean, 'Color', 'k','LineWidth',1,'LineWidth',2);
         set(h_min, 'Color', 'b','LineStyle','--','LineWidth',1);
         set(h_max, 'Color', 'r','LineStyle','--','LineWidth',1);
+
         % Mean with error bar (+- standard deviation)
-        h_mean_witherrorbar = errorbar(x_/x_(end),y_(:,2),y_(:,4));
-        set(h_mean_witherrorbar, 'Color', 'k','LineWidth',1);
-        h_mean=plot(x_/x_(end),y_(:,2)); % Plot over the other
-        set(h_mean, 'Color', 'k','LineWidth',1,'LineWidth',2);
+        % Old approach
+        % h_mean_witherrorbar = errorbar(x_/x_(end),y_(:,2),y_(:,4));
+        % set(h_mean_witherrorbar, 'Color', 'k','LineWidth',1);
+        % h_mean=plot(x_/x_(end),y_(:,2)); % Plot over the other
+        % set(h_mean, 'Color', 'k','LineWidth',1,'LineWidth',2);
+        % New approach
+        std_min = (y_(:,2) - y_(:,4))';
+        std_max = (y_(:,2) + y_(:,4))';
+        x2 = [(x_/x_(end)), fliplr((x_/x_(end)))];
+        inBetween = [std_min, fliplr(std_max)];
+        h_=fill(x2, inBetween, 'k');
+        set(h_,'LineStyle','none','FaceAlpha',0.25);
+
         lgd = legend(sub_axes,'Mean diameter with +- standard deviation','Minimum diameter', 'Maximun diameter','Location','best');        
         % - Grid
         grid(sub_axes,'on'); % Display grid
@@ -358,7 +368,7 @@ for current_phase=1:1:number_phase % Loop over phases
             str_title = 'Particle rotation Rz';
             y_ = phase(current_phase).rotation_x.along_3rd_axis_allslice_calculatedaftergeneration_stats;
         end
-        ylabel('Angle (°)');        
+        ylabel('Angle (Â°)');        
         h_title=title (str_title,'FontName','Times new roman','FontSize',14); % Set title font
         xlabel('Normalized position along direction 3 (thickness)');
         % Plot
@@ -371,11 +381,22 @@ for current_phase=1:1:number_phase % Loop over phases
         set(h_mean, 'Color', 'k','LineWidth',1,'LineWidth',2);
         set(h_min, 'Color', 'b','LineStyle','--','LineWidth',1);
         set(h_max, 'Color', 'r','LineStyle','--','LineWidth',1);
+        
         % Mean with error bar (+- standard deviation)
-        h_mean_witherrorbar = errorbar(x_/x_(end),y_(:,2),y_(:,4));
-        set(h_mean_witherrorbar, 'Color', 'k','LineWidth',1);
-        h_mean=plot(x_/x_(end),y_(:,2)); % Plot over the other
-        set(h_mean, 'Color', 'k','LineWidth',1,'LineWidth',2);
+        % Old approach
+        % h_mean_witherrorbar = errorbar(x_/x_(end),y_(:,2),y_(:,4));
+        % set(h_mean_witherrorbar, 'Color', 'k','LineWidth',1);
+        % h_mean=plot(x_/x_(end),y_(:,2)); % Plot over the other
+        % set(h_mean, 'Color', 'k','LineWidth',1,'LineWidth',2);
+
+        % New approach
+        std_min = (y_(:,2) - y_(:,4))';
+        std_max = (y_(:,2) + y_(:,4))';
+        x2 = [(x_/x_(end)), fliplr((x_/x_(end)))];
+        inBetween = [std_min, fliplr(std_max)];
+        h_=fill(x2, inBetween, 'k');
+        set(h_,'LineStyle','none','FaceAlpha',0.25);
+
         lgd = legend(sub_axes,'Mean rotation with +- standard deviation','Minimum rotation', 'Maximun rotation','Location','best');        
         % - Grid
         grid(sub_axes,'on'); % Display grid

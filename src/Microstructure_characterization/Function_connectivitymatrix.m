@@ -1,6 +1,7 @@
 function [Connectivity_matrix, Interface_label] = Function_connectivitymatrix(M, background, interface_complemetaryvolume, interface_anotherlabel)
 
 Domain_size = size(M);
+dimension = length(Domain_size);
 Interface_label = zeros(Domain_size);
 
 Ids = unique(M); % Get all ids
@@ -82,23 +83,25 @@ for k=1:1:n_ids
         end
         
         % Check z-
-        if z_>1
-            % Tested voxel
-            x_tested = x_; y_tested = y_; z_tested = z_-1;
-            % Value founded there
-            Id_tested = M(x_tested,y_tested,z_tested);
-            if Id_tested~=id
-                % Interface founded
-                if Id_tested==background
-                    % Interface with the complementary phase
-                    Interface_label(x_,y_,z_)=interface_complemetaryvolume;
-                else
-                    % Interface with the another particle of the phase
-                    Interface_label(x_,y_,z_)=interface_anotherlabel;
-                    % Update Connectivity_matrix as consequence
-                    row_ = find( Connectivity_matrix(:,1)==id);
-                    column_ = find( Connectivity_matrix(1,:)==Id_tested);
-                    Connectivity_matrix(row_,column_)=Connectivity_matrix(row_,column_)+1;
+        if dimension==3
+            if z_>1
+                % Tested voxel
+                x_tested = x_; y_tested = y_; z_tested = z_-1;
+                % Value founded there
+                Id_tested = M(x_tested,y_tested,z_tested);
+                if Id_tested~=id
+                    % Interface founded
+                    if Id_tested==background
+                        % Interface with the complementary phase
+                        Interface_label(x_,y_,z_)=interface_complemetaryvolume;
+                    else
+                        % Interface with the another particle of the phase
+                        Interface_label(x_,y_,z_)=interface_anotherlabel;
+                        % Update Connectivity_matrix as consequence
+                        row_ = find( Connectivity_matrix(:,1)==id);
+                        column_ = find( Connectivity_matrix(1,:)==Id_tested);
+                        Connectivity_matrix(row_,column_)=Connectivity_matrix(row_,column_)+1;
+                    end
                 end
             end
         end
@@ -148,23 +151,25 @@ for k=1:1:n_ids
         end
         
         % Check z+
-        if z_<Domain_size(3)
-            % Tested voxel
-            x_tested = x_; y_tested = y_; z_tested = z_+1;
-            % Value founded there
-            Id_tested = M(x_tested,y_tested,z_tested);
-            if Id_tested~=id
-                % Interface founded
-                if Id_tested==background
-                    % Interface with the complementary phase
-                    Interface_label(x_,y_,z_)=interface_complemetaryvolume;
-                else
-                    % Interface with the another particle of the phase
-                    Interface_label(x_,y_,z_)=interface_anotherlabel;
-                    % Update Connectivity_matrix as consequence
-                    row_ = find( Connectivity_matrix(:,1)==id);
-                    column_ = find( Connectivity_matrix(1,:)==Id_tested);
-                    Connectivity_matrix(row_,column_)=Connectivity_matrix(row_,column_)+1;
+        if dimension==3
+            if z_<Domain_size(3)
+                % Tested voxel
+                x_tested = x_; y_tested = y_; z_tested = z_+1;
+                % Value founded there
+                Id_tested = M(x_tested,y_tested,z_tested);
+                if Id_tested~=id
+                    % Interface founded
+                    if Id_tested==background
+                        % Interface with the complementary phase
+                        Interface_label(x_,y_,z_)=interface_complemetaryvolume;
+                    else
+                        % Interface with the another particle of the phase
+                        Interface_label(x_,y_,z_)=interface_anotherlabel;
+                        % Update Connectivity_matrix as consequence
+                        row_ = find( Connectivity_matrix(:,1)==id);
+                        column_ = find( Connectivity_matrix(1,:)==Id_tested);
+                        Connectivity_matrix(row_,column_)=Connectivity_matrix(row_,column_)+1;
+                    end
                 end
             end
         end

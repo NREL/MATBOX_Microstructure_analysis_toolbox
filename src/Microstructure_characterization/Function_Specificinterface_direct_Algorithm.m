@@ -1,4 +1,4 @@
-function [Postion_surface,surface] = Function_Specificinterface_direct_Algorithm(binary_phase)
+function [Postion_surface,surface,LOC_surface] = Function_Specificinterface_direct_Algorithm(binary_phase)
 
 % Domain size
 Current_Domain_size = size(binary_phase);
@@ -70,6 +70,13 @@ if method_fast
     
     % Summation of all the faces
     surface=sum1+sum2+sum3;
+
+    % Location (for fractal dimension)
+    LOC_surface=zeros(size(binary_phase));
+    LOC_surface(1:Current_Domain_size(1)-1,:,:) = Face_normal_1;
+    LOC_surface(:,1:Current_Domain_size(2)-1,:) = LOC_surface(:,1:Current_Domain_size(2)-1,:) + Face_normal_2;
+    LOC_surface(:,:,1:Current_Domain_size(3)-1) = LOC_surface(:,:,1:Current_Domain_size(3)-1) + Face_normal_3;
+    LOC_surface(LOC_surface~=0)=1;
     
 else
     

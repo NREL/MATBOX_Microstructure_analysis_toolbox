@@ -1,0 +1,212 @@
+% README
+% Write here the metadata you want to select in the GUI ('add/modify metadata' tab)
+% You must write MATLAB code as this file will be 'eval' by MATLAB
+% You can choose between three ways to enter a new metadata:
+% - text                               : app.metadata(k).choice = 'Open';
+% - predefined values (drop down menu) : app.metadata(k).choice = 'Predefined'; 
+% - Boolean choice (true or false)     : app.metadata(k).choice = 'boolean';
+% You can name your metadata in app.metadata(k).name = <your_metadata_name>, beware: you should not use empty space.
+% This list of metadata is tailored for battery electrodes
+
+
+% Voxel size
+k=k+1;
+app.metadata(k).name = 'Voxel_size';
+app.metadata(k).choice = 'Open';
+app.metadata(k).description = {'Voxel size. E.g.: 126 nm.'};      
+
+% Type
+k=k+1;
+app.metadata(k).name = 'Type';
+app.metadata(k).choice = 'Predefined';
+app.metadata(k).options = {'Grey level', 'Semantic segmentation','Instance segmentation', 'Other channel'};    
+app.metadata(k).description = 'Semantic segmentation: one value per phase/material. Instance segmentation: one value per instance (typically per particle). Other channel: any field other than the grey level brightness.';   
+
+% Scale
+k=k+1;            
+app.metadata(k).name = 'Scale';
+app.metadata(k).choice = 'Predefined';   
+app.metadata(k).options = {'Grains','Particle','Electrode','Full cell'};   
+app.metadata(k).description = 'What is the scale or field of view of the image ? Grains, a single (or very few) particle, an electrode microstructure, and/or the full cell microstructure.';              
+
+% Features
+k=k+1;            
+app.metadata(k).name = 'Features';
+app.metadata(k).choice = 'Predefined';   
+app.metadata(k).options = {'Channels','Gradation','Multilayer','Multimodal size distribution','Cracks','Particle alignement'};   
+app.metadata(k).description = 'Features that describe the best the microstructures.';     
+
+% History
+k=k+1;            
+app.metadata(k).name = 'History';
+app.metadata(k).choice = 'Predefined';   
+app.metadata(k).options = {'Pristine','Cycled'};   
+app.metadata(k).description = '';              
+
+% Porosity
+k=k+1;            
+app.metadata(k).name = 'Porosity';
+app.metadata(k).choice = 'Predefined';   
+app.metadata(k).options = {'Very high (>50%)','High (40-50%)','Intermediate (30-40%)','Low (20-30%)','Very low (10-20%)','Extremely low (<10%)'};   
+app.metadata(k).description = 'Electrode porosity.'; 
+
+% Project
+k=k+1;
+app.metadata(k).name = 'Project';
+app.metadata(k).choice = 'Open';   
+app.metadata(k).description = 'Name of the project related with this file. Use acronym to avoid duplicates.';        
+
+% Source
+k=k+1;
+app.metadata(k).name = 'Source';
+app.metadata(k).choice = 'Predefined';
+app.metadata(k).options = {'Imaged','Generated'};    
+app.metadata(k).description = 'An image can be obtained through experimental imaging or numerical generation, or a combination of the two.';   
+
+% Imaging technique
+k=k+1;
+app.metadata(k).name = 'Imaging_method';
+app.metadata(k).choice = 'Predefined';
+app.metadata(k).options = {'SEM','FIB-SEM','micro-CT','nano-CT'};    
+app.metadata(k).description = '';     
+
+% Generation technique
+k=k+1;
+app.metadata(k).name = 'Numerical_generation_method';
+app.metadata(k).choice = 'Predefined';
+app.metadata(k).options = {'Stochastic','Deterministic','GAN'};    
+app.metadata(k).description = '';      
+
+% Anode material
+k=k+1;            
+app.metadata(k).name = 'Anode material';
+app.metadata(k).choice = 'Predefined';   
+app.metadata(k).options = {'Graphite','Silicon','Lithium metal'};   
+app.metadata(k).description = 'Anode material.';            
+
+% Cathode material
+k=k+1;            
+app.metadata(k).name = 'Cathode material';
+app.metadata(k).choice = 'Predefined';   
+app.metadata(k).options = {'NMC','LiCoO2','LFP'};   
+app.metadata(k).description = 'Cathode material.';    
+
+% Particle morphology
+k=k+1;            
+app.metadata(k).name = 'Particle_morphology';
+app.metadata(k).choice = 'Predefined';   
+app.metadata(k).options = {'Sphere','Flake'};   
+app.metadata(k).description = 'Active material particle morphology.';  
+
+% Particle alignment
+k=k+1;            
+app.metadata(k).name = 'Particle_alignment';
+app.metadata(k).choice = 'Predefined';   
+app.metadata(k).options = {'Aligned','Random','Misaligned'};   
+app.metadata(k).description = 'Active material particle alignment for electrolyte transport (aligned: long diameter aligned with the electrode thickness)';
+
+% Additives
+k=k+1;
+app.metadata(k).name = 'Additives';
+app.metadata(k).choice = 'boolean';
+app.metadata(k).description = 'If checked, additives are visible, otherwise not.';          
+
+% Carbon additive material
+k=k+1;            
+app.metadata(k).name = 'Carbon_additive_material';
+app.metadata(k).choice = 'Predefined';   
+app.metadata(k).options = {'P84','SWCNT'};   
+app.metadata(k).description = 'Carbon_additive_material.';               
+
+% Carbon additive morphology
+k=k+1;            
+app.metadata(k).name = 'Carbon_additive_morphology';
+app.metadata(k).choice = 'Predefined';   
+app.metadata(k).options = {'Sphere','Tube','Amorph'};
+app.metadata(k).description = 'Carbon additive morphology';       
+
+% Binder additive material
+k=k+1;            
+app.metadata(k).name = 'Binder_additive_material';
+app.metadata(k).choice = 'Predefined';   
+app.metadata(k).options = {'PTFE','PVDF'};
+app.metadata(k).description = 'Binder additive material';    
+
+% Binder additive morphology
+k=k+1;            
+app.metadata(k).name = 'Binder_additive_morphology';
+app.metadata(k).choice = 'Predefined';   
+app.metadata(k).options = {'Sphere','Fibril','Amorph'};
+app.metadata(k).description = 'Binder additive morphology';             
+
+% Description
+k=k+1;
+app.metadata(k).name = 'Description';
+app.metadata(k).choice = 'Open';
+app.metadata(k).description = {'Additional information about the volume.'};                     
+
+% Material from
+k=k+1;
+app.metadata(k).name = 'Sample_provided_by_INST';
+app.metadata(k).choice = 'Open';
+app.metadata(k).description = {'Name of the institution which has provided the smaple. Use acronym to avoid duplicates.'};    
+
+% Imaging from
+k=k+1;
+app.metadata(k).name = 'Imaging_performed_by_INST';
+app.metadata(k).choice = 'Open';
+app.metadata(k).description = {'Name of the institution which did the imaging. Use acronym to avoid duplicates.'};      
+
+% Imaging from
+k=k+1;
+app.metadata(k).name = 'Imaging_performed_by_NAME';
+app.metadata(k).choice = 'Open';
+app.metadata(k).description = {'Name of the person who did the imaging. Use only family name to avoid duplicates.'};     
+
+% Segmentation from
+k=k+1;
+app.metadata(k).name = 'Segmentation_performed_by_INST';
+app.metadata(k).choice = 'Open';
+app.metadata(k).description = {'Name of the institution which did the segmentation. Use acronym to avoid duplicates.'};      
+
+% Segmentation from
+k=k+1;
+app.metadata(k).name = 'Segmentation_performed_by_NAME';
+app.metadata(k).choice = 'Open';
+app.metadata(k).description = {'Name of the person who did the segmentation. Use only family name to avoid duplicates.'};      
+
+% Segmentation macro
+k=k+1;
+app.metadata(k).name = 'Segmentation_macro';
+app.metadata(k).choice = 'Open';
+app.metadata(k).description = {'Path of the macro (if any) used for the segmentation.'};     
+
+% Numerical generation from
+k=k+1;
+app.metadata(k).name = 'Numerical_generation_performed_by_INST';
+app.metadata(k).choice = 'Open';
+app.metadata(k).description = {'Name of the institution which did the numerical generation. Use acronym to avoid duplicates.'};      
+
+% Numerical generation from
+k=k+1;
+app.metadata(k).name = 'Numerical_generation_performed_by_NAME';
+app.metadata(k).choice = 'Open';
+app.metadata(k).description = {'Name of the person who did the numerical generation. Use only family name to avoid duplicates.'};             
+
+% Public
+k=k+1;
+app.metadata(k).name = 'Private';
+app.metadata(k).choice = 'boolean';
+app.metadata(k).description = 'If checked: private data, if unchecked: public data.';
+
+% Article
+k=k+1;
+app.metadata(k).name = 'Article';
+app.metadata(k).choice = 'Open';
+app.metadata(k).description = 'Use this format to avoid duplicate: Name Journal acronym year (e.g.: Usseglio JES 2024). Do not use comma.';
+
+% Article
+k=k+1;
+app.metadata(k).name = 'Article_DOI';
+app.metadata(k).choice = 'Open';
+app.metadata(k).description = 'Use this format to avoid duplicate: https://doi.org/<doi>. Do not use comma.';

@@ -22,9 +22,9 @@ cluster_size = zeros(number_cluster,17); % Initialise
 % 2 : cluster volume in um3
 % 3 : cluster volume fraction relative to domain volume, in percents
 % 4 : cluster volume fraction relative to phase volume, in percents
-% 5 : centroid position x in um
-% 6 : centroid position y in um
-% 7 : centroid position z in um
+% 5 : centroid position x in physical length
+% 6 : centroid position y in physical length
+% 7 : centroid position z in physical length
 % 8 : 1= largest cluster, 2=unknown cluster, 3=isolated cluster
 % 9 : 1= connected cluster, 2=unknown cluster, 3=isolated cluster (face2face connection direction 1)
 % 10: 1= connected cluster, 2=unknown cluster, 3=isolated cluster (face2face connection direction 2)
@@ -44,7 +44,7 @@ for k=1:1:number_cluster % Loop over all clusters
     cluster_size(k,1) = unique_cluster(k); % Cluster id
     cluster_size(k,2) = sum(sum(sum(Clusters_tmp==cluster_size(k,1)))); % Number of voxel for current cluster
 end
-cluster_size(:,3) = cluster_size(:,2) * ((voxel_size/1000)^3); % Volume of cluster in um3
+cluster_size(:,3) = cluster_size(:,2) * (voxel_size^3); % Volume of cluster in physical length
 cluster_size(:,4) = 100 * cluster_size(:,2) ./ Numbervoxel_domain; % Volume fraction of cluster in regards with the domain, in percents
 cluster_size(:,5) = 100 * cluster_size(:,2) ./ Numbervoxel_phase; % Volume fraction of cluster in regards with the phase, in percents
         
@@ -99,10 +99,10 @@ for k=1:1:number_cluster % Loop over all clusters
     x_min = min(II); x_max = max(II);
     y_min = min(JJ); y_max = max(JJ);
     z_min = min(KK); z_max = max(KK);
-    % center of mass (centroid) in um
-    cluster_size(k,5) = mean(II)*voxel_size/1000;
-    cluster_size(k,6) = mean(JJ)*voxel_size/1000;
-    cluster_size(k,7) = mean(KK)*voxel_size/1000;
+    % center of mass (centroid) in physical length
+    cluster_size(k,5) = mean(II)*voxel_size;
+    cluster_size(k,6) = mean(JJ)*voxel_size;
+    cluster_size(k,7) = mean(KK)*voxel_size;
     
     % Check if the cluster is in contact with the domain boundary
     if k>1 % Exclude largest cluster

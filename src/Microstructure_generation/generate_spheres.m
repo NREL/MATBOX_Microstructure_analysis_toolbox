@@ -85,5 +85,48 @@ microstructure( Distance_map<=round(particle_diameter/2)-1 ) = 1;
 
 microstructure=uint8(microstructure); % Convert in 8 bits
 
+
+%%
+% keyboard
+% anode_id =1;
+% cathode_id =2;
+% separator_id = 4; % 4
+% electrolyte_id = 3;
+% 
+% sz = size(microstructure);
+% % a=zeros(5,sz(2),sz(3))+1;
+% % microstructure = [a; microstructure];
+% 
+% domain_size = size(microstructure);
+% tmp=zeros(domain_size,'uint8');
+% for k=1:1:domain_size(1)
+%     slice=microstructure(k,:,:);
+%     tmp(domain_size(1)-k+1,:,:)=slice;
+% end
+% 
+% microstructure(microstructure==1)=cathode_id; % Cathode
+% tmp(tmp==1)=anode_id; % anode
+% sep = zeros(20,sz(2),sz(3))+separator_id;
+% 
+% microstructure = [microstructure;sep;tmp];
+% microstructure(microstructure==0)=electrolyte_id; % Electrolyte
+% 
+% figure
+% microstructure(1:13,:,:) = [];
+% %microstructure(205:end,:,:) = [];
+% microstructure(122:end,:,:) = [];
+% 
+% sz = size(microstructure);
+% imagesc(microstructure(:,:,round(sz(3)/2)));
+% % 
+% % a=microstructure(:,1:9,:);
+% % a(a==electrolyte_id)=4;
+% % microstructure(:,1:9,:)=a;
+% %  
+% function_save_tif(microstructure,'Periodicspheres_beforeCBD.tif');
+% % function_save_tif(microstructure,'Periodic_spheres_withpad_withsep_smallrev.tif');
+% % function_save_tif(microstructure,'Periodic_spheres_withpad_withsep_smallpar.tif');
+
+
 end
 

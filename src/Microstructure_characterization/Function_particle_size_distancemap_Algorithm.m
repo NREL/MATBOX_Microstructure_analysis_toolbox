@@ -1,82 +1,131 @@
-function [distance_transform, fitted_diameter, dist_fct, analytical, error_radius] = Function_particle_size_distancemap_Algorithm(binary_phase, voxel_size)
+function [distance_transform, fitted_diameter, dist_fct, analytical, error_radius] = Function_particle_size_distancemap_Algorithm(M, label, removeinclusion, distancelabel, voxel_size, density_fct_parameters)
 % Fit distance map cumulative function with distance map cumulative
 % function of a sphere of diameter D
+% See article: DOI 10.1149/1945-7111/ab913b
 
 %% NOTATION
 % Binary phase
 % =1 phase investigated
 % =0 complementary phase
-Domain_size=size(binary_phase); % Domain size of the microstructure
+Domain_size=size(M); % Domain size of the microstructure
+dim = length(Domain_size);
+binary_phase=zeros(Domain_size); % Initialization
+
+%% CREATE BINARY PHASE
+if distancelabel==-1
+    binary_phase(M==label)=1;
+else
+    binary_phase(M~=distancelabel)=1;
+end
+
+if removeinclusion
+    L = bwlabeln(~binary_phase,6);
+    [C,~,ic] = unique(L);
+    if length(C)>2
+        counts = accumarray(ic,1);
+        value_counts = [C, counts];
+        idx_binary = find(value_counts(:,1)==0);
+        value_counts(idx_binary,:)=[];
+        value_counts = sortrows(value_counts,-2);
+        for k=2:1:length(C)-1
+            binary_phase(L==value_counts(k,1)) = 1;
+        end
+    end
+end
 
 %% EUCLIDEAN DISTANCE MAP
 distance_transform=double(bwdist(~binary_phase,'euclidean')); % Euclidean distance map
-distance_transform=distance_transform-0.5; % From voxel center to surface
-distance_transform(distance_transform<0)=0; % Complementary volume
+%distance_transform=distance_transform-0.5; % From voxel center to surface
+distance_transform(distance_transform<=0)=0; % Complementary volume
+distance_transform(M~=label)=0; % Complementary volume
 % Unit conversion
-distance_transform = distance_transform*voxel_size/1000; % nm->um
+distance_transform = distance_transform*voxel_size;
 
 distance_transform_vector=reshape(distance_transform,[prod(Domain_size),1]); % Convert in a vector
 distance_transform_vector(distance_transform_vector<=0)=[]; % % Remove all 0
 
 %% CUMULATIVE AND DISTRIBUTION FUNCTIONS
-% Cumulative and distribution functions parameters
-density_fct_parameters.round_value = 3;
-density_fct_parameters.smooth_cumulative_fct = true;
 [dist_fct, ~] = Function_probability_density(distance_transform_vector,[],density_fct_parameters);
 distance = dist_fct.cumulative_fct(:,1);
 cumulative= dist_fct.cumulative_fct(:,2);
 
-%% FIT DIAMETER FOR THE ANALYTICAL CUMULATIVE FUNCTIONS FOR A SPHERE OF DIAMETER F
-number_tested_radius=400;
-number_of_point = 400; % Numerical resolution
-min_radius=0.1*voxel_size/1000;
-max_radius=2*max(distance);
-error_radius=zeros(number_tested_radius,2);
-tested_radius = linspace(min_radius,max_radius,number_tested_radius);
+%% FIT DIAMETER FOR THE ANALYTICAL CUMULATIVE FUNCTIONS FOR A SPHERE OF DIAMETER 2*R
+% Parameters
+gridres = 1200;
+Rmin=0.5*voxel_size;
+Rmax=2*max(distance);
+nR = 400;
+Rs = linspace(Rmin,Rmax,nR);
 
+error_radius=zeros(nR,2);
 if length(distance)>=2
-    for current_iteration=1:1:number_tested_radius
-        % Sphere
-        current_radius=tested_radius(current_iteration);
-        volume_sphere=4/3*pi*(current_radius^3);
-        
-        % All r values between 0 and the sphere radius
-        allradius=linspace(0,current_radius,number_of_point);
-        
-        % Maximum distance to boundary for each radius
-        max_distance_to_boundary=current_radius-allradius;
-        % Volume with a distance to boundary superior to max_distance_to_boundary
-        volume_with_distancetoboundary_superior = (4/3*pi*(allradius.^3))/volume_sphere;
-        
-        % The cumulative function is max_distance_to_boundary=f(volume_with_distancetoboundary_superior)
-        
-        % To be compared the two functions need to share the same x-axis,
-        common_xaxis=linspace(0,max(distance),2*number_tested_radius);
-        
-        % The analytical function: above its max, value is equal to 0
-        analytical_ = interp1(max_distance_to_boundary,volume_with_distancetoboundary_superior,common_xaxis,'linear',0);
-        % The numerical function: below its min, value is equal to 1
-        numerical_ = interp1(distance,cumulative,common_xaxis,'linear',1);
-        
-        difference_=analytical_-numerical_; % Difference between analytical and numerical
-        integral_=trapz(common_xaxis,difference_); % integral
-        error_radius(current_iteration,2)=abs(integral_); % Absolute error...
-        error_radius(current_iteration,1)=current_radius; % ...obtained with this radius
+    for kR=1:1:nR
+        R=Rs(kR);
+        d=linspace(0,R,gridres);
+        if dim==3
+            C_edm_sphere = (R-d).^3./R.^3; % cf. eq. 12
+        else
+            C_edm_sphere = (R-d).^2./R.^2;
+        end
+        if R<max(distance)
+            d_tmp=[d max(distance)];
+            C_edm_sphere_tmp = [C_edm_sphere 0];
+            distance_tmp = distance;
+            cumulative_tmp = cumulative;
+        elseif R>max(distance)
+            distance_tmp = [distance; R];
+            cumulative_tmp = [cumulative; 0];
+            d_tmp = d;
+            C_edm_sphere_tmp = C_edm_sphere;
+        else
+            d_tmp = d;
+            C_edm_sphere_tmp = C_edm_sphere;
+            distance_tmp = distance;
+            cumulative_tmp = cumulative;
+        end
+        common_xaxis=linspace(0,max(distance_tmp),gridres);
+        analytical_ = interp1(d_tmp,C_edm_sphere_tmp,common_xaxis,'linear',1);
+        numerical_ = interp1(distance_tmp,cumulative_tmp,common_xaxis,'linear',1);
+
+        difference = analytical_-numerical_;
+        integral_=trapz(common_xaxis,difference); % integral
+
+        error_radius(kR,2)=abs(integral_); % Absolute error...
+        error_radius(kR,1)=R; % ...obtained with this radius
     end
     % Find the mimimum
     index_=find(error_radius(:,2)==min(error_radius(:,2)));
-    fitted_radius=error_radius(index_,1);
+    fitted_radius=error_radius(index_(1),1);
     fitted_diameter=2*fitted_radius;
+
     % Recalculate the fitted cumulative fct.
-    allradius=linspace(0,fitted_radius,number_of_point);
-    volume_sphere=4/3*pi*(fitted_radius^3);
-    max_distance_to_boundary=fitted_radius-allradius;
-    volume_with_distancetoboundary_superior = (4/3*pi*(allradius.^3))/volume_sphere;
-    
-    analytical=zeros(length(max_distance_to_boundary),2);
-    analytical(:,1)=max_distance_to_boundary;
-    analytical(:,2)=volume_with_distancetoboundary_superior;
-    
+    R=Rs(index_(1));
+    d=linspace(0,R,gridres);
+    if dim==3
+        C_edm_sphere = (R-d).^3./R.^3; % cf. eq. 12
+    else
+        C_edm_sphere = (R-d).^2./R.^2;
+    end
+    if R<max(distance)
+        d_tmp=[d max(distance)];
+        C_edm_sphere_tmp = [C_edm_sphere 0];
+        distance_tmp = distance;
+        cumulative_tmp = cumulative;
+    elseif R>max(distance)
+        distance_tmp = [distance; R];
+        cumulative_tmp = [cumulative; 0];
+        d_tmp = d;
+        C_edm_sphere_tmp = C_edm_sphere;
+    else
+        d_tmp = d;
+        C_edm_sphere_tmp = C_edm_sphere;
+        distance_tmp = distance;
+        cumulative_tmp = cumulative;
+    end
+    common_xaxis=linspace(0,max(distance_tmp),gridres);
+    analytical=zeros(gridres,2);
+    analytical(:,1) = common_xaxis;
+    analytical(:,2) = interp1(d_tmp,C_edm_sphere_tmp,common_xaxis,'linear',1);
 else
     fitted_diameter = NaN;
     analytical=NaN;

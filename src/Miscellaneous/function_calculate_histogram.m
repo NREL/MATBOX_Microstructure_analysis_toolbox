@@ -1,11 +1,4 @@
 function [histogram_array] = function_calculate_histogram(array)
-%UNTITLED5 Summary of this function goes here
-%   Detailed explanation goes here
-
-% colunm 1: values
-% colunm 2: sum(array)=value
-% colunm 3: normalized (i.e. colunm 2/max(colunm 2))
-
 [tmp, ~, ic]=unique(array); % Get all values of the array
 n=length(tmp); % Number of unique value
 histogram_array=zeros(n,3); % Initialise histogram array

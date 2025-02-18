@@ -1,194 +1,399 @@
 function [] = Function_create_figures_RVE(p)
 
-if strcmp(p.RVE.type,'C')
-    r_axe=2; n_axe=6; scr=1;
-    n2_axe=2; scr2=2/3;
-else
-    r_axe=1; n_axe=3; scr=1/2;
-    n2_axe=1; scr2=1/3;
-end
-
 p.propertyname(1) = upper(p.propertyname(1)); % Uppercase for first letter
 scrsz = get(0,'ScreenSize'); % Screen resolution
 
-if strcmp(p.RVE.type,'A') || strcmp(p.RVE.type,'B') || strcmp(p.RVE.type,'C')
-        
-    for current_phase=1:1:p.number_phase % Loop over all phases
-        
-        Fig = figure; % Create figure
-        Fig.Name= ['Representative volume element analysis:' p.propertyname ', ' p.INFO.phase(current_phase).name];
-        Fig.Color='white'; % Background colour
-        set(Fig,'position',[scrsz(1) scrsz(2) scrsz(3) scrsz(4)*scr]); % Full screen figure
-        for id_axe=1:1:n_axe % Iterate over axe
-            if id_axe<=3
-                str_xlabel='Equivalent cubic length of the subdomains (\mum)';
-            else
-                str_xlabel='Equivalent section length of the subdomains (\mum)';
-            end
-            sub_axes=subplot(r_axe,3,id_axe,'Parent',Fig);
-            hold(sub_axes,'on'); % Active subplot
-            
-            if id_axe==1 ||  id_axe==4
-                if id_axe==1
-                    kx = 1;
-                else
-                    kx = 2;
-                end
-                h_title=title ({p.propertyname, 'Statistics'}); % Set title font and string
-                % Mean
-                x_=p.Property_subdomains_statistics(:,kx,current_phase);
-                h_mean=plot(x_,p.Property_subdomains_statistics(:,4,current_phase));
-                % Extremums and Whole volume
-                h_min=plot(x_,p.Property_subdomains_statistics(:,7,current_phase));
-                
-                xmin = min(x_); xmax=max(x_);
-                h_whole = plot([xmin+0.9*(xmax-xmin) xmax],[p.Wholevolume_results(current_phase) p.Wholevolume_results(current_phase)]);
-                h_max=plot(x_,p.Property_subdomains_statistics(:,8,current_phase));
-                % Colors, thickness, markers
-                set(h_mean, 'Color', p.INFO.phase(current_phase).color,'LineWidth',p.OPTIONS.Linewidth,'MarkerSize',p.OPTIONS.Fontsize_axe,'Marker','o');
-                set(h_min, 'Color', p.INFO.phase(current_phase).color,'LineWidth',p.OPTIONS.Linewidth,'LineStyle','--');
-                set(h_max, 'Color', p.INFO.phase(current_phase).color,'LineWidth',p.OPTIONS.Linewidth,'LineStyle','--');
-                set(h_whole, 'Color', 'k','LineWidth',p.OPTIONS.Linewidth+1,'LineStyle',':');
-                
-                % Mean with error bar (+- standard deviation)
-                x_tmp = []; y_tmp = []; e_tmp = [];
-                for current_size=1:1:length(x_)
-                    %if p.Property_subdomains_statistics(current_size,3,current_phase)>=p.Criterion(2) % Standard deviation is meaningless for a low number of values
-                    x_tmp=[x_tmp p.Property_subdomains_statistics(current_size,kx,current_phase)];
-                    y_tmp=[y_tmp p.Property_subdomains_statistics(current_size,4,current_phase)];
-                    e_tmp=[e_tmp p.Property_subdomains_statistics(current_size,5,current_phase)];
-                    %end
-                end
-                h_mean_witherrorbar = errorbar(x_tmp,y_tmp,e_tmp);
-                set(h_mean_witherrorbar, 'Color', p.INFO.phase(current_phase).color,'LineWidth',p.OPTIONS.Linewidth,'MarkerSize',p.OPTIONS.Fontsize_axe,'Marker','o');
-                h_whole = plot([xmin+0.9*(xmax-xmin) xmax],[p.Wholevolume_results(current_phase) p.Wholevolume_results(current_phase)]);
-                set(h_whole, 'Color', 'k','LineWidth',p.OPTIONS.Linewidth+1,'LineStyle',':');
-                % Annotation: number of subdomains
-                for current_size=1:1:length(x_)
-                    yl = ylim ;
-                    y_bottom = p.Property_subdomains_statistics(current_size,4,current_phase)-0.1*(yl(2)-yl(1));
-                    y_top = p.Property_subdomains_statistics(current_size,4,current_phase)+0.1*(yl(2)-yl(1));
-                    if y_bottom<yl(1)
-                        y_=y_top;
-                    else
-                        y_=y_bottom;
-                    end
-                    h=text(x_(current_size),y_,num2str( p.Property_subdomains_statistics(current_size,3,current_phase) ));
-                    set(h,'Color','k','FontSize',p.OPTIONS.Fontsize_axe,'HorizontalAlignment','center','FontWeight','bold','FontName',p.OPTIONS.fontname);
-                end
-                % - Legend
-                h_legend = legend(sub_axes,'Mean with standard deviation','Extremums',['Whole volume, ' num2str(p.Wholevolume_size(kx),'%1.1f') ' \mum'],'Location','best');
-                h_legend.FontSize = p.OPTIONS.Fontsize_legend; % Set fontsize
-                if isempty(p.propertynameunit)
-                    ylabel(p.propertyname);
-                else
-                    ylabel([p.propertyname ' (' p.propertynameunit ')']);
-                end
-                
-            elseif id_axe==2 || id_axe==5
-                if id_axe==2
-                    kx = 1;
-                else
-                    kx = 2;
-                end
-                h_title=title ({p.propertyname,'Relative standard deviation'}); % Set title font and string
-                x_=p.Property_subdomains_statistics(:,kx,current_phase);
-                h=plot(x_,p.Property_subdomains_statistics(:,6,current_phase)); % Curves
-                set(h, 'Color', p.INFO.phase(current_phase).color,'LineWidth',p.OPTIONS.Linewidth,'MarkerSize',p.OPTIONS.Fontsize_axe,'Marker','o'); % Colors
-                x_RVE = [x_(1) x_(end)];
-                y_RVE = [p.Criterion(1) p.Criterion(1)];
-                h_RVE = plot(x_RVE,y_RVE);
-                set(h_RVE, 'Color', 'black','LineStyle','--','LineWidth',p.OPTIONS.Linewidth);
-                if p.Size_RVE(2,current_phase,kx)~=0
-                    h=plot([p.Size_RVE(2,current_phase,kx) p.Size_RVE(2,current_phase,kx)],[0 p.Criterion(1)]); % Curves
-                    set(h, 'Color', 'k','LineStyle','--','LineWidth',p.OPTIONS.Linewidth); % Colors
-                end
-                % Annotation: number of subdomains
-                for current_size=1:1:length(x_)
-                    yl = ylim ;
-                    y_bottom = p.Property_subdomains_statistics(current_size,6,current_phase)-0.1*(yl(2)-yl(1));
-                    y_top = p.Property_subdomains_statistics(current_size,6,current_phase)+0.1*(yl(2)-yl(1));
-                    if y_bottom<yl(1)
-                        y_=y_top;
-                    else
-                        y_=y_bottom;
-                    end
-                    h=text(x_(current_size),y_,num2str( p.Property_subdomains_statistics(current_size,3,current_phase) ));
-                    set(h,'Color','k','FontSize',p.OPTIONS.Fontsize_axe,'HorizontalAlignment','center','FontWeight','bold','FontName',p.OPTIONS.fontname);
-                end
-                h_legend.FontSize = p.OPTIONS.Fontsize_legend; % Set fontsize
-                ylabel('Relative standard deviation (%)');
-                
-            elseif id_axe==3 || id_axe==6
-                if id_axe==3
-                    kx = 1; kxcloud = 2;
-                else
-                    kx = 2; kxcloud = 3;
-                end
-                h_title=title ({p.propertyname, 'Points cloud'}); % Set title font and string
-                % Mean
-                x_=p.Property_subdomains_statistics(:,kx,current_phase);
-                h_mean=plot(x_,p.Property_subdomains_statistics(:,4,current_phase));
-                % Point cloud
-                x_= p.Property_eachsubdomain(:,kxcloud);
-                y_= p.Property_eachsubdomain(:,current_phase+3);
-                h_pointcloud = scatter(x_,y_);
-                % Whole volume
-                xmin = min(x_); xmax=max(x_);
-                h_whole = plot([xmin+0.9*(xmax-xmin) xmax],[p.Wholevolume_results(current_phase) p.Wholevolume_results(current_phase)]);
-                % Colors, thickness, markers
-                set(h_mean, 'Color', p.INFO.phase(current_phase).color,'LineWidth',p.OPTIONS.Linewidth,'MarkerSize',p.OPTIONS.Fontsize_axe,'Marker','o');
-                set(h_pointcloud, 'MarkerEdgeColor', p.INFO.phase(current_phase).color);
-                set(h_whole, 'Color', 'k','LineWidth',p.OPTIONS.Linewidth+1,'LineStyle',':');
-                % Annotation: number of subdomains
-                x_=p.Property_subdomains_statistics(:,kx,current_phase);
-                for current_size=1:1:length(x_)
-                    yl = ylim;
-                    y_bottom = p.Property_subdomains_statistics(current_size,4,current_phase)-0.1*(yl(2)-yl(1));
-                    y_top = p.Property_subdomains_statistics(current_size,4,current_phase)+0.1*(yl(2)-yl(1));
-                    if y_bottom<yl(1)
-                        y_=y_top;
-                    else
-                        y_=y_bottom;
-                    end
-                    h=text(x_(current_size),y_,num2str( p.Property_subdomains_statistics(current_size,3,current_phase) ));
-                    set(h,'Color','k','FontSize',p.OPTIONS.Fontsize_axe,'HorizontalAlignment','center','FontWeight','bold','FontName',p.OPTIONS.fontname);
-                end
-                h_legend = legend(sub_axes,'Mean','Point cloud',['Whole volume, ' num2str(p.Wholevolume_size(kx),'%1.1f') ' \mum'],'Location','best');
-                h_legend.FontSize = p.OPTIONS.Fontsize_legend; % Set fontsize
-                if isempty(p.propertynameunit)
-                    ylabel(p.propertyname);
-                else
-                    ylabel([p.propertyname ' (' p.propertynameunit ')']);
-                end                
-            end
-            
-            xlabel(str_xlabel);
-            if strcmp(p.OPTIONS.grid,'on') % Grid
-                grid(sub_axes,'on'); % Display grid
-                set(sub_axes,'XMinorGrid',p.OPTIONS.minorgrid,'YMinorGrid',p.OPTIONS.minorgrid); % Display grid for minor thicks
-            end
-            
-            set(sub_axes,'FontName',p.OPTIONS.fontname,'FontSize',p.OPTIONS.Fontsize_axe); % Fontname and fontsize
-            h_title.FontSize = p.OPTIONS.Fontsize_title; % Set title fontsize
-            hold(sub_axes,'off'); % Relase figure
-            if strcmp(p.RVE.type,'A') || strcmp(p.RVE.type,'B')
-                str_title = {['Representative volume element analysis:' p.propertyname ', ' p.INFO.phase(current_phase).name],p.RVE.name, ['Aspect ratio: ' p.RVE.Aspectratio_name]};
-            else
-                str_title = {['Representative volume element analysis:' p.propertyname ', ' p.INFO.phase(current_phase).name],p.RVE.name};
-            end
-            sgtitle(Fig,str_title,'FontWeight','bold','FontSize',p.OPTIONS.Fontsize_title+2,'FontName',p.OPTIONS.fontname);            
-        end
-        if p.OPTIONS.save_fig == true % Save figure
-            filename= [p.propertyname '_' p.INFO.phase(current_phase).name '_' p.RVE.savename];
-            function_savefig(Fig, p.savefolder, filename, p.OPTIONS); % Call function
-        end
-        if p.OPTIONS.closefigureaftercreation == true
-            close(Fig); % Do not keep open figures
-        end
-        
+strunit =  p.infovol.unit;
+if strcmp(strunit,'um') || strcmp(strunit,'micrometer') || strcmp(strunit,'Micrometer') || strcmp(strunit,'micrometers') || strcmp(strunit,'Micrometers')
+    axisunit = '(\mum)'; lgdunit = '\mum';
+else
+    axisunit = ['(' strunit ')']; lgdunit = strunit;
+end 
+
+if strcmp(p.RVE.type,'A') || strcmp(p.RVE.type,'B') || strcmp(p.RVE.type,'C') || strcmp(p.RVE.type,'D')
+
+    if strcmp(p.RVE.type,'C') || strcmp(p.RVE.type,'D')
+        r_axe=2; n_axe=8; scr=1;
+        n2_axe=2; scr2=2/3;
+    else
+        r_axe=1; n_axe=4; scr=1/2;
+        n2_axe=1; scr2=1/3;
     end
-    
+    current_phase_todo = 0;
+    for current_phase=1:1:p.number_phase % Loop over all phases
+        if p.todo(current_phase)
+            current_phase_todo=current_phase_todo+1;
+
+            Fig = figure; % Create figure
+            Fig.Name= ['Representative volume element analysis: ' p.propertyname ', ' char(p.infovol.phasename(current_phase,1))];
+            Fig.Color='white'; % Background colour
+            set(Fig,'position',[scrsz(1) scrsz(2) scrsz(3) scrsz(4)*scr]); % Full screen figure
+            for id_axe=1:1:n_axe % Iterate over axe
+                if id_axe<=4
+                    str_xlabel=['Equivalent length: cubic root of the subdomains ' axisunit];
+                else
+                    if strcmp(p.RVE.type,'C')
+                        str_xlabel=['Equivalent length: square root of the subdomains FOV ' axisunit];
+                    elseif strcmp(p.RVE.type,'D')
+                        str_xlabel=['Length of the subdomains FOV ' axisunit];
+                    end
+                end
+                sub_axes=subplot(r_axe,4,id_axe,'Parent',Fig);
+                hold(sub_axes,'on'); % Active subplot
+
+                if id_axe==1 ||  id_axe==5
+                    if id_axe==1
+                        kx = 1; % Use first RVE size
+                    else
+                        if strcmp(p.RVE.type,'C')
+                            kx = 2; % Use second RVE size
+                        elseif strcmp(p.RVE.type,'D')
+                            kx = 3; % Use third RVE size
+                        end
+                    end
+                    h_title=title ({p.propertyname, 'Statistics'}); % Set title font and string
+
+                    x_=p.Property_subdomains_statistics(:,kx,current_phase_todo);
+
+                    % Mean with error bar (+- standard deviation)
+                    x_tmp = []; y_tmp = []; e_tmp = [];
+                    for current_size=1:1:length(x_)
+                        x_tmp=[x_tmp p.Property_subdomains_statistics(current_size,kx,current_phase_todo)];
+                        y_tmp=[y_tmp p.Property_subdomains_statistics(current_size,5,current_phase_todo)];
+                        e_tmp=[e_tmp p.Property_subdomains_statistics(current_size,6,current_phase_todo)];
+                    end
+                    h_mean_witherrorbar = errorbar(x_tmp,y_tmp,e_tmp);
+                    set(h_mean_witherrorbar, 'Color', p.infovol.phasecolor(current_phase,:),'LineWidth',p.opt.format.linewidth,'MarkerSize',p.opt.format.axefontsize,'Marker','o');                    
+
+                    % 5% interval confidence
+                    int_min = (p.Property_subdomains_statistics(:,5,current_phase_todo) - p.Property_subdomains_statistics(:,14,current_phase_todo))';
+                    int_max = (p.Property_subdomains_statistics(:,5,current_phase_todo) + p.Property_subdomains_statistics(:,14,current_phase_todo))';
+                    x2 = [x_', fliplr(x_')];
+                    inBetween = [int_min, fliplr(int_max)];
+                    h_=fill(x2, inBetween, p.infovol.phasecolor(current_phase,:));
+                    set(h_,'LineStyle','none','FaceAlpha',0.25);   
+
+                    % Extremums and Whole volume
+                    h_min=plot(x_,p.Property_subdomains_statistics(:,8,current_phase_todo));
+                    xmin = min(x_); xmax=max(x_);
+                    h_whole = plot([xmin+0.9*(xmax-xmin) xmax],[p.Wholevolume_results(current_phase_todo) p.Wholevolume_results(current_phase_todo)]);
+                    h_max=plot(x_,p.Property_subdomains_statistics(:,9,current_phase_todo));
+
+                    % Colors, thickness, markers
+                    set(h_min, 'Color', p.infovol.phasecolor(current_phase,:),'LineWidth',p.opt.format.linewidth,'LineStyle','--');
+                    set(h_max, 'Color', p.infovol.phasecolor(current_phase,:),'LineWidth',p.opt.format.linewidth,'LineStyle','--');
+                    set(h_whole, 'Color', 'k','LineWidth',p.opt.format.linewidth+1,'LineStyle',':');
+
+                    % Annotation: number of subdomains
+                    for current_size=1:1:length(x_)
+                        yl = ylim ;
+                        y_bottom = p.Property_subdomains_statistics(current_size,5,current_phase_todo)-0.1*(yl(2)-yl(1));
+                        y_top = p.Property_subdomains_statistics(current_size,5,current_phase_todo)+0.1*(yl(2)-yl(1));
+                        if y_bottom<yl(1)
+                            y_=y_top;
+                        else
+                            y_=y_bottom;
+                        end
+                        h=text(x_(current_size),y_,num2str( p.Property_subdomains_statistics(current_size,4,current_phase_todo) ));
+                        set(h,'Color','k','FontSize',p.opt.format.axefontsize,'HorizontalAlignment','center','FontWeight','bold','FontName',p.opt.format.fontname);
+                    end
+                    % - Legend
+                    h_legend = legend(sub_axes,'Mean +/- standard deviation','95% interval confidence','Extremums',['Whole volume, ' num2str(p.Wholevolume_size(kx),'%1.1f') ' ' lgdunit],'Location','best');
+                    h_legend.FontSize = p.opt.format.legendfontsize; % Set fontsize
+                    if isempty(p.propertynameunit)
+                        ylabel(p.propertyname);
+                    else
+                        ylabel([p.propertyname ' (' p.propertynameunit ')']);
+                    end
+
+                elseif id_axe==2 || id_axe==6
+                    if id_axe==2
+                        kx = 1;
+                    else
+                        if strcmp(p.RVE.type,'C')
+                            kx = 2; % Use second RVE size
+                        elseif strcmp(p.RVE.type,'D')
+                            kx = 2; % Use third RVE size
+                        end                        
+                    end
+                    h_title=title ({p.propertyname,'Relative standard deviation'}); % Set title font and string
+                    h=plot(x_,p.Property_subdomains_statistics(:,7,current_phase_todo)); % Curves
+                    set(h, 'Color', p.infovol.phasecolor(current_phase,:),'LineWidth',p.opt.format.linewidth,'MarkerSize',p.opt.format.axefontsize,'Marker','o'); % Colors
+                    x_RVE = [x_(1) x_(end)];
+
+                    if sum(p.Size_RVE(:,current_phase_todo,2,kx)~=0)==1 % Only plot if only one threshold has been selected
+                        for k_threshold=1:1:length(p.Criterion)-1
+                            if p.Size_RVE(k_threshold,current_phase_todo,2,kx)~=0
+                                y_RVE = [p.Criterion(k_threshold) p.Criterion(k_threshold)];
+                                h_RVE = plot(x_RVE,y_RVE);
+                                set(h_RVE, 'Color', 'black','LineStyle','--','LineWidth',p.opt.format.linewidth);
+                                h=plot([p.Size_RVE(k_threshold,current_phase_todo,2,kx) p.Size_RVE(k_threshold,current_phase_todo,2,kx)],[0 p.Criterion(k_threshold)]); % Curves
+                                set(h, 'Color', 'k','LineStyle','--','LineWidth',p.opt.format.linewidth); % Colors
+                            end
+                        end
+                    end
+
+                    % Annotation: number of subdomains
+                    for current_size=1:1:length(x_)
+                        yl = ylim ;
+                        y_bottom = p.Property_subdomains_statistics(current_size,7,current_phase_todo)-0.1*(yl(2)-yl(1));
+                        y_top = p.Property_subdomains_statistics(current_size,7,current_phase_todo)+0.1*(yl(2)-yl(1));
+                        if y_bottom<yl(1)
+                            y_=y_top;
+                        else
+                            y_=y_bottom;
+                        end
+                        h=text(x_(current_size),y_,num2str( p.Property_subdomains_statistics(current_size,4,current_phase_todo) ));
+                        set(h,'Color','k','FontSize',p.opt.format.axefontsize,'HorizontalAlignment','center','FontWeight','bold','FontName',p.opt.format.fontname);
+                    end
+                    %h_legend.FontSize = p.opt.format.legendfontsize; % Set fontsize
+                    ylabel('Relative standard deviation (%)');
+
+
+                elseif id_axe==3 || id_axe==7
+                    if id_axe==3
+                        kx = 1;
+                    else
+                        if strcmp(p.RVE.type,'C')
+                            kx = 2; % Use second RVE size
+                        elseif strcmp(p.RVE.type,'D')
+                            kx = 3; % Use third RVE size
+                        end
+                    end
+                    h_title=title ({p.propertyname,'95% confidence interval'}); % Set title font and string
+                    h=plot(x_, p.Property_subdomains_statistics(:,14,current_phase_todo)); % Curves
+                    set(h, 'Color', p.infovol.phasecolor(current_phase,:),'LineWidth',p.opt.format.linewidth,'MarkerSize',p.opt.format.axefontsize,'Marker','o'); % Colors
+                    x_RVE = [x_(1) x_(end)];
+
+                    % Annotation: number of subdomains
+                    for current_size=1:1:length(x_)
+                        yl = ylim ;
+                        y_bottom = p.Property_subdomains_statistics(current_size,14,current_phase_todo)-0.1*(yl(2)-yl(1));
+                        y_top = p.Property_subdomains_statistics(current_size,14,current_phase_todo)+0.1*(yl(2)-yl(1));
+                        if y_bottom<yl(1)
+                            y_=y_top;
+                        else
+                            y_=y_bottom;
+                        end
+                        h=text(x_(current_size),y_,num2str( p.Property_subdomains_statistics(current_size,4,current_phase_todo) ));
+                        set(h,'Color','k','FontSize',p.opt.format.axefontsize,'HorizontalAlignment','center','FontWeight','bold','FontName',p.opt.format.fontname);
+                    end
+                    %h_legend.FontSize = p.opt.format.legendfontsize; % Set fontsize
+                    if isempty(p.propertynameunit)
+                        ylabel([p.propertyname ': +/- 2.5%']);
+                    else
+                        ylabel([p.propertyname ' (' p.propertynameunit '): +/- 2.5%']);
+                    end
+
+
+                elseif id_axe==4 || id_axe==8
+                    if id_axe==4
+                        kx = 1; kxcloud = 2;
+                    else
+                        if strcmp(p.RVE.type,'C')
+                            kx = 2; % Use second RVE size
+                            kxcloud = 3;
+                        elseif strcmp(p.RVE.type,'D')
+                            kx = 3; % Use third RVE size
+                            kxcloud = 4;
+                        end
+                    end
+                    h_title=title ({p.propertyname, 'Points cloud'}); % Set title font and string
+                    % Mean
+                    h_mean=plot(x_,p.Property_subdomains_statistics(:,5,current_phase_todo));
+                    % Point cloud
+                    x_= p.Property_eachsubdomain(:,kxcloud);
+                    y_= p.Property_eachsubdomain(:,current_phase_todo+4);
+                    h_pointcloud = scatter(x_,y_);
+                    % Whole volume
+                    xmin = min(x_); xmax=max(x_);
+                    h_whole = plot([xmin+0.9*(xmax-xmin) xmax],[p.Wholevolume_results(current_phase_todo) p.Wholevolume_results(current_phase_todo)]);
+                    % Colors, thickness, markers
+                    set(h_mean, 'Color', p.infovol.phasecolor(current_phase,:),'LineWidth',p.opt.format.linewidth,'MarkerSize',p.opt.format.axefontsize,'Marker','o');
+                    set(h_pointcloud, 'MarkerEdgeColor', p.infovol.phasecolor(current_phase,:));
+                    set(h_whole, 'Color', 'k','LineWidth',p.opt.format.linewidth+1,'LineStyle',':');
+                    % Annotation: number of subdomains
+                    x_=p.Property_subdomains_statistics(:,kx,current_phase_todo);
+                    for current_size=1:1:length(x_)
+                        yl = ylim;
+                        y_bottom = p.Property_subdomains_statistics(current_size,5,current_phase_todo)-0.1*(yl(2)-yl(1));
+                        y_top = p.Property_subdomains_statistics(current_size,5,current_phase_todo)+0.1*(yl(2)-yl(1));
+                        if y_bottom<yl(1)
+                            y_=y_top;
+                        else
+                            y_=y_bottom;
+                        end
+                        h=text(x_(current_size),y_,num2str( p.Property_subdomains_statistics(current_size,4,current_phase_todo) ));
+                        set(h,'Color','k','FontSize',p.opt.format.axefontsize,'HorizontalAlignment','center','FontWeight','bold','FontName',p.opt.format.fontname);
+                    end
+                    h_legend = legend(sub_axes,'Mean','Point cloud',['Whole volume, ' num2str(p.Wholevolume_size(kx),'%1.1f') ' ' lgdunit],'Location','best');
+                    h_legend.FontSize = p.opt.format.legendfontsize; % Set fontsize
+                    if isempty(p.propertynameunit)
+                        ylabel(p.propertyname);
+                    else
+                        ylabel([p.propertyname ' (' p.propertynameunit ')']);
+                    end
+
+                end
+
+                xlabel(str_xlabel);
+                grid(sub_axes,p.opt.format.grid); % Display grid
+                set(sub_axes,'XMinorGrid',p.opt.format.minorgrid,'YMinorGrid',p.opt.format.minorgrid); % Display grid for minor thicks
+                set(sub_axes,'FontName',p.opt.format.fontname,'FontSize',p.opt.format.axefontsize); % Fontname and fontsize
+                h_title.FontSize = p.opt.format.titlefontsize; % Set title fontsize
+                hold(sub_axes,'off'); % Relase figure
+                if strcmp(p.RVE.type,'A') || strcmp(p.RVE.type,'B')
+                    str_title = {['Representative volume element analysis: ' p.propertyname ', ' char(p.infovol.phasename(current_phase,1))],p.RVE.name, ['Aspect ratio: ' num2str(p.RVE.Aspectratio)]};
+                else
+                    str_title = {['Representative volume element analysis: ' p.propertyname ', ' char(p.infovol.phasename(current_phase,1))],p.RVE.name};
+                end
+                sgtitle(Fig,str_title,'FontWeight','bold','FontSize',p.opt.format.sgtitlefontsize,'FontName',p.opt.format.fontname);
+            end
+
+            if p.opt.save.savefig % Save figure
+                filename= [p.propertyname '_' char(p.infovol.phasename(current_phase,1)) '_' p.RVE.savename];
+                function_savefig(Fig, p.savefolder, filename, p.opt.save); % Call function
+            end
+            if p.opt.format.autoclosefig
+                close(Fig); % Do not keep open figures
+            end
+
+        end
+    end
+
+
+%     if strcmp(p.RVE.type,'C')
+%         r_axe=2; n_axe=6; scr=1;
+%         n2_axe=2; scr2=2/3;
+%     else
+%         r_axe=1; n_axe=3; scr=1/2;
+%         n2_axe=1; scr2=1/3;
+%     end
+%     current_phase_todo = 0;
+%     for current_phase=1:1:p.number_phase % Loop over all phases
+%         if p.todo(current_phase)
+%             current_phase_todo=current_phase_todo+1;
+% 
+%             Fig = figure; % Create figure
+%             Fig.Name= ['Error analysis: ' p.propertyname ', ' char(p.infovol.phasename(current_phase,1))];
+%             Fig.Color='white'; % Background colour
+%             set(Fig,'position',[scrsz(1) scrsz(2) scrsz(3) scrsz(4)*scr]); % Full screen figure
+%             for id_axe=1:1:n_axe % Iterate over axe
+%                 if id_axe<=3
+%                     str_xlabel=['Equivalent length: cubic root of the subdomains ' axisunit];
+%                 else
+%                     str_xlabel=['Equivalent length: square root of the subdomains FOV ' axisunit];
+%                 end
+%                 sub_axes=subplot(r_axe,3,id_axe,'Parent',Fig);
+%                 hold(sub_axes,'on'); % Active subplot
+%                 
+%                 if id_axe==1 || id_axe==4
+%                     if id_axe==1
+%                         kx = 1;
+%                     else
+%                         kx = 2;
+%                     end
+%                     h_title=title ({p.propertyname,'95% confidence interval'}); % Set title font and string
+%                     x_=p.Property_subdomains_statistics(:,kx,current_phase_todo);
+%                     h=plot(x_, p.Property_subdomains_statistics(:,14,current_phase_todo)); % Curves
+%                     set(h, 'Color', p.infovol.phasecolor(current_phase,:),'LineWidth',p.opt.format.linewidth,'MarkerSize',p.opt.format.axefontsize,'Marker','o'); % Colors
+%                     x_RVE = [x_(1) x_(end)];                    
+% 
+%                     % Annotation: number of subdomains
+%                     for current_size=1:1:length(x_)
+%                         yl = ylim ;
+%                         y_bottom = 2*p.Property_subdomains_statistics(current_size,14,current_phase_todo)-0.1*(yl(2)-yl(1));
+%                         y_top = 2*p.Property_subdomains_statistics(current_size,14,current_phase_todo)+0.1*(yl(2)-yl(1));
+%                         if y_bottom<yl(1)
+%                             y_=y_top;
+%                         else
+%                             y_=y_bottom;
+%                         end
+%                         h=text(x_(current_size),y_,num2str( p.Property_subdomains_statistics(current_size,4,current_phase_todo) ));
+%                         set(h,'Color','k','FontSize',p.opt.format.axefontsize,'HorizontalAlignment','center','FontWeight','bold','FontName',p.opt.format.fontname);
+%                     end
+%                     %h_legend.FontSize = p.opt.format.legendfontsize; % Set fontsize
+%                     if isempty(p.propertynameunit)
+%                         ylabel([p.propertyname ': +/- 2.5%']);
+%                     else
+%                         ylabel([p.propertyname ' (' p.propertynameunit '): +/- 2.5%']);
+%                     end
+% 
+%                 elseif id_axe==2 ||  id_axe==5
+%                     if id_axe==2
+%                         kx = 1; % Use first RVE size
+%                     else
+%                         kx = 2; % Use second RVE size
+%                     end
+%                     h_title=title ({p.propertyname, 'Number of subvolumes required to reach a given error on the mean'}); % Set title font and string
+% 
+%                     x_=p.Property_subdomains_statistics(:,kx,current_phase_todo);
+% 
+%                     h_1p=plot(x_,p.Property_subdomains_statistics(:,15,current_phase_todo));
+%                     h_5p=plot(x_,p.Property_subdomains_statistics(:,16,current_phase_todo));
+%                     h_10p=plot(x_,p.Property_subdomains_statistics(:,17,current_phase_todo));
+%                     
+%                     % Colors, thickness, markers
+%                     set(h_1p, 'Color', p.infovol.phasecolor(current_phase,:),'LineWidth',p.opt.format.linewidth,'MarkerSize',p.opt.format.axefontsize,'Marker','o'); % Colors
+%                     set(h_5p, 'Color', p.infovol.phasecolor(current_phase,:),'LineWidth',p.opt.format.linewidth,'MarkerSize',p.opt.format.axefontsize,'Marker','square'); % Colors
+%                     set(h_10p, 'Color', p.infovol.phasecolor(current_phase,:),'LineWidth',p.opt.format.linewidth,'MarkerSize',p.opt.format.axefontsize,'Marker','diamond'); % Colors
+% 
+%                     % Annotation: number of subdomains
+%                     for current_size=1:1:length(x_)
+%                         yl = ylim ;
+%                         y_bottom = p.Property_subdomains_statistics(current_size,16,current_phase_todo)-0.1*(yl(2)-yl(1));
+%                         y_top = p.Property_subdomains_statistics(current_size,16,current_phase_todo)+0.1*(yl(2)-yl(1));
+%                         if y_bottom<yl(1)
+%                             y_=y_top;
+%                         else
+%                             y_=y_bottom;
+%                         end
+%                         h=text(x_(current_size),y_,num2str( p.Property_subdomains_statistics(current_size,4,current_phase_todo) ));
+%                         set(h,'Color','k','FontSize',p.opt.format.axefontsize,'HorizontalAlignment','center','FontWeight','bold','FontName',p.opt.format.fontname);
+%                     end
+%                     set(sub_axes, 'YScale', 'log')
+%                     % - Legend
+%                     h_legend = legend(sub_axes,'1% error','5% error','10% error','Location','best');
+%                     h_legend.FontSize = p.opt.format.legendfontsize; % Set fontsize
+%                     ylabel('Number of subvolumes');
+% 
+%                 elseif id_axe==3 || id_axe==6
+%                     if id_axe==3
+%                         kx = 1; kxcloud = 2;
+%                     else
+%                         kx = 2; kxcloud = 3;
+%                     end
+%                     h_title=title ({p.propertyname, 'Points cloud'}); % Set title font and string
+%                     
+% 
+%                 end
+% 
+%                 xlabel(str_xlabel);
+%                 grid(sub_axes,p.opt.format.grid); % Display grid
+%                 set(sub_axes,'XMinorGrid',p.opt.format.minorgrid,'YMinorGrid',p.opt.format.minorgrid); % Display grid for minor thicks
+%                 set(sub_axes,'FontName',p.opt.format.fontname,'FontSize',p.opt.format.axefontsize); % Fontname and fontsize
+%                 h_title.FontSize = p.opt.format.titlefontsize; % Set title fontsize
+%                 hold(sub_axes,'off'); % Relase figure
+%                 if strcmp(p.RVE.type,'A') || strcmp(p.RVE.type,'B')
+%                     str_title = {['Error analysis: ' p.propertyname ', ' char(p.infovol.phasename(current_phase,1))],p.RVE.name, ['Aspect ratio: ' num2str(p.RVE.Aspectratio)]};
+%                 else
+%                     str_title = {['Error analysis: ' p.propertyname ', ' char(p.infovol.phasename(current_phase,1))],p.RVE.name};
+%                 end
+%                 sgtitle(Fig,str_title,'FontWeight','bold','FontSize',p.opt.format.sgtitlefontsize,'FontName',p.opt.format.fontname);
+%             end
+% 
+%             if p.opt.save.savefig % Save figure
+%                 filename= [p.propertyname '_' char(p.infovol.phasename(current_phase,1)) '_error_' p.RVE.savename];
+%                 function_savefig(Fig, p.savefolder, filename, p.opt.save); % Call function
+%             end
+%             if p.opt.format.autoclosefig
+%                 close(Fig); % Do not keep open figures
+%             end
+% 
+%         end
+%     end
+
+
     % Relative standard deviation, for all phases
     Fig = figure; % Create figure
     Fig.Name= [p.propertyname ' relative standard deviation']; % Figure name
@@ -196,237 +401,315 @@ if strcmp(p.RVE.type,'A') || strcmp(p.RVE.type,'B') || strcmp(p.RVE.type,'C')
     set(Fig,'position',[scrsz(1) scrsz(2) scrsz(3)*scr2 scrsz(4)*1/2]); % Full screen figure
     for id_axe=1:1:n2_axe % Iterate over axe
         if id_axe==1
-            str_xlabel='Equivalent cubic length of the subdomains (\mum)';
+            str_xlabel=['Equivalent length: cubic root of the subdomains ' axisunit];
             kx = 1;
+            kxRVE = 1;
         else
-            str_xlabel='Equivalent section length of the subdomains (\mum)';
-            kx = 2;
+            if strcmp(p.RVE.type,'C')
+                str_xlabel=['Equivalent length: square root of the subdomains FOV ' axisunit];
+                kx = 2;  
+                kxRVE = 2;
+            elseif strcmp(p.RVE.type,'D')
+                str_xlabel=['Length of the subdomains FOV ' axisunit];
+                kx = 3;  
+                kxRVE = 2;
+            end
         end
         sub_axes=subplot(1,n2_axe,id_axe,'Parent',Fig);
         hold(sub_axes,'on'); % Active subplot
         str1 = [p.propertyname ' relative standard deviation'];
         str2 = p.RVE.name;
         if strcmp(p.RVE.type,'A') || strcmp(p.RVE.type,'B')
-            str_title = {str1,str2,['Aspect ratio: ' p.RVE.Aspectratio_name]};
+            str_title = {str1,str2,['Aspect ratio: ' num2str(p.RVE.Aspectratio)]};
         else
             str_title = {str1,str2,};
         end
-        h_title=title (str_title,'FontName',p.OPTIONS.fontname,'FontSize',p.OPTIONS.Fontsize_title); % Set title font and string
+        h_title=title (str_title,'FontName',p.opt.format.fontname,'FontSize',p.opt.format.titlefontsize); % Set title font and string
         % - Plot graphs
+        current_phase_todo = 0;
         for current_phase=1:1:p.number_phase
-            x_=p.Property_subdomains_statistics(:,kx,current_phase);
-            h=plot(x_,p.Property_subdomains_statistics(:,6,current_phase)); % Curves
-            set(h, 'Color', p.INFO.phase(current_phase).color,'LineWidth',p.OPTIONS.Linewidth,'MarkerSize',p.OPTIONS.Fontsize_axe,'Marker','o'); % Colors
-        end
-        % RVE standard deviation criterion
-        x_RVE = [x_(1) x_(end)];
-        y_RVE = [p.Criterion(1) p.Criterion(1)];
-        h_RVE = plot(x_RVE,y_RVE);
-        set(h_RVE, 'Color', 'black','LineStyle','--','LineWidth',p.OPTIONS.Linewidth);
-        % Determination of the Representative Volume Elements
-        for current_phase=1:1:p.number_phase
-            if p.Size_RVE(2,current_phase,kx)~=0
-                h=plot([p.Size_RVE(2,current_phase,kx) p.Size_RVE(2,current_phase,kx)],[0 p.Criterion(1)]); % Curves
-                set(h, 'Color', p.INFO.phase(current_phase).color,'LineStyle','--','LineWidth',p.OPTIONS.Linewidth); % Colors
+            if p.todo(current_phase)
+                current_phase_todo=current_phase_todo+1;
+                str_legend(current_phase_todo).name = char(p.infovol.phasename(current_phase));
+                x_=p.Property_subdomains_statistics(:,kx,current_phase_todo);
+                h=plot(x_,p.Property_subdomains_statistics(:,7,current_phase_todo)); % Curves
+                set(h, 'Color', p.infovol.phasecolor(current_phase,:),'LineWidth',p.opt.format.linewidth,'MarkerSize',p.opt.format.axefontsize,'Marker','o'); % Colors
             end
         end
-        h_legend = legend(sub_axes,p.INFO.phase.name,'Location','best'); % Legend
-        h_legend.FontSize = p.OPTIONS.Fontsize_legend; % Set fontsize
+        % RVE standard deviation criterion
+        if sum(p.Size_RVE(:,current_phase_todo,2,kxRVE)~=0)==1 % Only plot if only one threshold has been selected
+            x_RVE = [x_(1) x_(end)];
+            for k_threshold=1:1:length(p.Criterion)-1
+                if p.Size_RVE(k_threshold,current_phase_todo,2,kxRVE)~=0
+                    y_RVE = [p.Criterion(k_threshold) p.Criterion(k_threshold)];
+                    h_RVE = plot(x_RVE,y_RVE);
+                    set(h_RVE, 'Color', 'black','LineStyle','--','LineWidth',p.opt.format.linewidth);
+                end
+            end
+            current_phase_todo = 0;
+            for current_phase=1:1:p.number_phase % Loop over all phases
+                if p.todo(current_phase)
+                    current_phase_todo=current_phase_todo+1;
+                    for k_threshold=1:1:length(p.Criterion)-1
+                        if p.Size_RVE(k_threshold,current_phase_todo,2,kxRVE)~=0
+                            h=plot([p.Size_RVE(k_threshold,current_phase_todo,2,kxRVE) p.Size_RVE(k_threshold,current_phase_todo,2,kxRVE)],[0 p.Criterion(k_threshold)]); % Curves
+                            set(h, 'Color', p.infovol.phasecolor(current_phase,:),'LineStyle','--','LineWidth',p.opt.format.linewidth); % Colors
+                        end
+                    end
+                end
+            end
+        end
+
+        h_legend = legend(sub_axes,str_legend.name,'Location','best'); % Legend
+        h_legend.FontSize = p.opt.format.legendfontsize; % Set fontsize
         % - Axis label
         xlabel(str_xlabel);
         ylabel('Relative standard deviation (%)');
-        if strcmp(p.OPTIONS.grid,'on') % Grid
-            grid(sub_axes,'on'); % Display grid
-            set(sub_axes,'XMinorGrid',p.OPTIONS.minorgrid,'YMinorGrid',p.OPTIONS.minorgrid); % Display grid for minor thicks
-        end
-        set(sub_axes,'FontName',p.OPTIONS.fontname,'FontSize',p.OPTIONS.Fontsize_axe); % Fontname and fontsize
-        h_title.FontSize = p.OPTIONS.Fontsize_title; % Set title fontsize
+        grid(sub_axes,p.opt.format.grid); % Display grid
+        set(sub_axes,'XMinorGrid',p.opt.format.minorgrid,'YMinorGrid',p.opt.format.minorgrid); % Display grid for minor thicks
+        set(sub_axes,'FontName',p.opt.format.fontname,'FontSize',p.opt.format.axefontsize); % Fontname and fontsize
+        h_title.FontSize = p.opt.format.titlefontsize; % Set title fontsize
         hold(sub_axes,'off'); % Relase figure
     end
-    if p.OPTIONS.save_fig == true % Save figure
+    if p.opt.save.savefig % Save figure
         filename= [p.propertyname '_' p.RVE.savename];
-        function_savefig(Fig, p.savefolder, filename, p.OPTIONS); % Call function
+        function_savefig(Fig, p.savefolder, filename, p.opt.save); % Call function
     end
-    if p.OPTIONS.closefigureaftercreation == true
+    if p.opt.format.autoclosefig
         close(Fig); % Do not keep open figures
     end
 
+    % RVE as function of threshold
+    if sum(p.Size_RVE(:,:,2,1)~=0) >= 2 % At least 2 points
+        Fig = figure; % Create figure
+        Fig.Name= [p.propertyname ' RVE size as function of standard deviation threshold']; % Figure name
+        Fig.Color='white'; % Background colour
+        set(Fig,'position',[scrsz(1) scrsz(2) scrsz(3)*scr2 scrsz(4)*1/2]); % Full screen figure
+        for id_axe=1:1:n2_axe % Iterate over axe
+            if id_axe==1
+                str_ylabel=['Equivalent length: RVE, cubic root ' axisunit];
+                kx = 1;
+            else
+                if strcmp(p.RVE.type,'C')
+                    str_ylabel=['Equivalent length: RVE, square root ' axisunit];
+                    kx = 2;
+                elseif strcmp(p.RVE.type,'D')
+                    str_ylabel=['RVE, length ' axisunit];
+                    kx = 2;
+                end
+            end
+            sub_axes=subplot(1,n2_axe,id_axe,'Parent',Fig);
+            hold(sub_axes,'on'); % Active subplot
+            str1 = [p.propertyname ' RVE size'];
+            str2 = p.RVE.name;
+            if strcmp(p.RVE.type,'A') || strcmp(p.RVE.type,'B')
+                str_title = {str1,str2,['Aspect ratio: ' num2str(p.RVE.Aspectratio)]};
+            else
+                str_title = {str1,str2,};
+            end
+            h_title=title (str_title,'FontName',p.opt.format.fontname,'FontSize',p.opt.format.titlefontsize); % Set title font and string
+            % - Plot graphs
+            current_phase_todo = 0;
+            for current_phase=1:1:p.number_phase
+                if p.todo(current_phase)
+                    current_phase_todo=current_phase_todo+1;
+                    str_legend(current_phase_todo).name = char(p.infovol.phasename(current_phase));
+                    x_= p.Criterion(1:end-1);
+                    y_ = p.Size_RVE(:,current_phase_todo,2,kx);
+                    y_(y_==0)=NaN;
+                    h=plot(x_,y_); % Curves
+                    set(h, 'Color', p.infovol.phasecolor(current_phase,:),'LineWidth',p.opt.format.linewidth,'MarkerSize',p.opt.format.axefontsize,'Marker','o'); % Colors
+                end
+            end
+            
+            h_legend = legend(sub_axes,str_legend.name,'Location','best'); % Legend
+            h_legend.FontSize = p.opt.format.legendfontsize; % Set fontsize
+            % - Axis label
+            xlabel('Relative standard deviation threshold (%)');
+            ylabel(str_ylabel);
+            grid(sub_axes,p.opt.format.grid); % Display grid
+            set(sub_axes,'XMinorGrid',p.opt.format.minorgrid,'YMinorGrid',p.opt.format.minorgrid); % Display grid for minor thicks
+            set(sub_axes,'FontName',p.opt.format.fontname,'FontSize',p.opt.format.axefontsize); % Fontname and fontsize
+            h_title.FontSize = p.opt.format.titlefontsize; % Set title fontsize
+            hold(sub_axes,'off'); % Relase figure
+        end
+        if p.opt.save.savefig % Save figure
+            filename= [p.propertyname '_fctThreshold_' p.RVE.savename];
+            function_savefig(Fig, p.savefolder, filename, p.opt.save); % Call function
+        end
+        if p.opt.format.autoclosefig
+            close(Fig); % Do not keep open figures
+        end
+    end
+
+
+elseif strcmp(p.RVE.type,'E') || strcmp(p.RVE.type,'F') || strcmp(p.RVE.type,'G') || strcmp(p.RVE.type,'H')
    
-elseif strcmp(p.RVE.type,'D')
-    % Property evolution for all phases
-    Fig = figure; % Create figure
-    Fig.Name= ['Representative volume element analysis:' p.propertyname];
-    Fig.Color='white'; % Background colour
-    str_xlabel='Equivalent cubic length of the subdomains (\mum)';
-    kx = 1;
-    axe_ = axes('Parent',Fig); % Create axes
-    hold(axe_,'on');
-    h_title=title ({['Representative volume element analysis:' p.propertyname],p.RVE.name,['Aspect ratio: ' p.RVE.Aspectratio_name]},'FontName',p.OPTIONS.fontname,'FontSize',p.OPTIONS.Fontsize_title); % Set title font and string
-    for current_phase=1:1:p.number_phase % Loop over all phases
-        % Unique volume
-        x_=p.Property_subdomains_statistics(:,kx,current_phase);
-        x_=[x_; p.Wholevolume_size(kx)];
-        y_ = p.Property_subdomains_statistics(:,4,current_phase);
-        y_ = [y_; p.Wholevolume_results(current_phase)];
-        h_=plot(x_,y_);
-        % Colors, thickness, markers
-        set(h_, 'Color', p.INFO.phase(current_phase).color,'LineWidth',p.OPTIONS.Linewidth,'MarkerSize',p.OPTIONS.Fontsize_axe,'Marker','o');
-    end
-    h_legend = legend(axe_,p.INFO.phase.name,'Location','best'); % Legend
-    h_legend.FontSize = p.OPTIONS.Fontsize_legend; % Set fontsize
-    % - Axis label
-    xlabel(str_xlabel);
-    if isempty(p.propertynameunit)
-        ylabel(p.propertyname);
+    if strcmp(p.RVE.type,'G') || strcmp(p.RVE.type,'H')
+        r_axe=2; n_axe=4; scr=1;
+        n2_axe=2; scr2=2/3;
     else
-        ylabel([p.propertyname ' (' p.propertynameunit ')']);
+        r_axe=1; n_axe=2; scr=1/2;
+        n2_axe=1; scr2=1/3;
     end
-    if strcmp(p.OPTIONS.grid,'on') % Grid
-        grid(axe_,'on'); % Display grid
-        set(axe_,'XMinorGrid',p.OPTIONS.minorgrid,'YMinorGrid',p.OPTIONS.minorgrid); % Display grid for minor thicks
-    end
-    set(axe_,'FontName',p.OPTIONS.fontname,'FontSize',p.OPTIONS.Fontsize_axe); % Fontname and fontsize
-    h_title.FontSize = p.OPTIONS.Fontsize_title; % Set title fontsize
-    hold(axe_,'off'); % Relase figure
-    if p.OPTIONS.save_fig == true % Save figure
-        filename= [p.propertyname '_' p.RVE.savename];
-        function_savefig(Fig, p.savefolder, filename, p.OPTIONS); % Call function
-    end
-    if p.OPTIONS.closefigureaftercreation == true
-        close(Fig); % Do not keep open figures
-    end
-    
-elseif strcmp(p.RVE.type,'E')
+
     % Property evolution for all phases
     Fig = figure; % Create figure
-    Fig.Name= ['Representative volume element analysis:' p.propertyname];
+    Fig.Name= ['Convergence analysis:' p.propertyname];
     Fig.Color='white'; % Background colour
-    set(Fig,'position',[scrsz(1) scrsz(2) scrsz(3)*2/3 scrsz(4)*1/2]); % Full screen figure
-    for id_axe=1:1:2 % Iterate over axe
-        if id_axe==1
-            str_xlabel='Equivalent cubic length of the subdomains (\mum)';
-            kx = 1;
+    set(Fig,'position',[scrsz(1) scrsz(2) scrsz(3)*2/3 scrsz(4)*scr]); % Full screen figure
+    for id_axe=1:1:n_axe % Iterate over axe
+        if id_axe==1 || id_axe==2
+            str_xlabel=['Equivalent length: cubic root of the subdomains ' axisunit];
+            kx = 1; kxx=1;
         else
-            str_xlabel='Length of the subdomains (\mum)';
-            kx = 2;
+            if strcmp(p.RVE.type,'G')
+                str_xlabel=['Length of the subdomain ' axisunit];
+                kx = 3;
+            elseif strcmp(p.RVE.type,'H')
+                str_xlabel=['Equivalent length: square root of the subdomain ' axisunit];
+                kx = 2;
+            end
+            kxx=2;
         end
-        sub_axes=subplot(1,2,id_axe,'Parent',Fig);
+        sub_axes=subplot(r_axe,2,id_axe,'Parent',Fig);
         hold(sub_axes,'on'); % Active subplot
-        
-        h_title=title ([p.propertyname ' evolution'],'FontName',p.OPTIONS.fontname,'FontSize',p.OPTIONS.Fontsize_title); % Set title font and string
-        for current_phase=1:1:p.number_phase % Loop over all phases
-            % Unique volume
-            x_=p.Property_subdomains_statistics(:,kx,current_phase);
-            x_=[x_; p.Wholevolume_size(id_axe)];
-            y_ = p.Property_subdomains_statistics(:,4,current_phase);
-            y_ = [y_; p.Wholevolume_results(current_phase)];
-            h_=plot(x_,y_);
-            % Colors, thickness, markers
-            set(h_, 'Color', p.INFO.phase(current_phase).color,'LineWidth',p.OPTIONS.Linewidth,'MarkerSize',p.OPTIONS.Fontsize_axe,'Marker','o');
+        if id_axe==1 || id_axe==3
+            h_title=title ([p.propertyname ' evolution'],'FontName',p.opt.format.fontname,'FontSize',p.opt.format.titlefontsize); % Set title font and string
+        else
+            h_title=title ([p.propertyname ' relative difference'],'FontName',p.opt.format.fontname,'FontSize',p.opt.format.titlefontsize); % Set title font and string
         end
-        h_legend = legend(sub_axes,p.INFO.phase.name,'Location','best'); % Legend
-        h_legend.FontSize = p.OPTIONS.Fontsize_legend; % Set fontsize
+        current_phase_todo = 0;
+        for current_phase=1:1:p.number_phase
+            if p.todo(current_phase)
+                current_phase_todo=current_phase_todo+1;
+                str_legend(current_phase_todo).name = char(p.infovol.phasename(current_phase));
+                if id_axe==1 || id_axe==3
+                    x_=p.Property_subdomains_statistics(:,kx,current_phase_todo);
+                    x_=[x_; p.Wholevolume_size(kxx)];
+                    y_ = p.Property_subdomains_statistics(:,5,current_phase_todo);
+                    y_ = [y_; p.Wholevolume_results(current_phase_todo)];
+                elseif id_axe==2
+                    x_=p.relativedifference_convergence(:,1);
+                    y_=p.relativedifference_convergence(:,current_phase_todo+2);
+                    x_conv = [x_(1) x_(end)];
+                else
+                    x_=p.relativedifference_convergence(:,2);
+                    y_=p.relativedifference_convergence(:,current_phase_todo+2);  
+                    x_conv = [x_(1) x_(end)];
+                end
+                h_=plot(x_,y_);
+                % Colors, thickness, markers
+                set(h_, 'Color', p.infovol.phasecolor(current_phase,:),'LineWidth',p.opt.format.linewidth,'MarkerSize',p.opt.format.axefontsize,'Marker','o');
+            end
+        end
+
+        % Other plot with no legend
+        if sum(p.Size_RVE(:,current_phase_todo,2,kxx)~=0)==1 % Only plot if only one threshold has been selected
+            if id_axe==2 || id_axe==4
+                for k_threshold=1:1:length(p.convergence_criterion)
+                    if p.Size_convergence(k_threshold,current_phase_todo,2,kxx)~=0
+                        y_conv = [p.convergence_criterion(k_threshold) p.convergence_criterion(k_threshold)];
+                        h_conv = plot(x_conv,y_conv);
+                        set(h_conv, 'Color', 'black','LineStyle','--','LineWidth',p.opt.format.linewidth);
+
+                        h=plot([p.Size_convergence(k_threshold,current_phase_todo,2,kxx) p.Size_convergence(k_threshold,current_phase_todo,2,kxx)],[0 p.convergence_criterion(k_threshold)]); % Curves
+                        set(h, 'Color', 'k','LineStyle','--','LineWidth',p.opt.format.linewidth); % Colors
+                    end
+                end
+            end
+        end
+
+        h_legend = legend(sub_axes,str_legend.name,'Location','best'); % Legend
+        h_legend.FontSize = p.opt.format.legendfontsize; % Set fontsize
         % - Axis label
         xlabel(str_xlabel);
-        if isempty(p.propertynameunit)
-            ylabel(p.propertyname);
+        if id_axe==1 || id_axe==3
+            if isempty(p.propertynameunit)
+                ylabel(p.propertyname);
+            else
+                ylabel([p.propertyname ' (' p.propertynameunit ')']);
+            end
         else
-            ylabel([p.propertyname ' (' p.propertynameunit ')']);
+            ylabel('%');
         end
-        if strcmp(p.OPTIONS.grid,'on') % Grid
-            grid(sub_axes,'on'); % Display grid
-            set(sub_axes,'XMinorGrid',p.OPTIONS.minorgrid,'YMinorGrid',p.OPTIONS.minorgrid); % Display grid for minor thicks
-        end
-        set(sub_axes,'FontName',p.OPTIONS.fontname,'FontSize',p.OPTIONS.Fontsize_axe); % Fontname and fontsize
-        h_title.FontSize = p.OPTIONS.Fontsize_title; % Set title fontsize
+        grid(sub_axes,p.opt.format.grid); % Display grid
+        set(sub_axes,'XMinorGrid',p.opt.format.minorgrid,'YMinorGrid',p.opt.format.minorgrid); % Display grid for minor thicks
+        set(sub_axes,'FontName',p.opt.format.fontname,'FontSize',p.opt.format.axefontsize); % Fontname and fontsize
+        h_title.FontSize = p.opt.format.titlefontsize; % Set title fontsize
         hold(sub_axes,'off'); % Relase figure
     end
-    sgtitle(Fig,{['Representative volume element analysis:' p.propertyname],p.RVE.name,p.RVE.Growthdirection},...
-        'FontWeight','bold','FontSize',p.OPTIONS.Fontsize_title+2,'FontName',p.OPTIONS.fontname);
-    if p.OPTIONS.save_fig == true % Save figure
+    sgtitle(Fig,{['Convergence analysis:' p.propertyname],p.RVE.name,p.RVE.Growthdirection},...
+        'FontWeight','bold','FontSize',p.opt.format.sgtitlefontsize,'FontName',p.opt.format.fontname);
+    if p.opt.save.savefig % Save figure
         filename= [p.propertyname '_' p.RVE.savename];
-        function_savefig(Fig, p.savefolder, filename, p.OPTIONS); % Call function
+        function_savefig(Fig, p.savefolder, filename, p.opt.save); % Call function
     end
-    if p.OPTIONS.closefigureaftercreation == true
+    if p.opt.format.autoclosefig
         close(Fig); % Do not keep open figures
     end
+
+
+    % Convergence length as function of threshold
+    if sum(p.Size_convergence(:,:,2,1)~=0) >= 2 % At least 2 points
+        Fig = figure; % Create figure
+        Fig.Name= [p.propertyname ' Convergence length as function of relative difference threshold']; % Figure name
+        Fig.Color='white'; % Background colour
+        set(Fig,'position',[scrsz(1) scrsz(2) scrsz(3)*scr2 scrsz(4)*1/2]); % Full screen figure
+        for id_axe=1:1:n2_axe % Iterate over axe
+            if id_axe==1
+                str_ylabel=['Equivalent length to reach convergence, cubic root ' axisunit];
+                kx = 1;
+            else
+                if strcmp(p.RVE.type,'G')
+                    str_ylabel=['Length to reach convergence ' axisunit];
+                elseif strcmp(p.RVE.type,'H')
+                    str_ylabel=['Square root length to reach convergence ' axisunit];
+                end
+                kx = 2;
+            end
+
+            sub_axes=subplot(1,n2_axe,id_axe,'Parent',Fig);
+            hold(sub_axes,'on'); % Active subplot
+            str1 = [p.propertyname ' convergence size'];
+            str2 = p.RVE.name;
+            str_title = {str1,str2,};
+            h_title=title (str_title,'FontName',p.opt.format.fontname,'FontSize',p.opt.format.titlefontsize); % Set title font and string
+            % - Plot graphs
+            current_phase_todo = 0;
+            for current_phase=1:1:p.number_phase
+                if p.todo(current_phase)
+                    current_phase_todo=current_phase_todo+1;
+                    str_legend(current_phase_todo).name = char(p.infovol.phasename(current_phase));
+                    x_= p.convergence_criterion;
+                    y_ = p.Size_convergence(:,current_phase_todo,2,kx);
+                    y_(y_==0)=NaN;
+                    h=plot(x_,y_); % Curves
+                    set(h, 'Color', p.infovol.phasecolor(current_phase,:),'LineWidth',p.opt.format.linewidth,'MarkerSize',p.opt.format.axefontsize,'Marker','o'); % Colors
+                end
+            end            
+            h_legend = legend(sub_axes,str_legend.name,'Location','best'); % Legend
+            h_legend.FontSize = p.opt.format.legendfontsize; % Set fontsize
+            % - Axis label
+            xlabel('Relative difference threshold (%)');
+            ylabel(str_ylabel);
+            grid(sub_axes,p.opt.format.grid); % Display grid
+            set(sub_axes,'XMinorGrid',p.opt.format.minorgrid,'YMinorGrid',p.opt.format.minorgrid); % Display grid for minor thicks
+            set(sub_axes,'FontName',p.opt.format.fontname,'FontSize',p.opt.format.axefontsize); % Fontname and fontsize
+            h_title.FontSize = p.opt.format.titlefontsize; % Set title fontsize
+            hold(sub_axes,'off'); % Relase figure
+        end
+        if p.opt.save.savefig % Save figure
+            filename= [p.propertyname '_fctThreshold_' p.RVE.savename];
+            function_savefig(Fig, p.savefolder, filename, p.opt.save); % Call function
+        end
+        if p.opt.format.autoclosefig
+            close(Fig); % Do not keep open figures
+        end
+    end
+
+
 end
-
-
-% % Impact of Aspect ratio
-% Fig = figure; % Create figure
-% Fig.Name= [p.propertyname ' Aspect ratio']; % Figure name
-% Fig.Color='white'; % Background colour
-% axe_ = axes('Parent',Fig); % Create axes
-% hold(axe_,'on');
-% str1 = [p.propertyname ' Aspect ratio x:y:1'];
-% str2 = p.RVE.name;
-% if strcmp(p.RVE.type,'E')
-%     str3 = p.RVE.Growthdirection;
-%     h_title=title ({str1,str2,str3},'FontName',p.OPTIONS.fontname,'FontSize',p.OPTIONS.Fontsize_title); % Set title font and string
-% elseif strcmp(p.RVE.type,'A') || strcmp(p.RVE.type,'B')  || strcmp(p.RVE.type,'D') 
-%     str3 = ['Aspect ratio: ' p.RVE.Aspectratio_name];
-%     h_title=title ({str1,str2,str3},'FontName',p.OPTIONS.fontname,'FontSize',p.OPTIONS.Fontsize_title); % Set title font and string
-% else
-%     h_title=title ({str1,str2},'FontName',p.OPTIONS.fontname,'FontSize',p.OPTIONS.Fontsize_title); % Set title font and string
-% end
-% % Plot
-% for current_phase=1:1:p.number_phase
-%     AR1 = [p.Wholevolume_size(3); p.Property_subdomains_statistics(:,9,current_phase)]; % Aspect ratio 1
-%     AR2 = [p.Wholevolume_size(4); p.Property_subdomains_statistics(:,10,current_phase)]; % Aspect ratio 2
-%     sz  = [p.Wholevolume_size(1);  p.Property_subdomains_statistics(:,1,current_phase)]; % subdomain size
-%     c   = [p.Wholevolume_results(current_phase); p.Property_subdomains_statistics(:,4,current_phase)]; % Propriety mean value
-%     if current_phase==1
-%         scatter(AR1,AR2,5*sz,c,'filled','o');
-%     elseif current_phase==2
-%         scatter(AR1,AR2,5*sz,c,'filled','p');
-%     elseif current_phase==3
-%         scatter(AR1,AR2,5*sz,c,'filled','d');
-%     elseif current_phase==4
-%         scatter(AR1,AR2,5*sz,c,'filled','^');
-%     elseif current_phase==5
-%         scatter(AR1,AR2,5*sz,c,'filled','v');
-%     elseif current_phase==6
-%         scatter(AR1,AR2,5*sz,c,'filled','>');
-%     elseif current_phase==7
-%         scatter(AR1,AR2,5*sz,c,'filled','<');
-%     end
-% end
-% xl=xlim;
-% yl=ylim;
-% scatter(xl(1)+0.9*(xl(2)-xl(1)) ,yl(1)+0.1*(yl(2)-yl(1)),5*100,'k');
-% for k=1:1:p.number_phase
-%     tmp(k).name = p.INFO.phase(k).name;
-% end
-% tmp(k+1).name = 'Size reference 100 \mum';
-% h_legend = legend(axe_,tmp.name,'Location','best'); % Legend
-% h_legend.FontSize = p.OPTIONS.Fontsize_legend; % Set fontsize
-% h=colorbar(axe_);
-% colormap cool
-% if isempty(p.propertynameunit)
-%     ylabel(h,p.propertyname);
-% else
-%     ylabel(h,[p.propertyname ' (' p.propertynameunit ')']);
-% end
-% set(h,'FontName',p.OPTIONS.fontname,'FontSize',p.OPTIONS.Fontsize_axe);
-% % - Axis label
-% xlabel('Domain aspect ratio x');
-% ylabel('Domain aspect ratio y');
-% if strcmp(p.OPTIONS.grid,'on') % Grid
-%     grid(axe_,'on'); % Display grid
-%     set(axe_,'XMinorGrid',p.OPTIONS.minorgrid,'YMinorGrid',p.OPTIONS.minorgrid); % Display grid for minor thicks
-% end
-% set(axe_,'FontName',p.OPTIONS.fontname,'FontSize',p.OPTIONS.Fontsize_axe); % Fontname and fontsize
-% h_title.FontSize = p.OPTIONS.Fontsize_title; % Set title fontsize
-% hold(axe_,'off'); % Relase figure
-% if p.OPTIONS.save_fig == true % Save figure
-%     filename= [p.propertyname '_Aspectratio_' p.RVE.savename];
-%     function_savefig(Fig, p.savefolder, filename, p.OPTIONS); % Call function
-% end
-% if p.OPTIONS.closefigureaftercreation == true
-%     close(Fig); % Do not keep open figures
-% end
-
 
 end
 

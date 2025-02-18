@@ -359,7 +359,7 @@ if visualize_2D
     title('sign(F(y))','FontName','Times New Roman','FontSize',14,'Parent',sub_axes_illustration(4).s);
     box(sub_axes_illustration(4).s,'on')
     hold(sub_axes_illustration(4).s,'off'); % Active subplot       
-    
+    function_savefig(Fig_illustration,desktop,'\Field')
 end
 
 

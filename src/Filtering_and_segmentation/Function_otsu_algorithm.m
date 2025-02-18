@@ -2,6 +2,12 @@ function [Otsu_result]=Function_otsu_algorithm(histogram,number_of_class)
 % The Otsu's algorithm is well explained in J. Villanova et al. JPS 2013
 % The same notation is used in this program, so please refer to the article for a detailed parameter definition
 
+noninteger = false;
+if sum(histogram(:,1)==round(histogram(:,1)))~=length(histogram(:,1))
+    histogram(:,1) = round(histogram(:,1)*1000);
+    noninteger = true;
+end
+
 %% CONTINUM HISTOGRAM
 x_min=min(histogram(:,1));
 x_max=max(histogram(:,1));
@@ -98,16 +104,21 @@ end
 % Find the case that has maximised the ratio
 index = find(ratio_==max(ratio_));
 
+all_permutations = all_permutations+x_min-1;
+
 % Save the result for this number of class
 Otsu_result.number_of_class = number_of_class;
 Otsu_result.sigmab2_sigmat2=ratio_(index(1));
 Otsu_result.threshold=all_permutations(index(1),:);
-Otsu_result.values=I(all_permutations(index(1),:));
+%Otsu_result.values=I(all_permutations(index(1),:));
 
 Otsu_result.allratio=ratio_;
 Otsu_result.allpermuation=all_permutations;
 
-
+if noninteger
+    Otsu_result.threshold = Otsu_result.threshold/1000;
+    Otsu_result.allpermuation = Otsu_result.allpermuation/1000;
+end
 
 end
 

@@ -32,7 +32,8 @@ inputs.saveoptions.makevideo = save_progression;
 for k_run = 1:1:run_number
     fprintf(['Run #'  num2str(k_run,'%i') '/' num2str(num2str(k_run,'%i'),'%i') ' ongoing... please wait. '])
     inputs.saveoptions.run_number = k_run;
-    [microstructure3D, ~, particle_data, outcome] = function_generate_ellipsoid_microstructure(inputs.domain_size,inputs.phase,inputs.tolerance,inputs.overlapping,inputs.check_contiguity, inputs.stopingconditions, inputs.doverification, inputs.saveoptions);
+
+    [microstructure3D, ~, particle_data, outcome, ~] = function_generate_ellipsoid_microstructure(inputs.domain_size,inputs.phase,inputs.tolerance,inputs.forceodddiameter,inputs.overlapping,inputs.acc,inputs.cropparameters,inputs.check_contiguity, inputs.pMask, inputs.stopingconditions, inputs.doverification, inputs.saveoptions);
     fprintf([outcome '\n']);
 
     if strcmp(outcome,'Success !')

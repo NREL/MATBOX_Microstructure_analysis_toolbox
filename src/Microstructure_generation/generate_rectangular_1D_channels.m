@@ -1,10 +1,24 @@
 function [unstructured_microstructure, microstructure] = generate_rectangular_1D_channels(unstructured_microstructure, p)
 
+p.thickness_axis = 3;
+beta = 75;
 Domain_size = size(unstructured_microstructure); % Dimension
 Ttot = Domain_size(p.thickness_axis); % Total thickness
 t = round(Ttot*p.t); % Thickness of the structured layer
-half_w2b = p.half_w2 * p.w; % Half bottom channel width
-slope_rad = atan( (p.half_w2-half_w2b)/t ); % Slope angle
+
+if beta>=0
+    half_w2b = p.half_w2 - t/tan(deg2rad(beta));
+    if half_w2b>0
+        alpha  = 90-beta;
+        slope_rad = deg2rad(alpha);
+    else
+        half_w2b = p.half_w2 * p.w; % Half bottom channel width
+        slope_rad = atan( (p.half_w2-half_w2b)/t ); % Slope angle
+    end
+else
+    half_w2b = p.half_w2 * p.w; % Half bottom channel width
+    slope_rad = atan( (p.half_w2-half_w2b)/t ); % Slope angle
+end
 
 %% INITIALIZE CROSS SECTION
 nx = Domain_size(p.thickness_axis);
@@ -118,6 +132,7 @@ elseif strcmp(p.apply,'Heterogenous microstructure (cut through particles)')
     microstructure(channel_mask==0)=0;
 elseif strcmp(p.apply,'Heterogenous microstructure (remove particles)')
     microstructure = unstructured_microstructure;
+    %microstructure = bwlabeln(microstructure,6);
     particles_id = unique(microstructure); particles_id(particles_id==0)=[]; n_particles = length(particles_id);
     idchannel = find(channel_mask==0);
     particles_id = microstructure(idchannel); particles_id=unique(particles_id);
@@ -125,12 +140,20 @@ elseif strcmp(p.apply,'Heterogenous microstructure (remove particles)')
     for k=1:1:n_particles
         current_id = particles_id(k);
         idx = find(microstructure==current_id);
-        check = unique(channel_mask(idx));
+        Id_on_mask = channel_mask(idx);
+        check = unique(Id_on_mask);
         if length(check)==1
             microstructure(idx) = 0; % Remove this particle completely
         else % Particle is both within and outside the channel
-            if rand < p.percentremove/100
+            vol_particle = length(idx);
+            vol_particle_withinchannel = sum(sum(sum(Id_on_mask==0)));
+            percent_withinchannel = 100*vol_particle_withinchannel/vol_particle;
+            if percent_withinchannel>=p.remove_threshold
                 microstructure(idx) = 0; % Remove this particle completely
+            else
+                if rand <= percent_withinchannel/100
+                    microstructure(idx) = 0; % Remove this particle completely
+                end
             end
         end
     end

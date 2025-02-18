@@ -78,12 +78,18 @@ if min(isovalues_)<=0
 end
 
 %% SURFACE MESH
+
+% should hack value dofix = 0 to use more than 64 label
+
 tmp=uint8(array_); % Convert in unsigned integer 8bits
 [nodes_coordinates,triangular_faces,regions,holes]=v2s(tmp,isovalues_,opt,method_surfacemesh);
 
 %% SMOOTHING
 conn=meshconn(triangular_faces(:,1:3),size(nodes_coordinates,1));
 mask_=[];
+
+% Can skip this if too much issue with self-intersecting cells
+
 smoothed_nodes_coordinates=smoothsurf(nodes_coordinates,mask_,conn,iteration_smoothing,useralpha,smooth_method);
 
 %% REPAIRING MESH

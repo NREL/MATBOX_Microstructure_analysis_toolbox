@@ -1,6 +1,12 @@
-function [microstructure3D, phase, particle_data, outcome] = function_generate_ellipsoid_microstructure(domain_size,phase,tolerance_vf,overlapping,check_contiguity, stoping_conditions, do_verification, save_options)
+function [microstructure3D, phase, particle_data, outcome, overlapping_stat] = function_generate_ellipsoid_microstructure(domain_size,phase,tolerance_vf,forceodddiameter,overlapping,acc,cropparameters,check_contiguity, pMask, stoping_conditions, do_verification, save_options)
 % Generate ellipsoids-based microstructrures
 % Francois Usseglio-Viretta, NREL
+
+% Hard-coded parameters. Should not be changed
+acc.idxfirstchoice = 'random';
+acc.use_dmapapproximation = true;
+acc.dmap_updaterange = 3;
+threshold_overlapping = 1.5; % Above this threshold overlapping, overlapping is no more a constraint (only triggered for very low porosity)
 
 refresh_time_for_progression_figure = stoping_conditions.refresheachs;% s
 have_stop_conditions = ~strcmp(stoping_conditions.action,'Ignore (no stoping condition)');
@@ -8,11 +14,9 @@ have_stop_conditions = ~strcmp(stoping_conditions.action,'Ignore (no stoping con
 make_video = save_options.makevideo;
 % Set to false for extremly large volume (that takes days to generate) for which the video may end corrupted
 
-%tic
+move_to_nextphase_toavoidoverlapping = false;
 
-%% PARAMETERS
-simulate_calendering = false; % Useful to set it true to achieve high density (Ignore it and keep it false it is outdated)
-%check_contiguity = true; % Default, true. False useful for very elongated particles
+
 
 %% DEDUCE MICROSTRUCTURE INFORMATION
 %% VOLUME FRACTIONS
@@ -55,13 +59,15 @@ for current_phase=1:1:number_phase % Check particle size
             error('microstructure_generation: sum of the particle size histogram is ~= 100% while it should be 100%.')
         end
     end
-%     is_odd = mod(phase(current_phase).size_histogram.along_3rd_axis(1,2:end),2);
-%     if sum(is_odd)~=numel(is_odd) % Some particle diameter is odd.
-%         idx = find(is_odd==0);
-%         phase(current_phase).size_histogram.along_3rd_axis(1,idx) = phase(current_phase).size_histogram.along_3rd_axis(1,idx)+1; % odd -> even number
-%         is_odd(idx) = is_odd(idx)+1; % Convert in a odd integer.
-%         warning('Even particle diameter (expressed in voxel length) have been converted to odd number.')
-%     end
+    if forceodddiameter
+        is_odd = mod(phase(current_phase).size_histogram.along_3rd_axis(1,2:end),2);
+        if sum(is_odd)~=numel(is_odd) % Some particle diameter is odd.
+            idx = find(is_odd==0);
+            phase(current_phase).size_histogram.along_3rd_axis(1,idx) = phase(current_phase).size_histogram.along_3rd_axis(1,idx)+1; % odd -> even number
+            is_odd(idx) = is_odd(idx)+1; % Convert in a odd integer.
+            warning('Even particle diameter (expressed in voxel length) have been converted to odd number.')
+        end
+    end
 end
 % Histogram per slice
 for current_phase=1:1:number_phase
@@ -278,7 +284,15 @@ if stoping_conditions.plot
     sgtitle(Fig_global_progression,'Algorithm generation progression and rate','FontWeight','bold','FontSize',16,'FontName','Times new roman');
 
     if make_video
-        video_format = 'mpeg-4';
+        profiles = VideoWriter.getProfiles(); % Machine dependent
+        video_format = profiles(1).Name; % Default
+        for kp = 1:length(profiles)
+            if strcmp(profiles(kp).Name,'MPEG-4')
+                video_format = 'mpeg-4';
+            end
+        end
+        
+        % check is mpeg-4 is part of profiles = VideoWriter.getProfiles()
         video_handle = VideoWriter([save_options.folder 'Algorithm_progression_video_run_' num2str(save_options.run_number)],video_format);
         set(video_handle,'Quality',100); % Set video quality
         % Set video framerate
@@ -342,9 +356,9 @@ unassigned_id = 0;
 microstructure3D.phase = zeros(domain_size) + unassigned_id; % Phase
 
 microstructure3D.particle_id = uint32(zeros(domain_size)); % Particle numerotation
-microstructure3D.particle_volume_numbervoxel = uint32(zeros(domain_size)); % Particle volume expressed in number of voxels
-microstructure3D.particle_volume_ellipsoid = zeros(domain_size); % Particle ellipsoid volume
-microstructure3D.particle_equivalentspherediameter = zeros(domain_size); % Particle equivalent sphere diameter
+%microstructure3D.particle_volume_numbervoxel = uint32(zeros(domain_size)); % Particle volume expressed in number of voxels
+%microstructure3D.particle_volume_ellipsoid = zeros(domain_size); % Particle ellipsoid volume
+%microstructure3D.particle_equivalentspherediameter = zeros(domain_size); % Particle equivalent sphere diameter
 for current_phase=1:1:number_phase
     microstructure3D.phase_(current_phase).particle_elongation_dx_over_dy = zeros(domain_size); % Ellispoid elongation dx/dy
     microstructure3D.phase_(current_phase).particle_elongation_dx_over_dz = zeros(domain_size); % Ellispoid elongation dx/dz
@@ -362,12 +376,25 @@ Idx_all_voxels = 1:1:voxel_number;
 Idx_unassigned_voxels_pickfrom = Idx_all_voxels;
 Idx_assigned_voxels=zeros(1,voxel_number);
 all_Idx_assigned_voxels=[];
+% Idx_unassigned_voxels = Idx_all_voxels;
 
-Idx_unassigned_voxels = Idx_all_voxels;
 [I,J,K] = ind2sub(domain_size,Idx_all_voxels);
 Coordinates_all_voxels = [I' J' K'];
 number_unassigned_voxels = voxel_number;
 
+%% MASK 
+if pMask.use_notwithin || pMask.use_within
+    all_Idx_assigned_voxels = find(pMask.mask_used)';
+    number_unassigned_voxels = number_unassigned_voxels - length(all_Idx_assigned_voxels);
+    Idx_assigned_voxels(all_Idx_assigned_voxels)=all_Idx_assigned_voxels;
+    r=Idx_all_voxels-Idx_assigned_voxels;
+    r(r==0)=[];
+    tmp1 = randi(number_unassigned_voxels,length(all_Idx_assigned_voxels),1)'; % Choose n number (for n assigned voxels), from 1 to the number of unassigned voxels
+    tmp2=r(tmp1); % For these n number, assing index of unassignes voxels
+    Idx_unassigned_voxels_pickfrom(all_Idx_assigned_voxels)=tmp2;
+end
+
+%%
 % Particle info
 % row i: particle id = i
 preallocating_particle = 1e6;
@@ -387,22 +414,36 @@ particle_data = zeros(preallocating_particle,11); % Id / phase label / x / y / z
 update_waitbar_step=0.05;
 phase_volume_filled = zeros(number_phase,1); % Number of voxel assigned to each phase
 phase_number_particle = zeros(number_phase,1); % Number of particle assigned to each phase
+overlapping_stat = zeros(1,2); % Porosity at overlapping onset / overlapping ratio
+overlappingids = [];
 number_iteration = 0;
 complete_stop = false;
+moved_to_nextphase_toavoidoverlapping = false;
 outcome = 'Success !'; % Default
 first_continue = true;
 new_particle_hasbeen_generated = false;
+
+idxchoice = 'random'; % Default
+tol_overlaping = zeros(number_phase,1); % Initialize
+pickbestchoice = false; % Initialize
+pickselection = false; % Initialize
+has_switched = false(number_phase,1); % Initialize
 for current_pass=1:1:number_pass
     for current_phase=1:1:number_phase
 
         % Reset counter for overlapping relaxation
-        tol_overlaping = 0;
         n_fail = 0;
 
         stop_condition_not_reached = true;
         if complete_stop
             break
         end
+
+        if moved_to_nextphase_toavoidoverlapping
+            moved_to_nextphase_toavoidoverlapping = false; % reset
+            %continue;
+        end
+
         % Progession bar
         unique_diameter = phase(current_phase).unique_dx_diameter;
         unique_dxdy_elongation = phase(current_phase).unique_dxdy_elongation;
@@ -420,6 +461,14 @@ for current_pass=1:1:number_pass
     
         phase_volume_target = phase(current_phase).voxel_number * phase(current_phase).fillratio(current_pass); % Number of voxel to assign for this phase before moving forward
 
+        if acc.dmap_threshold
+            dx_ = unique_diameter(1); % Particle lenght along axe 1
+            dy_ = dx_ * (1/unique_dxdy_elongation(1)); % Particle lenght along axe 2
+            dz_ = dx_ * (1/unique_dxdz_elongation(1)); % Particle lenght along axe 3
+            V_ = 4/3*pi*dx_*dy_*dz_/8;
+            r_threshold = (3*V_/(4*pi))^(1/3);
+        end
+        
         % Wait bar
         generation_progress = phase_volume_filled(current_phase,1)/phase_volume_target; % 0-1
         if generation_progress==1 || isnan(generation_progress)
@@ -630,8 +679,37 @@ for current_pass=1:1:number_pass
                waitbar(generation_progress,h_waitbar);
                previous_generation_progress=generation_progress;
             end
-            
+
             if new_particle_hasbeen_generated
+                if strcmp(acc.id_selector_behavior,'Accelerated') && (strcmp(acc.idxsecondchoice,'dmap') || strcmp(acc.idxsecondchoice,'dmap and z')) && acc.use_dmapapproximation
+                    if particle_id==1
+                        if pMask.use_notwithin || pMask.use_within
+                            BW = double(microstructure3D.phase) + double(pMask.mask_used);
+                        else
+                            BW = double(microstructure3D.phase);
+                        end
+                        dmap = bwdist(BW);
+                    else
+                        lastparticle = particle_data(particle_id,:);
+                        rmax = max(lastparticle(6:8));
+                        x0 = max([round(lastparticle(3)-acc.dmap_updaterange*rmax) 1]);
+                        x1 = min([round(lastparticle(3)+acc.dmap_updaterange*rmax) domain_size(1)]);
+                        y0 = max([round(lastparticle(4)-acc.dmap_updaterange*rmax) 1]);
+                        y1 = min([round(lastparticle(4)+acc.dmap_updaterange*rmax) domain_size(2)]);
+                        z0 = max([round(lastparticle(5)-acc.dmap_updaterange*rmax) 1]);
+                        z1 = min([round(lastparticle(5)+acc.dmap_updaterange*rmax) domain_size(3)]);
+                        local_volume = microstructure3D.phase(x0:x1,y0:y1,z0:z1);
+                        if pMask.use_notwithin || pMask.use_within
+                            local_volume = double(local_volume) + double(pMask.mask_used(x0:x1,y0:y1,z0:z1));
+                        end
+                        %dmap_true = bwdist(microstructure3D.phase);
+                        %local_dmap0 = dmap(x0:x1,y0:y1,z0:z1);
+                        %local_dmap1 = bwdist(local_volume);
+                        %local_dmap = min(local_dmap0,local_dmap1);                        
+                        dmap(x0:x1,y0:y1,z0:z1) = min(dmap(x0:x1,y0:y1,z0:z1),bwdist(local_volume));
+                    end   
+                end
+
                 n_fail = 0; % reset counter for overlapping relaxation
                 particle_id = particle_id+1; % Update
                 % Update volume fractions
@@ -684,28 +762,119 @@ for current_pass=1:1:number_pass
                 new_particle_hasbeen_generated = false; % Reset
             else
                 n_fail = n_fail +1;
-                if n_fail > overlapping.relax_nfail
-                    tol_overlaping = tol_overlaping + overlapping.relax_increment;
-                    n_fail = 0;
-                    fprintf('Pass %i, Phase %i, overlapping relaxation = %1.3f\n',current_pass, current_phase, tol_overlaping);
+                if n_fail > overlapping.relax_nfail || pickbestchoice
+                    if move_to_nextphase_toavoidoverlapping && current_phase<number_phase
+                        moved_to_nextphase_toavoidoverlapping = true;
+                        n_fail = 0;
+                        pickbestchoice = false;
+                        fprintf('Phase %i tried to overlapp, move to next phase\n',  current_phase);
+                        break
+                    else
+                        tol_overlaping(current_phase) = tol_overlaping(current_phase) + overlapping.relax_increment;
+                        fprintf('Pass %i, Phase %i, failed generation attempt = %i -> overlapping relaxation increase to %1.3f\n',current_pass, current_phase, n_fail-1, tol_overlaping(current_phase));
+                        if pickbestchoice
+                            fprintf('   Cause: best pick failed.\n');
+                        else
+                            fprintf('   Cause: too many particle generation fail.\n');
+                        end
+                        n_fail = 0;
+                    end
+                end
+            end            
+
+            if strcmp(acc.id_selector_behavior,'Accelerated')
+                if ~has_switched(current_phase) && n_fail<acc.n_fail_1
+                    idxchoice = acc.idxfirstchoice;
+                    pickbestchoice = false;
+                    pickselection = false;
+                elseif ~has_switched(current_phase) && n_fail>=acc.n_fail_1
+                    has_switched(current_phase) = true;
+                    idxchoice = acc.idxsecondchoice;
+                    pickbestchoice = true;
+                    pickselection = false;
+                    fprintf('Pass %i, Phase %i, failed generation attempt = %i -> first time to switch method: pick best candidate\n',current_pass, current_phase, n_fail);
+                elseif has_switched(current_phase)
+                    if n_fail<acc.n_fail_2
+                        idxchoice = acc.idxsecondchoice; % acc.idxfirstchoice;
+                        pickbestchoice = false;
+                        pickselection = true;
+                    else
+                        idxchoice = acc.idxsecondchoice;
+                        pickbestchoice = true;  
+                        pickselection = false;
+                        %fprintf('Pass %i, Phase %i, failed generation attempt = %i -> switch method: pick best candidate\n',current_pass, current_phase, n_fail);
+                    end
+                end
+            end          
+          
+            % Select Particle center position
+            % RANDOM CHOICE AMONG UNASSIGNED VOXELS
+            if strcmp(idxchoice,'random')
+                rn_pos = randi([1 voxel_number],1); % Pick a random number among all the voxels
+                idx_center = Idx_unassigned_voxels_pickfrom(rn_pos); % Select an indice among all the unassigned voxels
+            else % CHOICE FAVORS UNASSIGNED VOXELS THAT ARE FAR FROM EXISTING PARTICLES AND WITH Z-AXIS VOLUME FRACTION HIGH
+                id_background = unique(Idx_unassigned_voxels_pickfrom);
+                if strcmp(idxchoice,'dmap and z') || strcmp(idxchoice,'dmap')
+                    if ~acc.use_dmapapproximation
+                        if pMask.use_notwithin || pMask.use_within
+                            BW = double(microstructure3D.phase) + double(pMask.mask_used);
+                        else
+                            BW = double(microstructure3D.phase);
+                        end
+                        dmap = bwdist(BW);                        
+                    end
+                    dmap_background = dmap(id_background);        
+
+                    if acc.dmap_threshold
+                        current_maximum_interpenetration = max(overlapping.max(current_phase, :)) + tol_overlaping(current_phase);
+                        if overlapping_stat(1,1)==0 && current_maximum_interpenetration==0 % No overlapping didnt occur yet, and no overlapping is allowed yet
+                            if max(max(max(dmap))) <= acc.dmapthreshold_ratio * r_threshold
+                                pickbestchoice = true; % Overwritte
+                                pickselection = false;
+                            end
+                        end
+                    end  
+                else
+                    dmap_background = ones(size(id_background));
+                end
+
+                if strcmp(idxchoice,'dmap and z') || strcmp(idxchoice,'z')
+                    [~,~,z_background] = ind2sub(domain_size,id_background);
+                    remaining_volume_fraction_currentphase_z = max(0, phase(current_phase).volumefraction.along_3rd_axis_allslices(z_background) - phase(current_phase).current_volumefraction.along_3rd_axis_allslices(z_background)); % volume fraction of the current phase at z_center
+                else
+                    [~,~,z_background] = ind2sub(domain_size,id_background);
+                    remaining_volume_fraction_currentphase_z = max(0, phase(current_phase).volumefraction.along_3rd_axis_allslices(z_background) - phase(current_phase).current_volumefraction.along_3rd_axis_allslices(z_background)); % volume fraction of the current phase at z_center
+                    remaining_volume_fraction_currentphase_z = ceil(remaining_volume_fraction_currentphase_z);
+                    %remaining_volume_fraction_currentphase_z = ones(size(id_background));
+                end
+                product_dmapz = dmap_background.*remaining_volume_fraction_currentphase_z;
+
+                if pickbestchoice % Select best candidate
+                    ids = find(product_dmapz==max(product_dmapz));
+                    idx_center = id_background(ids(1));
+                elseif pickselection % Select among good candidate
+                    range_dmapz =  (max(product_dmapz)-min(product_dmapz));
+                    threshold_dmapz = min(product_dmapz) + (100-acc.selectamongbest)/100*range_dmapz;
+                    ids = find(product_dmapz>=threshold_dmapz);
+                    idsselection = randi([1 length(ids)]);
+                    idx_center = id_background(ids(idsselection));
                 end
             end
-            
-            % Particle center position
-            rn_pos = randi([1 voxel_number],1); % Pick a random number among all the voxels
-            idx_center = Idx_unassigned_voxels_pickfrom(rn_pos); % Select an indice among all the unassigned voxels
             x_center = Coordinates_all_voxels(idx_center,1);
             y_center = Coordinates_all_voxels(idx_center,2);
             z_center = Coordinates_all_voxels(idx_center,3);
             
             remaining_volume_fraction_currentphase_z = max(0, phase(current_phase).volumefraction.along_3rd_axis_allslices(z_center) - phase(current_phase).current_volumefraction.along_3rd_axis_allslices(z_center)); % volume fraction of the current phase at z_center
-
             normalized_term = 0;
             for kk=1:1:number_phase
                 normalized_term = normalized_term + phase(kk).volumefraction.along_3rd_axis_allslices(z_center) - phase(kk).current_volumefraction.along_3rd_axis_allslices(z_center);
             end
             
-            rn = rand; % Pick a random number from 0 to 1
+            if pickbestchoice || pickselection
+                rn = 0;
+            else
+                rn = rand; % Pick a random number from 0 to 1
+            end
             if rn < (remaining_volume_fraction_currentphase_z+tolerance_vf)/normalized_term % Check volume fraction
                 % Particle diameter
                 new_probability = update_probability(phase(current_phase).size_histogram.along_3rd_axis_allslices(z_center+1,:), phase(current_phase).current_diameter_dx.along_3rd_axis_allslices(z_center,:));
@@ -771,7 +940,7 @@ for current_pass=1:1:number_pass
                     idx = choose_randomly_from_histogramprobability( new_probability ); % Rotation z histogram (y) of the current phase at z_center
                     angle_z_deg = histogram_currentphase_z_rotation_z(idx); % Particle rotation                        
                     if dx~=dy || dx~=dz || dy~=dz % Only for ellipsoid
-                        if angle_x_deg~=0 || angle_y_deg~=0 || angle_z_deg~=0 % Only if one or more rotation
+                        if (angle_x_deg~=0 && angle_x_deg~=180) || (angle_y_deg~=0 && angle_y_deg~=180) || (angle_z_deg~=0 && angle_z_deg~=180) % Only if one or more rotation
                             binary_ellipsoid = rotate_domain(binary_ellipsoid,angle_x_deg, angle_y_deg, angle_z_deg); % Apply rotation matrix
                             binary_ellipsoid(binary_ellipsoid>=0.5)=1;
                             binary_ellipsoid(binary_ellipsoid~=1)=0;
@@ -787,14 +956,20 @@ for current_pass=1:1:number_pass
                     subdomain_ellipsoid = binary_ellipsoid(x_sub_min:x_sub_max, y_sub_min:y_sub_max, z_sub_min:z_sub_max); % Ellipsoid subdomain
                     z_update_min = z_min; z_update_max = z_max; % Specify bounds where to update probabilities, in case particle will be generated
                     
-                    % Insertion of the ellipsoid differ depending on the subdomain is empty or contains already other particles
-                    unique_subdomain = unique(subdomain);
-                    if length(unique_subdomain)==1 && unique_subdomain==unassigned_id % Subdomain is empty
-                        if simulate_calendering==true && particle_id>1
+                    % Check overlapping with mask
+                    if (pMask.use_notwithin || pMask.use_within) && pMask.cannot_overlap_with_mask
+                        subdomain_mask = pMask.mask_used(x_min:x_max, y_min:y_max, z_min:z_max);
+                        overlap_mask = double(subdomain_mask)+subdomain_ellipsoid;
+                        if max(max(max(overlap_mask)))>1
                             new_particle_hasbeen_generated = false;  % Not necessary. For clarification sake.
                             continue_whileloop_and_go_to_next_randcenter = true;
                             continue
                         end
+                    end
+
+                    % Insertion of the ellipsoid differ depending on the subdomain is empty or contains already other particles
+                    unique_subdomain = unique(subdomain);
+                    if length(unique_subdomain)==1 && unique_subdomain==unassigned_id % Subdomain is empty
                         number_voxel_assigned = sum(sum(sum(subdomain_ellipsoid == 1))); % Number of new voxel for the current phase
                         number_voxel_idealshape = number_voxel_assigned;
                         microstructure3D.phase(x_min:x_max, y_min:y_max, z_min:z_max) = subdomain_ellipsoid * phase(current_phase).code; % Insert ellipsoid within the domain.
@@ -810,14 +985,9 @@ for current_pass=1:1:number_pass
                         subdomain_binary = subdomain;
                         subdomain_binary(subdomain_binary~=unassigned_id)=1;
                         union_subdomain_ellipsoid = subdomain_binary + subdomain_ellipsoid;
-                        idx_interpenetration = find(union_subdomain_ellipsoid==2);
+                        idx_overlapping = find(union_subdomain_ellipsoid==2);
 
-                        if isempty(idx_interpenetration) % There is no overlapping
-                            if simulate_calendering==true && particle_id>1
-                                new_particle_hasbeen_generated = false;  % Not necessary. For clarification sake.
-                                continue_whileloop_and_go_to_next_randcenter = true;
-                                continue
-                            end
+                        if isempty(idx_overlapping) % There is no overlapping
                             number_voxel_assigned = sum(sum(sum(subdomain_ellipsoid == 1))); % Number of new voxel for the current phase
                             number_voxel_idealshape = number_voxel_assigned;
                             microstructure3D.phase(x_min:x_max, y_min:y_max, z_min:z_max) = subdomain + (subdomain_ellipsoid * phase(current_phase).code); % Insert ellipsoid within the domain.
@@ -840,7 +1010,7 @@ for current_pass=1:1:number_pass
                             for k_other = 1:1:n_otherparticles % Loop over all existing particles
                                 other_id = particles_id_subdomain(k_other); % Get code of the other particle
                                 other_phasenumber =  particle_info.Phase_number(other_id);
-                                current_maximum_interpenetration = overlapping.max(current_phase, other_phasenumber) + tol_overlaping;
+                                current_maximum_interpenetration = overlapping.max(current_phase, other_phasenumber) + tol_overlaping(current_phase);
                                 if current_maximum_interpenetration<=0 % No need to continue
                                     new_particle_hasbeen_generated = false;  % Not necessary. For clarification sake.
                                     continue_whileloop_and_go_to_next_randcenter = true;
@@ -877,9 +1047,9 @@ for current_pass=1:1:number_pass
                                 other_phasenumber =  particle_info.Phase_number(other_id);                                
                                 other_code =  particle_info.Phase_code(other_id);
                                 other_center = particle_info.Center_xyz(other_id,:); % Get coordinate center of the other particle
-                                tmp = find(subdomain_id(idx_interpenetration)==other_id); % Index of the overlapping region for the current particle
+                                tmp = find(subdomain_id(idx_overlapping)==other_id); % Index of the overlapping region for the current particle
                                 if length(tmp)>=1
-                                    idx_overlapping_ellipsoid_other = idx_interpenetration(tmp); % Linear index of the overlapping between the ellispode and the current other particle, subdomain
+                                    idx_overlapping_ellipsoid_other = idx_overlapping(tmp); % Linear index of the overlapping between the ellispode and the current other particle, subdomain
                                     [linear_indices_overlapping_ellipsoid_other] = Index_from_subdomain_to_domain(subdomain_ellipsoid, idx_overlapping_ellipsoid_other, domain_size, [x_min y_min z_min]); % Same index, but expressed in the full domain
                                     [I_overlapping,J_overlapping,K_overlapping] = ind2sub(domain_size,linear_indices_overlapping_ellipsoid_other); % Coordinates of the overlaping region expressed in the full domain
                                     
@@ -890,12 +1060,12 @@ for current_pass=1:1:number_pass
                                     ratio_overlapping = (d_max_overlapping_to_centre-d_min_overlapping_to_centre)/d_max_overlapping_to_centre;
                                     d_min_overlapping_to_othercentre = min(distance_overlapping_to_othercenter); % Min and max of the previous results
                                     d_max_overlapping_to_othercentre = max(distance_overlapping_to_othercenter);
-                                    ratio_overlapping_other = (d_max_overlapping_to_othercentre-d_min_overlapping_to_othercentre)/d_max_overlapping_to_centre;
+                                    ratio_overlapping_other = (d_max_overlapping_to_othercentre-d_min_overlapping_to_othercentre)/d_max_overlapping_to_othercentre;
                                     
-                                    current_maximum_interpenetration = overlapping.max(current_phase, other_phasenumber) + tol_overlaping;
-                                    if max(ratio_overlapping, ratio_overlapping_other)<=current_maximum_interpenetration % Check overlapping
+                                    current_maximum_interpenetration = overlapping.max(current_phase, other_phasenumber) + tol_overlaping(current_phase);
+                                    if max(ratio_overlapping, ratio_overlapping_other)<=current_maximum_interpenetration || current_maximum_interpenetration>threshold_overlapping % Check overlapping
                                         
-                                        % In case the overlapping is allowed, each particle will loose this number of voxels (which them impact its original shape)
+                                        % In case the overlapping is allowed, each particle will loose this number of voxels (which then impact its original shape)
                                         % This loss is cumulative with each new overlapping.
                                         estimation_numbervoxel_foreach_particle = length(idx_overlapping_ellipsoid_other)/2; % True for sphere-sphere, estimation for ellipsoid-ellipsoid
                                         % Estimation of the other particle volume ratio if the overlapping will be allowed
@@ -904,7 +1074,7 @@ for current_pass=1:1:number_pass
                                         loss_voxels_fromidealshape = loss_voxels_fromidealshape + estimation_numbervoxel_foreach_particle;
                                         ratio_ = (number_voxel_idealshape-loss_voxels_fromidealshape)/number_voxel_idealshape;
                                         % Check ratio of original volume is still high enough
-                                        if ratio_other <= overlapping.minvolume(other_phasenumber) - tol_overlaping || ratio_ <= overlapping.minvolume(current_phase) - tol_overlaping;
+                                        if (ratio_other <= overlapping.minvolume(other_phasenumber) - tol_overlaping(current_phase) || ratio_ <= overlapping.minvolume(current_phase) - tol_overlaping(current_phase)) && current_maximum_interpenetration<threshold_overlapping
                                             new_particle_hasbeen_generated = false;  % Not necessary. For clarification sake.
                                             continue_whileloop_and_go_to_next_randcenter = true;
                                             break
@@ -1003,6 +1173,12 @@ for current_pass=1:1:number_pass
                                     particle_index(other_id).Index = uint32(linear_indices_other);
                                 end
                             end
+                            % Overlapping
+                            if overlapping_stat(1,1)==0 % First time overlapping is occuring
+                                overlapping_stat(1,1) = sum(sum(sum( microstructure3D.phase==0 )))/numel(microstructure3D.phase);
+                            end
+                            [idx_interpenetration_domain] = Index_from_subdomain_to_domain(union_subdomain_ellipsoid, idx_overlapping, domain_size, [x_min y_min z_min]);
+                            overlappingids = [overlappingids; idx_interpenetration_domain];    
                             % Update
                             new_particle_hasbeen_generated = true;
                         end
@@ -1017,7 +1193,19 @@ for current_pass=1:1:number_pass
             
             if new_particle_hasbeen_generated % Update
                 phase_volume_filled(current_phase,1) = phase_volume_filled(current_phase,1) + number_voxel_assigned;
-                number_unassigned_voxels = number_unassigned_voxels - number_voxel_assigned;
+                if mod(particle_id,100)==0
+                    phase_volume_filled(current_phase,1) = sum(sum(sum( microstructure3D.phase==phase(current_phase).code )));
+                end
+
+                if pMask.use_notwithin || pMask.use_within
+                    number_unassigned_voxels = sum(sum(sum( (microstructure3D.phase + double(pMask.mask_used)) == 0 )));
+                    if number_unassigned_voxels<=0
+                        warning('Premature generation end: there is no more unassigned voxels to choose from. Check your mask parameters')
+                        break
+                    end
+                else
+                    number_unassigned_voxels = number_unassigned_voxels - number_voxel_assigned;
+                end
                 phase_number_particle(current_phase,1) = phase_number_particle(current_phase,1) + 1;
                 % Particle info update
                 particle_info.Center_xyz(particle_id,:) = [x_center y_center z_center];
@@ -1060,7 +1248,7 @@ if stoping_conditions.plot
     porosity_progression = [porosity_progression 1-sum(volumefraction_progression(:,end))];
     particle_progression = [particle_progression  phase_number_particle(:,1)];
     
-    time_progression_generationrate = [time_progression_generationrate time_progression(end-1)+((time_progression(end)-time_progression(end-1))/2)];;
+    time_progression_generationrate = [time_progression_generationrate time_progression(end-1)+((time_progression(end)-time_progression(end-1))/2)];
     generationrate_progression = [generationrate_progression (volumefraction_progression(:,end)-volumefraction_progression(:,end-1)) ./ (time_progression(end)-time_progression(end-1)) ];
     generationrate_progression_average = [generationrate_progression_average mean(generationrate_progression,2)];
     particle_generationrate_progression = [particle_generationrate_progression (particle_progression(:,end)-particle_progression(:,end-1)) ./ (time_progression(end)-time_progression(end-1)) ];
@@ -1094,7 +1282,9 @@ if stoping_conditions.plot
     for current_phase_figure = 1:1:number_phase
         plot(sub_axes_progression_2,time_progression_generationrate,generationrate_progression(current_phase_figure,:),'LineWidth',1,'LineStyle','-','Color',c_(current_phase_figure,:),'DisplayName',[phase(current_phase_figure).name ' (instantaneous)']);
         plot(sub_axes_progression_2,time_progression_generationrate,generationrate_progression_average(current_phase_figure,:),'LineWidth',2,'LineStyle','--','Color',c_(current_phase_figure,:),'DisplayName',[phase(current_phase_figure).name ' (global average)']);
-        plot(sub_axes_progression_2,time_progression_generationrate_avglastiterations,generationrate_progression_lastiterations(current_phase_figure,:),'LineWidth',2,'LineStyle',':','Color',c_(current_phase_figure,:),'DisplayName',[phase(current_phase_figure).name ' (average of last ' num2str(stoping_conditions.average_on_last_n_iterations) ' iterations)']);
+        if ~isempty(time_progression_generationrate_avglastiterations)
+            plot(sub_axes_progression_2,time_progression_generationrate_avglastiterations,generationrate_progression_lastiterations(current_phase_figure,:),'LineWidth',2,'LineStyle',':','Color',c_(current_phase_figure,:),'DisplayName',[phase(current_phase_figure).name ' (average of last ' num2str(stoping_conditions.average_on_last_n_iterations) ' iterations)']);
+        end
     end
     xlim(sub_axes_progression_2,[0 time_since_start])
     legend(sub_axes_progression_2,'Location','southoutside');
@@ -1105,7 +1295,9 @@ if stoping_conditions.plot
     for current_phase_figure = 1:1:number_phase
         %plot(sub_axes_progression_3,time_progression_generationrate,particle_generationrate_progression(current_phase_figure,:),'LineWidth',1,'LineStyle','-','Color',c_(current_phase_figure,:),'DisplayName',[phase(current_phase_figure).name ' (instantaneous)']);
         plot(sub_axes_progression_3,time_progression_generationrate,particle_generationrate_progression_average(current_phase_figure,:),'LineWidth',2,'LineStyle','--','Color',c_(current_phase_figure,:),'DisplayName',[phase(current_phase_figure).name ' (global average)']);
-        plot(sub_axes_progression_3,time_progression_generationrate_avglastiterations,particle_generationrate_progression_lastiterations(current_phase_figure,:),'LineWidth',2,'LineStyle',':','Color',c_(current_phase_figure,:),'DisplayName',[phase(current_phase_figure).name ' (average of last ' num2str(stoping_conditions.average_on_last_n_iterations) ' iterations)']);
+        if ~isempty(time_progression_generationrate_avglastiterations)
+            plot(sub_axes_progression_3,time_progression_generationrate_avglastiterations,particle_generationrate_progression_lastiterations(current_phase_figure,:),'LineWidth',2,'LineStyle',':','Color',c_(current_phase_figure,:),'DisplayName',[phase(current_phase_figure).name ' (average of last ' num2str(stoping_conditions.average_on_last_n_iterations) ' iterations)']);
+        end
     end
     xlim(sub_axes_progression_3,[0 time_since_start])
     legend(sub_axes_progression_3,'Location','southoutside');
@@ -1192,6 +1384,125 @@ if do_verification
     function_verification_generatedmicrostructure(microstructure3D,phase, input_porosity, current_porosity, save_options)
 end
 
+%% MASK
+if pMask.use_notwithin || pMask.use_within
+    if pMask.use_notwithin && pMask.add_preexistingmaterial
+        idmask = find(pMask.mask_notwithin);
+        mask_id = max(max(max(microstructure3D.particle_id))) + 1;
+        microstructure3D.particle_id(idmask) = mask_id;
+        microstructure3D.phase(idmask) = max(max(max(microstructure3D.phase))) + 1;
+    end
+end
+
+%% OVERLAPPING STAT AND CROPPING
+overlappingids = unique(overlappingids); % Remove duplicate  
+cs = [cropparameters(1,1) cropparameters(2,1) cropparameters(3,1)];
+sz = size(microstructure3D.phase);
+if sum(cropparameters(:,1))>0
+    [IX,IY,IZ]=ind2sub(sz,overlappingids);
+    ids_notcropped = ones(length(IX),1);
+    ids_notcropped(IX < cs(1)+1) = 0;
+    ids_notcropped(IY < cs(2)+1) = 0;
+    ids_notcropped(IZ < cs(3)+1) = 0;
+    ids_notcropped(IX > sz(1) - cs(1))=0;
+    ids_notcropped(IY > sz(2) - cs(2))=0;
+    ids_notcropped(IZ > sz(3) - cs(3))=0;
+    microstructure3D.phase = microstructure3D.phase(cs(1)+1:end-cs(1), cs(2)+1:end-cs(2), cs(3)+1:end-cs(3));
+    microstructure3D.particle_id = microstructure3D.particle_id(cs(1)+1:end-cs(1), cs(2)+1:end-cs(2), cs(3)+1:end-cs(3));
+    sz = size(microstructure3D.phase);
+    overlapping_stat(1,2) = sum(ids_notcropped) / sum(sum(sum( microstructure3D.phase~=0 ))); % Ratio of overlapping over solid phases volume
+    % For visualization only
+    IX(~ids_notcropped)=[];
+    IY(~ids_notcropped)=[];
+    IZ(~ids_notcropped)=[];
+    IX = IX-cs(1); IY = IY-cs(1); IZ = IZ-cs(1);
+    overlappingids = sub2ind(sz,IX,IY,IZ);
+
+else
+    overlapping_stat(1,2) = length(overlappingids) / sum(sum(sum( microstructure3D.phase~=0 ))); % Ratio of overlapping over solid phases volume
+end
+
+% For visualization only
+overlaping_map = microstructure3D.phase;
+overlaping_map(microstructure3D.phase~=0)=1;
+overlaping_map(overlappingids)=2;
+
+
+%% REMOVE TRUNCATED PARTICLES
+remove_ids = [];
+for dir=1:1:3
+    if sum(cropparameters(dir,2:4))>0
+        if dir==1
+            Idedges_all = [microstructure3D.particle_id(1,:,:);microstructure3D.particle_id(end,:,:)];
+        elseif dir==2
+            Idedges_all = [microstructure3D.particle_id(:,1,:);microstructure3D.particle_id(:,end,:)];
+        else
+            Idedges_all = [microstructure3D.particle_id(:,:,1);microstructure3D.particle_id(:,:,end)];
+        end
+        Idedges_all = reshape(Idedges_all,[numel(Idedges_all),1]);
+        Idedges_all(Idedges_all==0)=[];
+        if pMask.use_notwithin || pMask.use_within
+            if pMask.use_notwithin && pMask.add_preexistingmaterial
+                Idedges_all(Idedges_all==mask_id)=[];
+            end
+        end
+        Idedges = unique(Idedges_all);
+        n_Idedge = length(Idedges);
+        if ~isempty(Idedges)
+            if cropparameters(dir,2) % Remove particles with more than 4 voxels at the edges
+                for kid=1:1:n_Idedge
+                    current_particle_data = particle_data(Idedges(kid),:);
+                    particle_center = current_particle_data(2+dir);
+                    new_particle_center = particle_center-cs(dir);                    
+                    if new_particle_center>=1 && new_particle_center<=sz(dir)
+                        n_voxel = sum(Idedges_all==Idedges(kid));
+                        if n_voxel >4
+                            remove_ids = [remove_ids; Idedges(kid)];
+                        end
+                    else
+                        remove_ids = [remove_ids; Idedges(kid)];
+                    end
+                end
+            end
+            if cropparameters(dir,3) % Remove particles with more than x% truncated volume
+                for kid=1:1:n_Idedge
+                    n_voxel_FOV = sum(sum(sum( microstructure3D.particle_id==Idedges(kid) )));
+                    current_particle_data = particle_data(Idedges(kid),:);
+                    [binary_ellipsoid] = create_ellipsoid(current_particle_data(6),current_particle_data(7),current_particle_data(8));
+                    n_voxel_particle = sum(sum(sum( binary_ellipsoid )));
+                    truncated_percentage = max([0, 100*(n_voxel_particle-n_voxel_FOV)/n_voxel_particle]);
+                    if truncated_percentage>=cropparameters(dir,3)
+                        remove_ids = [remove_ids; Idedges(kid)];
+                    end
+                end
+            end
+            if cropparameters(dir,4) % Remove particles with center outside FOV (can happen if domain has been cropped)
+                for kid=1:1:n_Idedge
+                    current_particle_data = particle_data(Idedges(kid),:);
+                    % Id / phase label / x / y / z / dx / dy / dz / Rx / Ry / Rz
+                    particle_center = current_particle_data(2+dir);
+                    new_particle_center = particle_center-cs(dir);
+                    if new_particle_center<1 ||  new_particle_center>sz(dir)
+                        remove_ids = [remove_ids; Idedges(kid)];
+                    end
+                end
+            end
+        end
+    end
+end
+if ~isempty(remove_ids)
+    remove_ids = unique(remove_ids); % Remove duplicates
+    for kid = 1:1:length(remove_ids)
+        remove_idx = find( microstructure3D.particle_id == remove_ids(kid) );
+        microstructure3D.particle_id(remove_idx) = 0;
+        microstructure3D.phase(remove_idx) = 0;
+    end
+end
+
+if particle_data(end,1)==0
+    particle_data(end,:)=[];
+end
+
 
 %%
 %% FUNCTIONS
@@ -1242,26 +1553,39 @@ end
  end
 
 function [binary_ellipsoid] = create_ellipsoid(dx,dy,dz)
-% Source: https://www.mathworks.com/matlabcentral/answers/58885-creating-a-spherical-matrix
 
-Rx = (dx)/2; Ry = (dy)/2; Rz = (dz)/2; % Three radius
-[X,Y,Z] = ndgrid(linspace(-Rx,Rx,dx),linspace(-Ry,Ry,dy),linspace(-Rz,Rz,dz));
-R = sqrt((X/Rx).^2 + (Y/Ry).^2 + (Z/Rz).^2);
-binary_ellipsoid = zeros(size(X));
-%binary_ellipsoid(R <= 1 ) = 1; % Assign 1 for ellipsoid, 0 for complementary volume
-idr = find(R<=1);
-if isempty(idr)
-    idr = find(R==min(min(min(R))));
+if ~mod(dx,2) && ~mod(dy,2) && ~mod(dz,2) && dx==dy && dx==dz
+    % Sphere, even diameter
+    binary_ellipsoid = zeros(dx,dx,dx);
+    center1 = dx/2;
+    center2 = center1+1;
+    binary_ellipsoid(center1,center1,center1) = 1;
+    binary_ellipsoid(center2,center1,center1) = 1;
+    binary_ellipsoid(center1,center2,center1) = 1;
+    binary_ellipsoid(center2,center2,center1) = 1;
+    binary_ellipsoid(center1,center1,center2) = 1;
+    binary_ellipsoid(center2,center1,center2) = 1;
+    binary_ellipsoid(center1,center2,center2) = 1;
+    binary_ellipsoid(center2,center2,center2) = 1;    
+    dmap_sphere = bwdist(binary_ellipsoid);
+    radius = (dx-2)/2;
+    binary_ellipsoid(dmap_sphere<=radius) = 1;
+
+else
+    % Exact for sphere and ellipsoid with odd diameters. Approximation if one diameter is even
+    % Source: https://www.mathworks.com/matlabcentral/answers/58885-creating-a-spherical-matrix
+    Rx = (dx)/2; Ry = (dy)/2; Rz = (dz)/2; % Three radius
+    [X,Y,Z] = ndgrid(linspace(-Rx,Rx,dx),linspace(-Ry,Ry,dy),linspace(-Rz,Rz,dz));
+    R = sqrt((X/Rx).^2 + (Y/Ry).^2 + (Z/Rz).^2);
+    binary_ellipsoid = zeros(size(X));
+    %binary_ellipsoid(R <= 1 ) = 1; % Assign 1 for ellipsoid, 0 for complementary volume
+    idr = find(R<=1);
+    if isempty(idr)
+        idr = find(R==min(min(min(R))));
+    end
+    binary_ellipsoid(idr) = 1; % Assign 1 for ellipsoid, 0 for complementary volume
 end
-binary_ellipsoid(idr) = 1; % Assign 1 for ellipsoid, 0 for complementary volume
 
-
-% Remove one voxel tip, if any?
-
-% Visualization
-%slice(Y,X,Z,binary_ellipsoid,0,0,0);
-%axis equal vis3d; colorbar;
-%imagesc(binary_ellipsoid(:,:,1))
 end
 
 function [binary_ellipsoid] = rotate_domain(binary_ellipsoid,angle_x_deg, angle_y_deg, angle_z_deg)
@@ -1323,7 +1647,7 @@ end
 
 function [microstructure3D] = ThreeD_array_assignment(microstructure3D, phase_number, idx, particle_id, number_voxel, number_voxel_idealshape, dx, dy, dz, anglex, angley, anglez, x_center, y_center, z_center)
 microstructure3D.particle_id(idx) = particle_id; % Assign particle id
-microstructure3D.particle_volume_numbervoxel(idx) = number_voxel; % Assign particle volume
+%microstructure3D.particle_volume_numbervoxel(idx) = number_voxel; % Assign particle volume
 microstructure3D.particle_volume_numbervoxel_idealshape(idx) = number_voxel_idealshape; % Assign particle volume
 if number_voxel~=1
     volume_ideal_ellipsoid = 4/3 * pi * dx * dy * dz / 8;
@@ -1346,7 +1670,7 @@ microstructure3D.phase_(phase_number).particle_rotation_z(idx) = round(anglez,4)
 end
 
 function [microstructure3D] = Update_ThreeD_array_assignment(microstructure3D, idx, number_voxel)
-microstructure3D.particle_volume_numbervoxel(idx) = number_voxel; % Assign particle volume
+%microstructure3D.particle_volume_numbervoxel(idx) = number_voxel; % Assign particle volume
 end
 
 

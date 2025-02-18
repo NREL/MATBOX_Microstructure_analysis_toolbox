@@ -8,7 +8,9 @@ if options.savepng
 else
     opt.savefig_informat = [];
 end
+opt.fig_infig = options.fig_infig;
 opt.overwritte = false;
+opt.fig_format = {'png'};
 
 if strcmp(options.coloris,'Phase Id')
     % Initialize

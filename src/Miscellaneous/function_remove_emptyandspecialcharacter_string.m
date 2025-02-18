@@ -1,6 +1,7 @@
 function [ str_new ] = function_remove_emptyandspecialcharacter_string(str_old)
 %function_remove_emptyandspecialcharacter_string is used to change
 %   string 'str1 str2-str3' to 'str1_str2str3'
+% :, \, /, ?, *, [, and ].
 
 str_new=str_old; % Initialization
 number_of_suppression = 0; % Initialise suppression counter
@@ -27,10 +28,7 @@ for current_iteration = 1:1:length(str_old) % Loop over all letter
     
     if strcmp(current_letter,'/') || strcmp(current_letter,'(') || strcmp(current_letter,')')% Check
         str_new(current_position_new_string) = '_';
-    end
-    
-
-    
+    end  
 end
 
 str_old=str_new;

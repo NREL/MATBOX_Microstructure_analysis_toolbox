@@ -406,7 +406,7 @@ classdef microstructure_visualization_exported < matlab.apps.AppBase
                             [~, number_phase] = size(data);
                             phase_results={};
                             for kk=1:1:number_phase
-                                phase_results(kk,1)={data(kk).name};
+                                phase_results(kk,1)={char(data(kk).name)};
                             end
                             set(app.ForthephaseDropDown,'Items', phase_results,'enable','on');
                             app.ForthephaseDropDownLabel.Enable = 'on';

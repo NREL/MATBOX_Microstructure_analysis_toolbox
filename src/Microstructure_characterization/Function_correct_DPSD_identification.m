@@ -90,7 +90,7 @@ end
 
 while number_change~=0
     iteration_=iteration_+1;
-    if details_convergence==1
+    if details_convergence
         fprintf ('Current iteration: %i\n',iteration_);
     end
     if visualize_2D && cpsd_refining
@@ -308,7 +308,7 @@ while number_change~=0
             [Ch1,Ch2,Ch3] = ind2sub(Domain_size,index_chess);
             % Number of voxel that belong to the chess pattern
             number_voxel_chess = length(Ch1);
-            if details_convergence==1
+            if details_convergence
                 fprintf ('   Number of voxel with a chess pattern: %i\n',number_voxel_chess);
             end
             % Calculate the center of mass of all particles, without taking into
@@ -446,7 +446,7 @@ while number_change~=0
         unique_particle(1)=[]; % Remove the 0, allocated to the complementary phase
         % Get number of particle
         number_particle = length(unique_particle);
-        if details_convergence==1
+        if details_convergence
             fprintf ('   - Chess pattern removed (step1):     number of discrete particle: %i\n',number_particle);
         end
         
@@ -556,7 +556,7 @@ while number_change~=0
         unique_particle(1)=[]; % Remove the 0, allocated to the complementary phase
         % Get number of particle
         number_particle = length(unique_particle);
-        if details_convergence==1
+        if details_convergence
             fprintf ('   - Chess pattern removed (step2):     number of discrete particle: %i\n',number_particle);
         end
         
@@ -703,9 +703,9 @@ while number_change~=0
                         x_=Cl1(current_voxel); y_=Cl2(current_voxel); z_=Cl3(current_voxel);
                         % Calculate all distance betwenen the voxel and the surrounding voxels
                         for voxel_surround=1:1:n_surrounding
-                            x_s=pos_surrounding(voxel_surround,1);
-                            y_s=pos_surrounding(voxel_surround,2);
-                            z_s=pos_surrounding(voxel_surround,3);
+                            x_s=double(pos_surrounding(voxel_surround,1));
+                            y_s=double(pos_surrounding(voxel_surround,2));
+                            z_s=double(pos_surrounding(voxel_surround,3));
                             dist_surround = sqrt((x_s-x_)^2 + (y_s-y_)^2 + (z_s-z_)^2);
                             pos_surrounding(voxel_surround,4)=dist_surround;
                         end
@@ -743,7 +743,7 @@ while number_change~=0
     unique_particle(1)=[]; % Remove the 0, allocated to the complementary phase
     % Get number of particle
     number_particle = length(unique_particle);
-    if details_convergence==1
+    if details_convergence
         fprintf ('   - Search for non connected particle: number of discrete particle: %i\n',number_particle);
     end
     
@@ -852,9 +852,9 @@ while number_change~=0
                     x_=Cl1(current_voxel); y_=Cl2(current_voxel); z_=Cl3(current_voxel);
                     % Calculate all distance betwenen the voxel and the surrounding voxels
                     for voxel_surround=1:1:n_surrounding
-                        x_s=pos_surrounding(voxel_surround,1);
-                        y_s=pos_surrounding(voxel_surround,2);
-                        z_s=pos_surrounding(voxel_surround,3);
+                        x_s=double(pos_surrounding(voxel_surround,1));
+                        y_s=double(pos_surrounding(voxel_surround,2));
+                        z_s=double(pos_surrounding(voxel_surround,3));
                         dist_surround = sqrt((x_s-x_)^2 + (y_s-y_)^2 + (z_s-z_)^2);
                         pos_surrounding(voxel_surround,4)=dist_surround;
                     end
@@ -899,12 +899,12 @@ while number_change~=0
     unique_particle(1)=[]; % Remove the 0, allocated to the complementary phase
     % Get number of particle
     number_particle = length(unique_particle);
-    if details_convergence==1
+    if details_convergence
         fprintf ('   - One-voxel size particle treated:   number of discrete particle: %i\n',number_particle);
     end
     
     
-    if cpsd_refining==1
+    if cpsd_refining
         %% STEP 3: Discrete-PSD
         % Initialisation
         D_PSD_particle_size = zeros(Domain_size(1),Domain_size(2),Domain_size(3));
@@ -933,7 +933,7 @@ while number_change~=0
             end
             D_PSD_particle_size(index_particle)= equivalent_diameter_size;
         end
-        if details_convergence==1
+        if details_convergence
             fprintf ('   - Discrete particle size calculated\n');
         end
         if visualize_2D && cpsd_refining
@@ -955,7 +955,9 @@ while number_change~=0
         % It will be calculated only one time
         if iteration_==1
             % Run the C-PSD algorithm
-            [C_PSD_particle_size] = Function_particle_size_CPSD_Algorithm(binary_phase);
+            roundvalues = true;
+            approximate = false;
+            [C_PSD_particle_size,~,~] = Function_particle_size_CPSD_Algorithm(binary_phase,roundvalues,approximate);
             if visualize_2D && cpsd_refining
                 hold(axe_video(1).s,'on'); % Active subplot
                 imagesc(axe_video(1).s,C_PSD_particle_size);
@@ -1148,9 +1150,9 @@ while number_change~=0
                     x_=Z1(current_voxel); y_=Z2(current_voxel); z_=Z3(current_voxel);
                     % Calculate all distance betwenen the voxel and the surrounding voxels
                     for voxel_surround=1:1:n_surrounding
-                        x_s=pos_surrounding(voxel_surround,1);
-                        y_s=pos_surrounding(voxel_surround,2);
-                        z_s=pos_surrounding(voxel_surround,3);
+                        x_s=double(pos_surrounding(voxel_surround,1));
+                        y_s=double(pos_surrounding(voxel_surround,2));
+                        z_s=double(pos_surrounding(voxel_surround,3));
                         dist_surround = sqrt((x_s-x_)^2 + (y_s-y_)^2 + (z_s-z_)^2);
                         pos_surrounding(voxel_surround,4)=dist_surround;
                     end
@@ -1193,7 +1195,7 @@ while number_change~=0
         unique_particle(1)=[]; % Remove the 0, allocated to the complementary phase
         % Get number of particle
         number_particle = length(unique_particle);
-        if details_convergence==1
+        if details_convergence
             fprintf ('   - C-PSD & D-PSD analysis:            number of discrete particle: %i\n',number_particle);
         end
         
@@ -1265,7 +1267,7 @@ while number_change~=0
     % Compare with previous iteration resutt
     if iteration_>1
         number_change=sum(sum(sum(previous_discrete_particle~=Label_lake)));
-        if details_convergence==1
+        if details_convergence
             fprintf ('   CONVERGENCE CHECK: Number of voxels changed compared with previous iteration: %i\n',number_change);
         end
     end
@@ -1297,7 +1299,7 @@ while number_change~=0
     Checksum_list.state(iteration_+1).hash=Checksum_currentstate_Label_lake;
     % Exit loop due to checksum equality
     if (exit_loop_checksum==1 && number_change>0)
-        if details_convergence==1
+        if details_convergence
             disp 'Iterative process has been founded to back to a previous state. Iterations are stopped.'
         end
         break

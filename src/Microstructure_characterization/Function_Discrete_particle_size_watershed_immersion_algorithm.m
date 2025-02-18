@@ -1,4 +1,4 @@
-function [D_PSD_particle_size,Label_lake] = Function_Discrete_particle_size_watershed_immersion_algorithm(binary_phase,cpsd_refining,customfunction,details_convergence,visualize_2D)
+function [D_PSD_particle_size,Label_lake] = Function_Discrete_particle_size_watershed_immersion_algorithm(binary_phase,cpsd_refining,details_convergence,visualize_2D)
 
 %% REFERENCE
 % This algorithm is inspired by this publication:
@@ -373,7 +373,7 @@ unique_particle = unique(Label_lake);
 unique_particle(1)=[]; % Remove the 0, allocated to the complementary phase
 % Get number of particle
 number_particle = length(unique_particle);
-if details_convergence==1
+if details_convergence
     fprintf ('Initial number of discrete particle identified: %i\n',number_particle);
 end
 

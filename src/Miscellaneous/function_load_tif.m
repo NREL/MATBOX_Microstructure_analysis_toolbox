@@ -41,7 +41,7 @@ if isfile(FileTif) % Check existence
         outcome = true; % Initialize
         return % Exit function
     else
-        warning('function_load_tif: File imported is not a tif file');
+        warning('function_load_tif: File imported is not a .tif or a .tiff file');
         help function_load_tif
         return % Exit function
     end

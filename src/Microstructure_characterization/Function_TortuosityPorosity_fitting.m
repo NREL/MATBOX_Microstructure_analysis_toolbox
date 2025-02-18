@@ -59,16 +59,17 @@ elseif n==1 % One unique doublet (epsilon, tau): enforce tau = epsilon^(-gamma)
     results.form = 'Empirical_Bruggeman';
     results.equation = 'tau = epsilon^(-gamma)';
     results.success = true;
+    results.Bruggeman = 1 + results.gamma;
 else
     results.form = form;
-    if strcmp(form, 'Empirical_Bruggeman')
+    if strcmp(form, 'Empirical_Bruggeman') || strcmp(form, 'Bruggeman')
         p = polyfit(log(epsilon),log(tau),1);
         results.gamma = -p(1);
         results.equation = 'tau = epsilon^(-gamma)';
         results.epsilon_fit = linspace(min(epsilon), max(epsilon));
         results.tau_fit = results.epsilon_fit.^(-results.gamma);        
         results.success = true;
-    elseif strcmp(form, 'Generalized_ArchieLaw')
+    elseif strcmp(form, 'Generalized_ArchieLaw') || strcmp(form, 'Scaled Bruggeman (Thorat, 2009)')
         p = polyfit(log(epsilon),log(tau),1);
         results.alpha = exp(p(2));
         results.gamma = -p(1);
@@ -77,6 +78,7 @@ else
         results.tau_fit = results.alpha * results.epsilon_fit.^(-results.gamma);
         results.success = true;
     end
+    results.Bruggeman = 1 + results.gamma;
 end
 
 end

@@ -25,7 +25,16 @@ font_size_GUI = 12;
 
 % Default colormap
 color_phase_default = round(colororder*255);
-tmp=randi(255,10000,3);
+
+%color_phase_default(2,:) = [127 127 127];
+
+%color_phase_default(2,:) = color_phase_default(3,:);
+%color_phase_default(3,:) = color_phase_default(4,:);
+
+% color_phase_default(2,:) = [127 127 127];;
+% color_phase_default(3,:) = color_phase_default(3,:);
+
+tmp=randi(255,100000,3);
 color_phase_default=[color_phase_default;tmp];
 color_phase_default=color_phase_default/255; % Normalized for Matlab
 choice_colormap = 'MATLAB default';
@@ -33,8 +42,18 @@ choice_colormap = 'MATLAB default';
 
 %% PHASE INFORMATION
 Phase_code=unique(array); % Get phase code
+if min(Phase_code)>=0 && max(Phase_code)<255
+    if sum(Phase_code==round(Phase_code))==length(Phase_code)
+        array = uint8(array);
+    end
+end
 number_phase=length(Phase_code); % Get number of phase
 Domain_size = size(array);
+[~,number_of_dimension]=size(Domain_size);
+if number_of_dimension==2 % Case 2D
+    Domain_size=[Domain_size(1) Domain_size(2) 1];
+end
+
 % Default Colors
 if nargin==2 && isfield(p,'custom_colormap')
     for current_phase=1:1:number_phase
@@ -65,20 +84,29 @@ axis(axes_2dview,'tight');
 axis(axes_2dview,'equal');
 
 % Slider
-Slider_axes_2dview = uicontrol('Parent', Fig,'Style', 'slider','Min',1,'Max',100,'Value',1,'Units','normalized','Position', [0.3 0.05 0.4 0.04],'Callback', @slider_axes2dview_Callback,...
+Slider_axes_2dview = uicontrol('Parent', Fig,'Style', 'slider','Min',1,'Max',100,'Value',1,'Units','normalized','Position', [0.3 0.06 0.4 0.04],'Callback', @slider_axes2dview_Callback,...
     'Visible','on','enable','on');
 % Text (slider position)
 Text_slider = uicontrol('Parent', Fig,'Style', 'text','FontSize',font_size_GUI,'FontName',font_name_GUI,'String','Position: -/-','Visible','on','enable','on',...
     'BackgroundColor','w','HorizontalAlignment','left','Units','normalized','Position', [0.3 0.0 0.4 0.04]);
 % Popup menu (slider direction)
 Popup_slider = uicontrol('Parent', Fig,'Style', 'popup','FontSize',font_size_GUI,'FontName',font_name_GUI,...
-    'String', direction_name,'Value',3,'Units','normalized','Position', [0.05 0.05 0.215 0.04],'enable','on','Visible','on','Callback', @popup_axes2dview_Callback);
+    'String', direction_name,'Value',3,'Units','normalized','Position', [0.05 0.06 0.215 0.04],'enable','on','Visible','on','Callback', @popup_axes2dview_Callback);
+% 3D view
+Button_3D = uicontrol('Parent', Fig,'Style', 'pushbutton','FontSize',font_size_GUI,'FontName',font_name_GUI,...
+    'String', '3D view','Units','normalized','Position', [0.05 0.015 0.1 0.04],'enable','on','Visible','on','Callback', @button_3Dview_Callback);
+
 
 direction = 3; pos_=1;
 set(Text_slider,'String',['Slice: ' num2str(pos_) '/' num2str(Domain_size(direction))]);
 minor_step = 1/(Domain_size(direction)-1);
 major_step = max([minor_step 0.1]);
-set(Slider_axes_2dview,'Min',1,'Max',Domain_size(direction),'SliderStep', [minor_step, major_step],'Value',1);
+if number_of_dimension==2 && Domain_size(direction)==1
+    set(Slider_axes_2dview,'Visible','off','enable','off');
+    Position_slice(direction)=1;
+else
+    set(Slider_axes_2dview,'Min',1,'Max',Domain_size(direction),'SliderStep', [minor_step, major_step],'Value',1);
+end
 
 % Colormap
 list_cmap = {'MATLAB default','gray','bone','copper','turbo','jet','parula','Random'};
@@ -86,7 +114,20 @@ if ~isempty(customcmap)
     list_cmap = {'Custom','MATLAB default','gray','bone','copper','turbo','jet','parula','Random'};
 end
 Popup_colormap = uicontrol('Parent', Fig,'Style', 'popup','FontSize',font_size_GUI,'FontName',font_name_GUI,...
-    'String',list_cmap ,'Value',1,'Units','normalized','Position', [0.725 0.05 0.215 0.04],'enable','on','Visible','on','Callback', @popup_colormap_Callback);
+    'String',list_cmap ,'Value',1,'Units','normalized','Position', [0.725 0.06 0.215 0.04],'enable','on','Visible','on','Callback', @popup_colormap_Callback);
+
+% Pixel grid checkbox
+Checkbox_pixelgrid = uicontrol('Parent', Fig,'Style', 'checkbox','FontSize',font_size_GUI,'FontName',font_name_GUI,...
+    'String','Pixel grid' ,'Value',0,'Units','normalized','Position', [0.725 0.01 0.215 0.04],'enable','on','Visible','on','Callback', @checkbox_pixelgrid_Callback);
+
+% Checkbox
+    function checkbox_pixelgrid_Callback(source,~)
+        % Get position value
+        if source.Value
+            pixelgrid
+        end    
+        update_figure
+    end
 
 % Slider
     function slider_axes2dview_Callback(source,~)
@@ -135,17 +176,36 @@ Popup_colormap = uicontrol('Parent', Fig,'Style', 'popup','FontSize',font_size_G
         % Set slider min, max
         minor_step = 1/(Domain_size(direction)-1);
         major_step = max([minor_step 0.1]);
-        set(Slider_axes_2dview,'Min',1,'Max',Domain_size(direction),'SliderStep', [minor_step, major_step],'Value',1);
+        if number_of_dimension==2 && Domain_size(direction)==1
+            set(Slider_axes_2dview,'Visible','off','enable','off');
+            Position_slice(direction)=1;
+        else
+            set(Slider_axes_2dview,'Min',1,'Max',Domain_size(direction),'SliderStep', [minor_step, major_step],'Value',1,'Visible','on','enable','on');
+        end
         % Update text
         set(Text_slider,'String',['Slice: ' num2str(1) '/' num2str(Domain_size(direction))]);
         % Update figure
         update_figure
     end
 
+    function button_3Dview_Callback(source,~)
+        color_map = char(Popup_colormap.String(Popup_colormap.Value));
+        if strcmp(color_map,'MATLAB default')
+            vol = volshow(array);
+        else
+            col_ = eval(color_map);
+            vol = volshow(array,Colormap=col_);
+        end
+    end
+
     function update_figure
         direction = Popup_slider.Value;
         pos_ = round(Slider_axes_2dview.Value);
-        Position_slice(direction)=pos_;
+        if number_of_dimension==2 && Domain_size(direction)==1
+            Position_slice(direction)=1;
+        else
+            Position_slice(direction)=pos_;
+        end
         if direction==1
             % Initializaion
             slice_color = zeros(Domain_size(2),Domain_size(3),3); % RGB color map
@@ -201,6 +261,9 @@ Popup_colormap = uicontrol('Parent', Fig,'Style', 'popup','FontSize',font_size_G
         axis(axes_2dview,'tight');
         % Aspect ratio is 1:1
         axis(axes_2dview,'equal');
+        if Checkbox_pixelgrid.Value
+            pixelgrid
+        end
     end
 
 % Initialize
