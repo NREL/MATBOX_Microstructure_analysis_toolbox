@@ -1,9 +1,10 @@
 # MATBOX: Microstructure Analysis Toolbox
 **MATLAB open source microstructure analysis code embedded with a graphic user interface**\
-*v2.0 beta preview February 2025*\
+*v2.0 beta preview February 2025*
 
 **Update: February 2025**\
 I decided to release a preview version of MATBOX2.0 while I am finishing the rework of the characterization module.
+One reason of the partial release is that an article of mine has been recently published with some of the new features of this release.
 The segmentation module is brand new with many new features. As well, the generation module offers new possibilities.
 I will update the release notes only after I finish the rework, but for now, all modules except characterization can be used.
 If you find bugs/issues, please open a ticket.
