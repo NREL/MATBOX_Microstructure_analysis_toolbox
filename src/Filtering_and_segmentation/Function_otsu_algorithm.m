@@ -74,6 +74,8 @@ n_case = size(all_permutations,1);
 
 % Store all the sigmab2/sigmat2
 ratio_=zeros(n_case,1);
+sigmaw2 = zeros(n_case,1); % Within variance per class
+thresholds_bounds = zeros(number_of_class,2);
 
 % Iteration on all the different cases
 for current_case = 1:1:n_case
@@ -96,9 +98,9 @@ for current_case = 1:1:n_case
         muc_ = sum( I(l_:r_).*pi(l_:r_) ) / sum(pi(l_:r_));
         diff_mu = (muc_-mut)^2;
         sum_class=sum_class+ (sum(pi(l_:r_))*diff_mu);
+        sigmaw2(current_case,class_) = sum( pi(l_:r_) .* (I(l_:r_)-muc_).^2);
     end
-    ratio_(current_case,1)=sum_class/sigmat2;
-    
+    ratio_(current_case,1)=sum_class/sigmat2;  
 end
 
 % Find the case that has maximised the ratio
@@ -109,7 +111,19 @@ all_permutations = all_permutations+x_min-1;
 % Save the result for this number of class
 Otsu_result.number_of_class = number_of_class;
 Otsu_result.sigmab2_sigmat2=ratio_(index(1));
+Otsu_result.sigmaw2=sigmaw2(index(1),:);
 Otsu_result.threshold=all_permutations(index(1),:);
+
+
+thresholds_bounds(1,1) = -1;
+thresholds_bounds(1,2) = Otsu_result.threshold(2);
+for k=2:number_of_class
+    thresholds_bounds(k,1) = thresholds_bounds(k-1,2)+1;
+    thresholds_bounds(k,2) = Otsu_result.threshold(k+1);
+end
+
+Otsu_result.thresholdbounds=thresholds_bounds;
+
 %Otsu_result.values=I(all_permutations(index(1),:));
 
 Otsu_result.allratio=ratio_;

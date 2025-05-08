@@ -151,6 +151,8 @@ if p.perparts
     % Combine
     Mseg = Segm_InstanceRecombineParts(idlargestaxe,bounds_independant,bounds_overlapping,Ind,Over);
 
+    % Avoid duplicates (can happen if number of parts is too high)
+    Mseg = uint32(Mseg).*uint32(BW);
 
 else
     BW_initial = BW;

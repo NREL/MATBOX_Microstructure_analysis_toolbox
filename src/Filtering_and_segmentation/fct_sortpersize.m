@@ -1,6 +1,6 @@
 function [M,newtype,foo] = fct_sortpersize(M,p)
 
-keyboard
+%keyboard
 
 uni = unique(M);
 if p.keepunchangedsomelabels

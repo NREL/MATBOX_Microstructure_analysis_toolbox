@@ -8,7 +8,9 @@ if p.perslice && dimension==3
     if strcmp(p.alongaxe,'along axe 3')
         diameter = zeros(sz);
         for z=1:1:sz(3)
-            [M(:,:,z),diameter(:,:,z)] = fct_localdilation_spheresizefilter_algo(M(:,:,z),p);
+            if sum(sum(M(:,:,z)))>0
+                [M(:,:,z),diameter(:,:,z)] = fct_localdilation_spheresizefilter_algo(M(:,:,z),p);
+            end
         end
 
     elseif strcmp(p.alongaxe,'along axe 1')
@@ -24,7 +26,9 @@ if p.perslice && dimension==3
         sz = size(M);
         diameter = zeros(sz);
         for z=1:1:sz(3)
-            [M(:,:,z),diameter(:,:,z)] = fct_localdilation_spheresizefilter_algo(M(:,:,z),p);
+            if sum(sum(M(:,:,z)))>0
+                [M(:,:,z),diameter(:,:,z)] = fct_localdilation_spheresizefilter_algo(M(:,:,z),p);
+            end
         end
 
         % swap axis 1 with 3
@@ -55,7 +59,9 @@ if p.perslice && dimension==3
         sz = size(M);
         diameter = zeros(sz);
         for z=1:1:sz(3)
-            [M(:,:,z),diameter(:,:,z)] = fct_localdilation_spheresizefilter_algo(M(:,:,z),p);
+            if sum(sum(M(:,:,z)))>0
+                [M(:,:,z),diameter(:,:,z)] = fct_localdilation_spheresizefilter_algo(M(:,:,z),p);
+            end
         end
 
         % swap axis 2 with 3

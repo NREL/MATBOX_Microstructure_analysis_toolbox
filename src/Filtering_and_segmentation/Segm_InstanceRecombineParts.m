@@ -3,6 +3,7 @@ function [Mseg] = Segm_InstanceRecombineParts(idlargestaxe,bounds_independant,bo
 nfile = length(Ind) + length(Over);
 kind = 0;
 kover = 0;
+
 for k = 1:1:nfile
     if rem(k,2)==0
         kover = kover+1;
@@ -60,7 +61,7 @@ for k = 1:1:nfile
     if k>1
         id0 = find(inst==0);
         max_id = max(max(max( file(k-1).new_instances )));
-        inst = inst + max_id;
+        inst = double(inst) + double(max_id);
         inst(id0) = 0;
     end
 

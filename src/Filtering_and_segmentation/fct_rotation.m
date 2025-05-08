@@ -41,9 +41,14 @@ if ~isempty(t)
     else
         t_form = affine2d(t);
     end
-    M = imwarp(M,t_form);
-end
 
+    % Interpolation option
+    if strcmp(p.datatype,'label') || strcmp(p.datatype,'Segmented (phase)') || strcmp(p.datatype,'Segmented (instance)')
+        M = imwarp(M,t_form,'nearest');
+    else
+        M = imwarp(M,t_form,'linear');
+    end
+end
 
 [M] = fct_intconvert(M);
 

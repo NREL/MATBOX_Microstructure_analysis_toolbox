@@ -54,9 +54,19 @@ if strcmp(p.definition,'Isotropic')
         x1 = unique(M(end,:,:));
         y0 = unique(M(:,1,:));
         y1 = unique(M(:,end,:));
-        z0 = unique(M(:,:,1));
-        z1 = unique(M(:,:,end));
-        attheborders = unique([x0;x1;y0;y1;z0;z1]);
+        x0 = reshape(x0,[length(x0) 1]);
+        x1 = reshape(x1,[length(x1) 1]);
+        y0 = reshape(y0,[length(y0) 1]);
+        y1 = reshape(y1,[length(y1) 1]);        
+        if dimension == 2
+            attheborders = unique([x0;x1;y0;y1]);
+        else
+            z0 = unique(M(:,:,1));
+            z1 = unique(M(:,:,end));
+            z0 = reshape(z0,[length(z0) 1]);
+            z1 = reshape(z1,[length(z1) 1]);            
+            attheborders = unique([x0;x1;y0;y1;z0;z1]);
+        end
         attheborders(attheborders==p.complementarylabel)=[];
     else
         BW = zeros(sz);
