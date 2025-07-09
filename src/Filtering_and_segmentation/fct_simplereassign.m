@@ -10,9 +10,9 @@ elseif strcmp(p.action,'Round')
     newtype = 'same';
 elseif strcmp(p.action,'Arithmetic')
     if strcmp(p.ope,'+')
-        M = M + p.val;    
+        M = double(M) + double(p.val);    
     elseif strcmp(p.ope,'x')
-        M = M .* p.val;
+        M = double(M) .* double(p.val);
     end
     newtype = 'same';
     [M] = fct_intconvert(M);

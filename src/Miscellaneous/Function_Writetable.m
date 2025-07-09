@@ -29,7 +29,12 @@ if ispc % One table per sheet
 
         if ~isempty(DATA_writetable.sheet(current_sheet).table)
             Headline = DATA_writetable.sheet(current_sheet).table.Properties.VariableNames;
+            Rownames = DATA_writetable.sheet(current_sheet).table.Properties.RowNames;
             Values = table2cell(DATA_writetable.sheet(current_sheet).table);
+            if ~isempty(Rownames)
+                Headline = [{' '} Headline];
+                Values = [Rownames Values];
+            end
             T=[Headline;Values];
             writecell(T,f,'Sheet',name_);
             %writecell(T,f,'Sheet',current_sheet);

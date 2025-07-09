@@ -46,7 +46,7 @@ if ~isempty(t)
     if strcmp(p.datatype,'label') || strcmp(p.datatype,'Segmented (phase)') || strcmp(p.datatype,'Segmented (instance)')
         M = imwarp(M,t_form,'nearest');
     else
-        M = imwarp(M,t_form,'linear');
+        M = imwarp(M,t_form,'linear'); % Grey level
     end
 end
 

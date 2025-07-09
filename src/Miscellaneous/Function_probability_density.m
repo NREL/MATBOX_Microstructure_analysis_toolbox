@@ -127,7 +127,7 @@ warning(s_warning) % Restore the saved warning state structure
 
 %% FUNCTIONS
     function [cumulative_fct, x50] = function_calculate_cumulative_fct (x,w)
-        
+        % x50 is the median, not the mean
         unique_ = unique(x); % Unique values
         cumulative_fct = zeros(length(unique_),2); % Initialisation (x, cumulative fct, smoothed cumulative fct)
         cumulative_fct(:,1)=unique_;        

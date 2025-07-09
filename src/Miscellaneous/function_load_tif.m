@@ -9,6 +9,10 @@ function [array,outcome] = function_load_tif(FileTif,datatype_array)
 % - array: MATLAB array with the user-defined datatype
 % - outcome: true if algorithm has been done successfully, false otherwise.
 
+
+id = 'imageio:tiffutils:libtiffWarning';
+warning('off',id);
+
 outcome = false; % Initialize
 
 % Set default argument
@@ -18,7 +22,7 @@ switch nargin
     case 2
         foo=1;
     otherwise
-        warning('function_load_tif: wrong number of arguments (1 or 2).')
+        warning('Wrong number of arguments (1 or 2).')
         help function_load_tif
         return % Exit function
 end
@@ -33,6 +37,7 @@ if isfile(FileTif) % Check existence
         NumberImages=length(InfoImage);
         array=zeros(nImage,mImage,NumberImages,datatype_array);
         TifLink = Tiff(FileTif, 'r');
+        %w = warning('query','last');
         for i=1:NumberImages
             TifLink.setDirectory(i);
             array(:,:,i)=TifLink.read();
@@ -41,14 +46,12 @@ if isfile(FileTif) % Check existence
         outcome = true; % Initialize
         return % Exit function
     else
-        warning('function_load_tif: File imported is not a .tif or a .tiff file');
-        help function_load_tif
+        warning([FileTif ' is not a .tif or a .tiff file']);
         return % Exit function
     end
    
 else
-    warning('function_load_tif: File to load does not exist');
-    help function_load_tif
+    warning([FileTif ' does not exist']);
     return % Exit function
 end
 

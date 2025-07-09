@@ -1,5 +1,10 @@
 function Video3D_v3(Img,box_sz,seq,times,vis,p)
 
+timepause_after_rot = 2.0; % s
+timepause_after_trans = 0.5; % s
+timepause_firstframe = 1.0; % s
+
+
 % Size and quality
 hFig = uifigure;
 scrsz = get(0,'ScreenSize'); % Screen resolution
@@ -42,16 +47,22 @@ for k=1:length(Img)
         min_(k) = double(min(min(min(Img(k).modified_forcolormap))));
         max_(k) = double(max(max(max(Img(k).modified_forcolormap))));
 
+        % Note: volobj need to be initialize with the full volume (i.e., Img(k).modified_forcolormap)
+        %       Otherwise it can cause opacity/colormap issue (especially if in the first frame the volume is fully clipped (not visible)
+        %       Just after, we replace with the initial state (i.e., Img(k).visible)
         if strcmp(Img(k).datatype,'grey')
-            volobj = volshow([],"Parent",viewer,"OverlayData",Img(k).visible,"OverlayColormap",Img(k).colmap,'OverlayAlphamap',Img(k).alphamap,'OverlayDisplayRangeMode',"data-range","Transformation",tform);
+            volobj = volshow([],"Parent",viewer,"OverlayData",Img(k).modified_forcolormap,"OverlayColormap",Img(k).colmap,'OverlayAlphamap',Img(k).alphamap,'OverlayDisplayRangeMode',"data-range","Transformation",tform);
             volobj.RenderingStyle="GradientOpacity";
             volobj.OverlayRenderingStyle="LabelOverlay";
+            viewer.Children(kchildren).OverlayData = Img(k).visible;
         elseif strcmp(Img(k).datatype,'semantic')
-            volobj = volshow(Img(k).visible,"Parent",viewer,"Interpolation","nearest","Colormap",Img(k).colmap,"Alphamap",Img(k).alphamap,"Transformation",tform);
+            volobj = volshow(Img(k).modified_forcolormap,"Parent",viewer,"Interpolation","nearest","Colormap",Img(k).colmap,"Alphamap",Img(k).alphamap,"Transformation",tform);
             volobj.DisplayRangeMode = "manual";
             volobj.DisplayRange = [min_(k) max_(k)];            
+            viewer.Children(kchildren).Data = Img(k).visible;
         elseif strcmp(Img(k).datatype,'instance')
-            volobj = volshow([],"Parent",viewer,"OverlayData",Img(k).visible,"OverlayAlpha",1,"OverlayColormap",Img(k).colmap,'OverlayDisplayRangeMode',"data-range","Transformation",tform);
+            volobj = volshow([],"Parent",viewer,"OverlayData",Img(k).modified_forcolormap,"OverlayAlpha",1,"OverlayColormap",Img(k).colmap,'OverlayDisplayRangeMode',"data-range","Transformation",tform);
+            viewer.Children(kchildren).OverlayData = Img(k).visible;
         end        
 
         Img(k).center = size(Img(k).modified_forcolormap)/2;
@@ -59,9 +70,9 @@ for k=1:length(Img)
         % [IX,IY,IZ] = ind2sub(size(Img(k).modified_forcolormap),idx);
         % Img(k).center = [mean(IX) mean(IY) mean(IZ)]/2;
 
-        drawnow
-        pause(0.1);
-        drawnow
+        %drawnow
+        %pause(0.1);
+        %drawnow
     end
 end
 clear tmp;
@@ -689,11 +700,31 @@ for kseq = 1:1:length(seq)
                                 end
                             end
 
+                            % Ensure in-bounds
+                            x1s(kframe) = max([1 x1s(kframe)]);
+                            y1s(kframe) = max([1 y1s(kframe)]);
+                            z1s(kframe) = max([1 z1s(kframe)]);
+
+                            x1s(kframe) = min([sz(1) x1s(kframe)]);
+                            y1s(kframe) = min([sz(1) y1s(kframe)]);
+                            z1s(kframe) = min([sz(1) z1s(kframe)]);
+
 
                             if seq(kseq).vol(kchildren).orthogonal
+                                % z1s(kframe) = min([z1s(kframe) 296]);
+                                % x1s(kframe) = min([x1s(kframe) 552]);
+                                % y1s(kframe) = min([y1s(kframe) 518]);
+
                                 xst = min([x0, x1s(kframe)]); xend = max([x0, x1s(kframe)]);
                                 yst = min([y0, y1s(kframe)]); yend = max([y0, y1s(kframe)]);
                                 zst = min([z0, z1s(kframe)]); zend = max([z0, z1s(kframe)]);
+
+                                
+                                %[x0 x1s(kframe) xst xend]
+                                %[y0 y1s(kframe) yst yend]
+                                %[z0 z1s(kframe) zst zend]
+                                
+
                                 if isempty(seq(kseq).vol(kchildren).clipping_label)
                                     if seq(kseq).vol(kchildren).clipping_additive
                                         Img(k).visible(xst:xend, yst:yend, zst:zend) = Img(k).modified_forcolormap(xst:xend, yst:yend, zst:zend);
@@ -843,7 +874,11 @@ for kseq = 1:1:length(seq)
                             elseif strcmp(Img(k).datatype,'instance')
                                 viewer.Children(kchildren).OverlayData = tmpvol;
                             end
+                            pause(timepause_after_rot);
+                            %drawnow
                         end
+
+                        %keyboard
 
                         % % Translations
                         % Change due to previous rotations
@@ -856,11 +891,13 @@ for kseq = 1:1:length(seq)
                         pp.startval = 0; pp.endval = tr(2); tr2s = getnewvals(pp);
                         pp.startval = 0; pp.endval = tr(3); tr3s = getnewvals(pp);
 
+                        %keyboard
+
                         tform = transltform3d([Img(k).ty-delta(2)+pr_tr(1)+tr1s(kframe), Img(k).tx-delta(1)+pr_tr(2)+tr2s(kframe), Img(k).tz-delta(3)+pr_tr(3)+tr3s(kframe)]); % Switch axe X and Y
                         viewer.Children(kchildren).Transformation = tform;
 
-                        pause(0.1);
-                        drawnow
+                        pause(timepause_after_trans);
+                        %drawnow
 
                         % History for next sequence
                         if kframe == nframe
@@ -927,23 +964,26 @@ for kseq = 1:1:length(seq)
 
 
         %% DATA RANGE
-        kchildren = 0;
-        for k=1:length(Img)
-            if Img(k).selected
-                kchildren = kchildren + 1;
-                if strcmp(Img(k).datatype,'semantic')
-                    %volobj = volshow(Img(k).visible,"Parent",viewer,"Interpolation","nearest","Colormap",Img(k).colmap,"Alphamap",Img(k).alphamap,"Transformation",tform);
-                    viewer.Children(kchildren).DisplayRangeMode = "type-range";
-                    viewer.Children(kchildren).DisplayRangeMode = "manual";
-                    viewer.Children(kchildren).DisplayRange = [min_(k) max_(k)];
-                elseif strcmp(Img(k).datatype,'instance')
-                    %volobj = volshow([],"Parent",viewer,"OverlayData",Img(k).visible,"OverlayAlpha",1,"OverlayColormap",Img(k).colmap,'OverlayDisplayRangeMode',"data-range","Transformation",tform);
-                    %viewer.Children(kchildren).OverlayDisplayRangeMode = "type-range";
-                    %viewer.Children(kchildren).OverlayDisplayRangeMode = "manual";
-                    viewer.Children(kchildren).OverlayDisplayRange = [min_(k) max_(k)];
-                end
-            end
-        end
+
+        % kchildren = 0;
+        % for k=1:length(Img)
+        %     if Img(k).selected
+        %         kchildren = kchildren + 1;
+        %         % 2024b for semantic
+        %         if strcmp(Img(k).datatype,'semantic')
+        %             %volobj = volshow(Img(k).visible,"Parent",viewer,"Interpolation","nearest","Colormap",Img(k).colmap,"Alphamap",Img(k).alphamap,"Transformation",tform);
+        %             viewer.Children(kchildren).DisplayRangeMode = "type-range";
+        %             viewer.Children(kchildren).DisplayRangeMode = "manual";
+        %             viewer.Children(kchildren).DisplayRange = [min_(k) max_(k)];
+        %         end
+        %         if strcmp(Img(k).datatype,'instance')  % 2025a for semantic
+        %             %volobj = volshow([],"Parent",viewer,"OverlayData",Img(k).visible,"OverlayAlpha",1,"OverlayColormap",Img(k).colmap,'OverlayDisplayRangeMode',"data-range","Transformation",tform);
+        %             %viewer.Children(kchildren).OverlayDisplayRangeMode = "type-range";
+        %             %viewer.Children(kchildren).OverlayDisplayRangeMode = "manual";
+        %             viewer.Children(kchildren).OverlayDisplayRange = [min_(k) max_(k)];
+        %         end
+        %     end
+        % end
 
         %% CAMERA
         viewer.CameraPosition = [new_camera_pos_x(kframe) new_camera_pos_y(kframe) new_camera_pos_z(kframe)];
@@ -966,12 +1006,11 @@ for kseq = 1:1:length(seq)
         %     pause(0.1);
         % end
         if current_frame==1
-            pause(2.0);
+            pause(timepause_firstframe); % Buffering time. If first frame is all blue bakcground, increase this value.
         end
 
         drawnow;
-        stored_frame(current_frame) = getframe(hFig);
-        writeVideo(video_handle,stored_frame(current_frame))
+        writeVideo(video_handle,getframe(hFig))
 
     end
 end

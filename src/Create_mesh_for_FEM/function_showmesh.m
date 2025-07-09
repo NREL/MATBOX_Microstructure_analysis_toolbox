@@ -8,7 +8,8 @@ if options.savepng
 else
     opt.savefig_informat = [];
 end
-opt.fig_infig = options.fig_infig;
+%opt.fig_infig = options.fig_infig;
+opt.fig_infig = false;
 opt.overwritte = false;
 opt.fig_format = {'png'};
 
@@ -176,7 +177,7 @@ if strcmp(options.show,'Slice')
         colormap(options.colormap);
         hold(axes_,'off');
         % Save figures
-        %function_savefig(Fig_, options.folder, [str_mesh_name '_axe_' num2str(k)], opt);
+        function_savefig(Fig_, options.folder, [str_mesh_name '_axe_' num2str(k)], opt);
     end
 end
 

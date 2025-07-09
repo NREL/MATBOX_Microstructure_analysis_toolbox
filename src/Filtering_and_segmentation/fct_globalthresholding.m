@@ -6,6 +6,17 @@ newtype = 'Segmented (phase)';
 unis = unique(Mgrey);
 n_greylevel = length(unis);
 
+% May have too modifed format if parameters were loaded from a modified macro
+if isfield(p,'labels') && ischar(p.labels)
+    p.labels = str2num(p.labels);
+end
+if isfield(p,'thresholds') && ischar(p.thresholds)
+    p.thresholds = str2num(p.thresholds);
+end
+p.thresholds = reshape(p.thresholds,[length(p.thresholds),1]);
+p.labels = reshape(p.labels,[length(p.labels),1]);
+p.expectedvf = reshape(p.expectedvf,[length(p.expectedvf),1]);
+
 if n_greylevel >= p.numberofphase
 
     if p.excludebackground
@@ -133,7 +144,7 @@ if n_greylevel >= p.numberofphase
             thresholds(t) = Otsu_result_tmp.threshold(2);
         end
     end
-
+ 
     if ~strcmp(p.method,'Linear')
         % Assign voxels to phase based on threshold
         Mseg = zeros(sz);

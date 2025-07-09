@@ -844,7 +844,7 @@ for current_pass=1:1:number_pass
                 else
                     [~,~,z_background] = ind2sub(domain_size,id_background);
                     remaining_volume_fraction_currentphase_z = max(0, phase(current_phase).volumefraction.along_3rd_axis_allslices(z_background) - phase(current_phase).current_volumefraction.along_3rd_axis_allslices(z_background)); % volume fraction of the current phase at z_center
-                    remaining_volume_fraction_currentphase_z = ceil(remaining_volume_fraction_currentphase_z);
+                    %remaining_volume_fraction_currentphase_z = ceil(remaining_volume_fraction_currentphase_z);
                     %remaining_volume_fraction_currentphase_z = ones(size(id_background));
                 end
                 product_dmapz = dmap_background.*remaining_volume_fraction_currentphase_z;
@@ -875,8 +875,12 @@ for current_pass=1:1:number_pass
             else
                 rn = rand; % Pick a random number from 0 to 1
             end
+            if remaining_volume_fraction_currentphase_z==0
+                rn = 1e9;
+            end
             if rn < (remaining_volume_fraction_currentphase_z+tolerance_vf)/normalized_term % Check volume fraction
                 % Particle diameter
+
                 new_probability = update_probability(phase(current_phase).size_histogram.along_3rd_axis_allslices(z_center+1,:), phase(current_phase).current_diameter_dx.along_3rd_axis_allslices(z_center,:));
                 idx = choose_randomly_from_histogramprobability( new_probability ); % Diameter histogram (y) of the current phase at z_center
                 current_diameter = histogram_currentphase_z_diameter(idx);

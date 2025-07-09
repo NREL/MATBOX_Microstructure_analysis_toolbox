@@ -6,40 +6,40 @@ newtype = 'same';
 new_sz=zeros(1,3);
 if dimension==3
     if strcmp(p.action,'Flip axis 1')
-        tmp=zeros(sz);
+        tmp=zeros(sz,like=M);
         for k=1:1:sz(1)
             slice=M(k,:,:);
             tmp(sz(1)-k+1,:,:)=slice;
         end
     elseif strcmp(p.action,'Flip axis 2')
-        tmp=zeros(sz);
+        tmp=zeros(sz,like=M);
         for k=1:1:sz(2)
             slice=M(:,k,:);
             tmp(:,sz(2)-k+1,:)=slice;
         end
     elseif strcmp(p.action,'Flip axis 3')
-        tmp=zeros(sz);
+        tmp=zeros(sz,like=M);
         for k=1:1:sz(3)
             slice=M(:,:,k);
             tmp(:,:,sz(3)-k+1)=slice;
         end
     elseif strcmp(p.action,'Swap axis 1 with axis 2')
         new_sz(1)=sz(2); new_sz(2)=sz(1); new_sz(3)=sz(3);
-        tmp=zeros(new_sz);
+        tmp=zeros(new_sz,like=M);
         for k=1:1:sz(2)
             slice=M(:,k,:);
             tmp(k,:,:)=slice;
         end
     elseif strcmp(p.action,'Swap axis 1 with axis 3')
         new_sz(1)=sz(3); new_sz(2)=sz(2); new_sz(3)=sz(1);
-        tmp=zeros(new_sz);
+        tmp=zeros(new_sz,like=M);
         for k=1:1:sz(3)
             slice=M(:,:,k)';
             tmp(k,:,:)=slice;
         end
     elseif strcmp(p.action,'Swap axis 2 with axis 3')
         new_sz(1)=sz(1); new_sz(2)=sz(3); new_sz(3)=sz(2);
-        tmp=zeros(new_sz);
+        tmp=zeros(new_sz,like=M);
         for k=1:1:sz(3)
             slice=M(:,:,k);
             tmp(:,k,:)=slice;
@@ -48,20 +48,20 @@ if dimension==3
 
 else
     if strcmp(p.action,'Flip axis 1')
-        tmp=zeros(sz);
+        tmp=zeros(sz,like=M);
         for k=1:1:sz(1)
             slice=M(k,:);
             tmp(sz(1)-k+1,:)=slice;
         end
     elseif strcmp(p.action,'Flip axis 2')
-        tmp=zeros(sz);
+        tmp=zeros(sz,like=M);
         for k=1:1:sz(2)
             slice=M(:,k);
             tmp(:,sz(2)-k+1)=slice;
         end
     elseif strcmp(p.action,'Swap axis 1 with axis 2')
         new_sz=zeros(1,2); new_sz(1)=sz(2); new_sz(2)=sz(1);
-        tmp=zeros(new_sz);
+        tmp=zeros(new_sz,like=M);
         for k=1:1:sz(2)
             slice=M(:,k);
             tmp(k,:)=slice;

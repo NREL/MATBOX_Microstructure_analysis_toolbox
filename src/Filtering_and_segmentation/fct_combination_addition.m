@@ -9,9 +9,9 @@ else
 end
 
 if p.plus
-    M = Ma + max(max(max(Mb)));
+    M = double(Ma) + max(max(max(double(Mb))));
 else
-    M = Ma + Mb;
+    M = double(Ma) + double(Mb);
 end
 
 if sum(sum(sum( M==round(M) )))==numel(M)
