@@ -39,7 +39,7 @@ tube_phase = zeros(domain_size);
 tube_id = zeros(domain_size);
 tube_skeleton = zeros(domain_size);
 if isempty(p.maskused)
-    p.maskused = zeros(domain_size);
+    p.maskused = ones(domain_size);
 end
 
 %% SET TUBE SEEDS
@@ -68,9 +68,7 @@ if p.seeds_onlyatedges % Locate seeds at domain's edge
     end
 end
 
-if ~isempty(p.maskused) % Starting location can not be within mask
-    seeds = seeds .* (~p.maskused);
-end
+seeds = seeds .* p.maskused; % Starting location can only be within mask
 
 idseeds = find(seeds); % Index of all initial starting locations
 
@@ -245,7 +243,7 @@ while k_tube < stopcond.n_tube && volume_fraction < stopcond.target_volumefracti
             overlapping_tube = tube_tmp + tube_phase;
         end
         if ~tube_can_overlap_with_mask
-            overlaping_mask = tube_tmp + p.maskused;
+            overlaping_mask = tube_tmp + ~p.maskused;
         end
         if max(max(max(overlapping_tube)))==1 && max(max(max(overlaping_mask)))==1 % No overlapping with other tube and with mask
             % We can add the tube
@@ -498,7 +496,7 @@ while k_tube < stopcond.n_tube && volume_fraction < stopcond.target_volumefracti
                     overlapping_tube = tube_tmp + tube_phase;
                 end
                 if ~tube_can_overlap_with_mask
-                    overlaping_mask = tube_tmp + p.maskused;
+                    overlaping_mask = tube_tmp + ~p.maskused;
                 end
                 if max(max(max(overlapping_tube)))==1 && max(max(max(overlaping_mask)))==1 % No overlapping with other tube and with mask
                     % Add point
@@ -519,8 +517,10 @@ while k_tube < stopcond.n_tube && volume_fraction < stopcond.target_volumefracti
                     end
                     length_tube(npoint) = length_tube(npoint-1)+point2point_distance;
 
+
                     % Check tube
                     if (p.finitelength && length_tube(npoint)>=tubelength) || (~p.finitelength && reached_edge && length_tube(npoint)>=p.min_length) % Keep tube
+
                         % Update stoping condition
                         k_tube = k_tube + 1;
                         volume_fraction = sum(sum(sum(tube_phase~=0)))/nvoxel;
