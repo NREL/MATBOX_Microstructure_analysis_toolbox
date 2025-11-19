@@ -28,7 +28,7 @@ end
 
 if strcmp(p.applyon,'A single label')
     newtype = 'same';
-    BW = zeros(sz);
+    BW = zeros(sz,'uint8');
     idx = M==p.labeltoapply;
     BW(idx)=1;
 

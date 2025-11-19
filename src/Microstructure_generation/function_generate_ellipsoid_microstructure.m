@@ -16,7 +16,7 @@ make_video = save_options.makevideo;
 
 move_to_nextphase_toavoidoverlapping = false;
 
-
+n_phase_threshold = 20; % Above this number, overwritte some plot options (no legend)
 
 %% DEDUCE MICROSTRUCTURE INFORMATION
 %% VOLUME FRACTIONS
@@ -209,6 +209,10 @@ current_porosity.along_3rd_axis_allslices = ones(1,domain_size(dir_)); % Initial
 %%  MICROSTRUCTURE GENERATION
 %%
 
+if number_phase>n_phase_threshold
+    stoping_conditions.plotporosity = false;
+end
+
 %% PROGRESSION RATE
 if stoping_conditions.plot || have_stop_conditions
     time_progression = [0];
@@ -232,6 +236,9 @@ end
 
 if stoping_conditions.plot
     c_ = [colororder; rand(1000,3)];
+    if number_phase>n_phase_threshold
+        c_ = turbo(number_phase);
+    end
     
     Fig_global_progression = figure; % Create figure
     Fig_global_progression.Name= 'Algorithm generation progression and rate'; % Figure name
@@ -254,7 +261,9 @@ if stoping_conditions.plot
     xlabel(sub_axes_progression_1,'Wallclock time (s)');
     ylabel(sub_axes_progression_1,'Volume fraction');
     grid(sub_axes_progression_1,'on');
-    legend(sub_axes_progression_1,'Location','southoutside');
+    if number_phase<=n_phase_threshold
+        legend(sub_axes_progression_1,'Location','southoutside');
+    end
     set(sub_axes_progression_1,'FontName','Times new roman','FontSize',12); % Fontname and fontsize
     set(h_title,'FontSize',14)
     hold(sub_axes_progression_1,'off');
@@ -265,7 +274,9 @@ if stoping_conditions.plot
     xlabel(sub_axes_progression_2,'Wallclock time (s)');
     ylabel(sub_axes_progression_2,'Volume fraction.s^{-1}');
     grid(sub_axes_progression_2,'on');
-    legend(sub_axes_progression_2,'Location','southoutside');
+    if number_phase<=n_phase_threshold
+        legend(sub_axes_progression_2,'Location','southoutside');
+    end
     set(sub_axes_progression_2,'FontName','Times new roman','FontSize',12); % Fontname and fontsize
     set(h_title,'FontSize',14)    
     hold(sub_axes_progression_2,'off');
@@ -276,7 +287,9 @@ if stoping_conditions.plot
     xlabel(sub_axes_progression_3,'Wallclock time (s)');
     ylabel(sub_axes_progression_3,'Particle.s^{-1}');
     grid(sub_axes_progression_3,'on');
-    legend(sub_axes_progression_3,'Location','southoutside');
+    if number_phase<=n_phase_threshold
+        legend(sub_axes_progression_3,'Location','southoutside');
+    end
     set(sub_axes_progression_3,'FontName','Times new roman','FontSize',12); % Fontname and fontsize
     set(h_title,'FontSize',14)    
     hold(sub_axes_progression_3,'off'); 
@@ -323,7 +336,9 @@ if stoping_conditions.plot
         xlabel('Normalized position along direction 3 (thickness)');
         ylabel(ax_video,'Volume fraction');
         grid(ax_video,'on');
-        legend(ax_video,'Location','southoutside','NumColumns',2);
+        if number_phase<=n_phase_threshold
+            legend(ax_video,'Location','southoutside','NumColumns',2);
+        end
         set(ax_video,'FontName','Times new roman','FontSize',12); % Fontname and fontsize
         set(h_title,'FontSize',14)
         stored_frame(frame_number) = getframe(Fig_progression_video);
@@ -351,6 +366,10 @@ for current_phase=2:1:number_phase
     end
 end
 
+if ~isfield(save_options,"sav_addinfo")
+    save_options.sav_addinfo = true;
+end
+
 % Initialize
 unassigned_id = 0; 
 microstructure3D.phase = zeros(domain_size) + unassigned_id; % Phase
@@ -360,14 +379,32 @@ microstructure3D.particle_id = uint32(zeros(domain_size)); % Particle numerotati
 %microstructure3D.particle_volume_ellipsoid = zeros(domain_size); % Particle ellipsoid volume
 %microstructure3D.particle_equivalentspherediameter = zeros(domain_size); % Particle equivalent sphere diameter
 for current_phase=1:1:number_phase
-    microstructure3D.phase_(current_phase).particle_elongation_dx_over_dy = zeros(domain_size); % Ellispoid elongation dx/dy
-    microstructure3D.phase_(current_phase).particle_elongation_dx_over_dz = zeros(domain_size); % Ellispoid elongation dx/dz
-    microstructure3D.phase_(current_phase).particle_length_x = zeros(domain_size); % Ellispoid lenght along axe 1
-    microstructure3D.phase_(current_phase).particle_length_y = zeros(domain_size); % Ellispoid lenght along axe 2
-    microstructure3D.phase_(current_phase).particle_length_z = zeros(domain_size); % Ellispoid lenght along axe 3
-    microstructure3D.phase_(current_phase).particle_rotation_x = zeros(domain_size); % Ellispoid rotation along axe 1
-    microstructure3D.phase_(current_phase).particle_rotation_y = zeros(domain_size); % Ellispoid rotation along axe 2
-    microstructure3D.phase_(current_phase).particle_rotation_z = zeros(domain_size); % Ellispoid rotation along axe 3
+
+    % Can improve this
+    phase(current_phase).issphere = false;
+    if length(phase(current_phase).unique_dx_diameter) == 1
+        if length(phase(current_phase).unique_dy_diameter) == 1
+            if length(phase(current_phase).unique_dz_diameter) == 1
+                if phase(current_phase).unique_dx_diameter == phase(current_phase).unique_dy_diameter
+                    if phase(current_phase).unique_dx_diameter == phase(current_phase).unique_dz_diameter
+                        phase(current_phase).issphere = true;
+                    end
+                end
+            end
+        end
+    end
+
+    if ~phase(current_phase).issphere
+        microstructure3D.phase_(current_phase).particle_elongation_dx_over_dy = zeros(domain_size); % Ellispoid elongation dx/dy
+        microstructure3D.phase_(current_phase).particle_elongation_dx_over_dz = zeros(domain_size); % Ellispoid elongation dx/dz
+        microstructure3D.phase_(current_phase).particle_length_x = zeros(domain_size); % Ellispoid lenght along axe 1
+        microstructure3D.phase_(current_phase).particle_length_y = zeros(domain_size); % Ellispoid lenght along axe 2
+        microstructure3D.phase_(current_phase).particle_length_z = zeros(domain_size); % Ellispoid lenght along axe 3
+        microstructure3D.phase_(current_phase).particle_rotation_x = zeros(domain_size); % Ellispoid rotation along axe 1
+        microstructure3D.phase_(current_phase).particle_rotation_y = zeros(domain_size); % Ellispoid rotation along axe 2
+        microstructure3D.phase_(current_phase).particle_rotation_z = zeros(domain_size); % Ellispoid rotation along axe 3
+    end
+
 end
 particle_id = 1; % Particle current numero
 
@@ -575,7 +612,9 @@ for current_pass=1:1:number_pass
 
                         ylim(sub_axes_progression_1,[0 +Inf])
                         xlim(sub_axes_progression_1,[0 time_since_start])
-                        legend(sub_axes_progression_1,'Location','southoutside');
+                        if number_phase<=n_phase_threshold
+                            legend(sub_axes_progression_1,'Location','southoutside');
+                        end
                         hold(sub_axes_progression_1,'off');
                         
                         cla(sub_axes_progression_2); % Clear axes
@@ -590,7 +629,9 @@ for current_pass=1:1:number_pass
                             end
                         end
                         xlim(sub_axes_progression_2,[0 time_since_start])
-                        legend(sub_axes_progression_2,'Location','southoutside');
+                        if number_phase<=n_phase_threshold
+                            legend(sub_axes_progression_2,'Location','southoutside');
+                        end
                         hold(sub_axes_progression_2,'off');
                         
                         cla(sub_axes_progression_3); % Clear axes
@@ -605,7 +646,9 @@ for current_pass=1:1:number_pass
                             end
                         end
                         xlim(sub_axes_progression_3,[0 time_since_start])
-                        legend(sub_axes_progression_3,'Location','southoutside');
+                        if number_phase<=n_phase_threshold
+                            legend(sub_axes_progression_3,'Location','southoutside');
+                        end
                         hold(sub_axes_progression_3,'off');
                         pause(0.01); % Force refresh of the graph
 
@@ -641,7 +684,9 @@ for current_pass=1:1:number_pass
                             xlabel(ax_video,'Normalized position along direction 3 (thickness)');
                             ylabel(ax_video,'Volume fraction');
                             grid(ax_video,'on');
-                            legend(ax_video,'Location','southoutside','NumColumns',2);
+                            if number_phase<=n_phase_threshold
+                                legend(ax_video,'Location','southoutside','NumColumns',2);
+                            end
                             set(ax_video,'FontName','Times new roman','FontSize',12); % Fontname and fontsize
                             set(h_title,'FontSize',14)
                             hold(ax_video,'off');
@@ -715,46 +760,48 @@ for current_pass=1:1:number_pass
                 % Update volume fractions
                 phase(current_phase).current_volumefraction.along_3rd_axis_allslices(z_update_min:z_update_max) = sum(sum(microstructure3D.phase(:,:,z_update_min:z_update_max)==phase(current_phase).code))/area_xy;
 
-                % Update particle size histogram
-                for k_diameter=1:1:length(unique_diameter)
-                    current_section = zeros(z_update_max-z_update_min+1,1);
-                    current_section(:) = sum(sum(microstructure3D.phase_(current_phase).particle_length_x(:,:,z_update_min:z_update_max)==unique_diameter(k_diameter)));
-                    target_section = area_xy * phase(current_phase).volumefraction.along_3rd_axis_allslices(z_update_min:z_update_max)';
-                    phase(current_phase).current_diameter_dx.along_3rd_axis_allslices(z_update_min:z_update_max,k_diameter) = 100*current_section./target_section;
+                if ~phase(current_phase).issphere
+                    % Update particle size histogram
+                    for k_diameter=1:1:length(unique_diameter)
+                        current_section = zeros(z_update_max-z_update_min+1,1);
+                        current_section(:) = sum(sum(microstructure3D.phase_(current_phase).particle_length_x(:,:,z_update_min:z_update_max)==unique_diameter(k_diameter)));
+                        target_section = area_xy * phase(current_phase).volumefraction.along_3rd_axis_allslices(z_update_min:z_update_max)';
+                        phase(current_phase).current_diameter_dx.along_3rd_axis_allslices(z_update_min:z_update_max,k_diameter) = 100*current_section./target_section;
+                    end
+                    % Update particle elongation histogram
+                    for k_elongation_dxdy=1:1:length(unique_dxdy_elongation)
+                        current_section = zeros(z_update_max-z_update_min+1,1);
+                        current_section(:) = sum(sum(microstructure3D.phase_(current_phase).particle_elongation_dx_over_dy(:,:,z_update_min:z_update_max)==unique_dxdy_elongation(k_elongation_dxdy)));
+                        target_section = area_xy * phase(current_phase).volumefraction.along_3rd_axis_allslices(z_update_min:z_update_max)';
+                        phase(current_phase).current_elongation_dxdy.along_3rd_axis_allslices(z_update_min:z_update_max,k_elongation_dxdy) = 100*current_section./target_section;
+                    end
+                    for k_elongation_dxdz=1:1:length(unique_dxdz_elongation)
+                        current_section = zeros(z_update_max-z_update_min+1,1);
+                        current_section(:) = sum(sum(microstructure3D.phase_(current_phase).particle_elongation_dx_over_dz(:,:,z_update_min:z_update_max)==unique_dxdz_elongation(k_elongation_dxdz)));
+                        target_section = area_xy * phase(current_phase).volumefraction.along_3rd_axis_allslices(z_update_min:z_update_max)';
+                        phase(current_phase).current_elongation_dxdz.along_3rd_axis_allslices(z_update_min:z_update_max,k_elongation_dxdz) = 100*current_section./target_section;
+                    end
+
+                    % Update particle orientation histogram
+                    for k_otientation_x=1:1:length(unique_rotation_x)
+                        current_section = zeros(z_update_max-z_update_min+1,1);
+                        current_section(:) = sum(sum(microstructure3D.phase_(current_phase).particle_rotation_x(:,:,z_update_min:z_update_max)==unique_rotation_x(k_otientation_x)));
+                        target_section = area_xy * phase(current_phase).volumefraction.along_3rd_axis_allslices(z_update_min:z_update_max)';
+                        phase(current_phase).current_rotation_x.along_3rd_axis_allslices(z_update_min:z_update_max,k_otientation_x) = 100*current_section./target_section;
+                    end
+                    for k_otientation_y=1:1:length(unique_rotation_y)
+                        current_section = zeros(z_update_max-z_update_min+1,1);
+                        current_section(:) = sum(sum(microstructure3D.phase_(current_phase).particle_rotation_y(:,:,z_update_min:z_update_max)==unique_rotation_y(k_otientation_y)));
+                        target_section = area_xy * phase(current_phase).volumefraction.along_3rd_axis_allslices(z_update_min:z_update_max)';
+                        phase(current_phase).current_rotation_y.along_3rd_axis_allslices(z_update_min:z_update_max,k_otientation_y) = 100*current_section./target_section;
+                    end
+                    for k_otientation_z=1:1:length(unique_rotation_z)
+                        current_section = zeros(z_update_max-z_update_min+1,1);
+                        current_section(:) = sum(sum(microstructure3D.phase_(current_phase).particle_rotation_z(:,:,z_update_min:z_update_max)==unique_rotation_z(k_otientation_z)));
+                        target_section = area_xy * phase(current_phase).volumefraction.along_3rd_axis_allslices(z_update_min:z_update_max)';
+                        phase(current_phase).current_rotation_z.along_3rd_axis_allslices(z_update_min:z_update_max,k_otientation_z) = 100*current_section./target_section;
+                    end
                 end
-                % Update particle elongation histogram
-                for k_elongation_dxdy=1:1:length(unique_dxdy_elongation)
-                    current_section = zeros(z_update_max-z_update_min+1,1);
-                    current_section(:) = sum(sum(microstructure3D.phase_(current_phase).particle_elongation_dx_over_dy(:,:,z_update_min:z_update_max)==unique_dxdy_elongation(k_elongation_dxdy)));
-                    target_section = area_xy * phase(current_phase).volumefraction.along_3rd_axis_allslices(z_update_min:z_update_max)';
-                    phase(current_phase).current_elongation_dxdy.along_3rd_axis_allslices(z_update_min:z_update_max,k_elongation_dxdy) = 100*current_section./target_section;
-                end
-                for k_elongation_dxdz=1:1:length(unique_dxdz_elongation)
-                    current_section = zeros(z_update_max-z_update_min+1,1);
-                    current_section(:) = sum(sum(microstructure3D.phase_(current_phase).particle_elongation_dx_over_dz(:,:,z_update_min:z_update_max)==unique_dxdz_elongation(k_elongation_dxdz)));
-                    target_section = area_xy * phase(current_phase).volumefraction.along_3rd_axis_allslices(z_update_min:z_update_max)';
-                    phase(current_phase).current_elongation_dxdz.along_3rd_axis_allslices(z_update_min:z_update_max,k_elongation_dxdz) = 100*current_section./target_section;
-                end
-                
-                % Update particle orientation histogram
-                for k_otientation_x=1:1:length(unique_rotation_x)
-                    current_section = zeros(z_update_max-z_update_min+1,1);
-                    current_section(:) = sum(sum(microstructure3D.phase_(current_phase).particle_rotation_x(:,:,z_update_min:z_update_max)==unique_rotation_x(k_otientation_x)));
-                    target_section = area_xy * phase(current_phase).volumefraction.along_3rd_axis_allslices(z_update_min:z_update_max)';
-                    phase(current_phase).current_rotation_x.along_3rd_axis_allslices(z_update_min:z_update_max,k_otientation_x) = 100*current_section./target_section;
-                end
-                for k_otientation_y=1:1:length(unique_rotation_y)
-                    current_section = zeros(z_update_max-z_update_min+1,1);
-                    current_section(:) = sum(sum(microstructure3D.phase_(current_phase).particle_rotation_y(:,:,z_update_min:z_update_max)==unique_rotation_y(k_otientation_y)));
-                    target_section = area_xy * phase(current_phase).volumefraction.along_3rd_axis_allslices(z_update_min:z_update_max)';
-                    phase(current_phase).current_rotation_y.along_3rd_axis_allslices(z_update_min:z_update_max,k_otientation_y) = 100*current_section./target_section;
-                end      
-                for k_otientation_z=1:1:length(unique_rotation_z)
-                    current_section = zeros(z_update_max-z_update_min+1,1);
-                    current_section(:) = sum(sum(microstructure3D.phase_(current_phase).particle_rotation_z(:,:,z_update_min:z_update_max)==unique_rotation_z(k_otientation_z)));
-                    target_section = area_xy * phase(current_phase).volumefraction.along_3rd_axis_allslices(z_update_min:z_update_max)';
-                    phase(current_phase).current_rotation_z.along_3rd_axis_allslices(z_update_min:z_update_max,k_otientation_z) = 100*current_section./target_section;
-                end                    
                                 
                 % Update unassigned voxel index
                 % Note that you may use a simpler explicit method, such as I=find(microstructure3D.phase==unassigned_id), but it is much more slower.
@@ -892,7 +939,7 @@ for current_pass=1:1:number_pass
                     % Indices of newly assigned voxels
                     linear_indices = rn_pos;
                     % 3D arrays assignment
-                    microstructure3D = ThreeD_array_assignment(microstructure3D, current_phase, linear_indices, particle_id, number_voxel_assigned, number_voxel_idealshape, 1, 1, 1, 0, 0, 0, x_center, y_center, z_center);
+                    microstructure3D = ThreeD_array_assignment(microstructure3D, current_phase, linear_indices, particle_id, number_voxel_assigned, number_voxel_idealshape, 1, 1, 1, 0, 0, 0, x_center, y_center, z_center, phase(current_phase).issphere);
                     % Update
                     new_particle_hasbeen_generated = true;
                     particle_xyz_min_max = [x_center y_center z_center x_center y_center z_center];
@@ -980,7 +1027,7 @@ for current_pass=1:1:number_pass
                         % Indices of newly assigned voxels
                         [linear_indices] = Index_from_subdomain_to_domain(subdomain_ellipsoid, [], domain_size, [x_min y_min z_min]);
                         % 3D arrays assignment
-                        microstructure3D = ThreeD_array_assignment(microstructure3D, current_phase, linear_indices, particle_id, number_voxel_assigned, number_voxel_idealshape, dx, dy, dz, angle_x_deg, angle_y_deg, angle_z_deg, x_center, y_center, z_center);
+                        microstructure3D = ThreeD_array_assignment(microstructure3D, current_phase, linear_indices, particle_id, number_voxel_assigned, number_voxel_idealshape, dx, dy, dz, angle_x_deg, angle_y_deg, angle_z_deg, x_center, y_center, z_center, phase(current_phase).issphere);
                         % Update
                         particle_xyz_min_max = [x_min y_min z_min x_max y_max z_max];
                         new_particle_hasbeen_generated = true;
@@ -998,7 +1045,7 @@ for current_pass=1:1:number_pass
                             % Indices of newly assigned voxels
                             [linear_indices] = Index_from_subdomain_to_domain(subdomain_ellipsoid, [], domain_size, [x_min y_min z_min]);
                             % 3D arrays assignment
-                            microstructure3D = ThreeD_array_assignment(microstructure3D, current_phase, linear_indices, particle_id, number_voxel_assigned, number_voxel_idealshape, dx, dy, dz, angle_x_deg, angle_y_deg, angle_z_deg, x_center, y_center, z_center);
+                            microstructure3D = ThreeD_array_assignment(microstructure3D, current_phase, linear_indices, particle_id, number_voxel_assigned, number_voxel_idealshape, dx, dy, dz, angle_x_deg, angle_y_deg, angle_z_deg, x_center, y_center, z_center, phase(current_phase).issphere);
                             % Update
                             particle_xyz_min_max = [x_min y_min z_min x_max y_max z_max];
                             new_particle_hasbeen_generated = true;
@@ -1140,7 +1187,7 @@ for current_pass=1:1:number_pass
                                     % Phase assignment
                                     %subdomain_phase(all_particles_subdomain(k_particle).idx) = phase(current_phase).code;
                                     % 3D arrays assignment (it will overwritte overlapping region as well: thus updating the other particles)
-                                    microstructure3D = ThreeD_array_assignment(microstructure3D, current_phase, linear_indices, particle_id, number_voxel_assigned, number_voxel_idealshape, dx, dy, dz, angle_x_deg, angle_y_deg, angle_z_deg, x_center, y_center, z_center);
+                                    microstructure3D = ThreeD_array_assignment(microstructure3D, current_phase, linear_indices, particle_id, number_voxel_assigned, number_voxel_idealshape, dx, dy, dz, angle_x_deg, angle_y_deg, angle_z_deg, x_center, y_center, z_center, phase(current_phase).issphere);
                                     microstructure3D.phase(linear_indices) = phase(current_phase).code;
                                     % Min-max
                                     [I_particle,J_particle,K_particle] = ind2sub(domain_size,linear_indices);
@@ -1278,7 +1325,9 @@ if stoping_conditions.plot
 
     ylim(sub_axes_progression_1,[0 +Inf])
     xlim(sub_axes_progression_1,[0 time_since_start])
-    legend(sub_axes_progression_1,'Location','southoutside');
+    if number_phase<=n_phase_threshold
+        legend(sub_axes_progression_1,'Location','southoutside');
+    end
     hold(sub_axes_progression_1,'off');
     
     cla(sub_axes_progression_2); % Clear axes
@@ -1291,7 +1340,9 @@ if stoping_conditions.plot
         end
     end
     xlim(sub_axes_progression_2,[0 time_since_start])
-    legend(sub_axes_progression_2,'Location','southoutside');
+    if number_phase<=n_phase_threshold
+        legend(sub_axes_progression_2,'Location','southoutside');
+    end
     hold(sub_axes_progression_2,'off');
     
     cla(sub_axes_progression_3); % Clear axes
@@ -1304,7 +1355,9 @@ if stoping_conditions.plot
         end
     end
     xlim(sub_axes_progression_3,[0 time_since_start])
-    legend(sub_axes_progression_3,'Location','southoutside');
+    if number_phase<=n_phase_threshold
+        legend(sub_axes_progression_3,'Location','southoutside');
+    end
     hold(sub_axes_progression_3,'off');
     
     if ~isempty(save_options.folder) && save_options.save_progression
@@ -1342,7 +1395,9 @@ if stoping_conditions.plot
         xlabel(ax_video,'Normalized position along direction 3 (thickness)');
         ylabel(ax_video,'Volume fraction');
         grid(ax_video,'on');
-        legend(ax_video,'Location','southoutside','NumColumns',2);
+        if number_phase<=n_phase_threshold
+            legend(ax_video,'Location','southoutside','NumColumns',2);
+        end
         set(ax_video,'FontName','Times new roman','FontSize',12); % Fontname and fontsize
         set(h_title,'FontSize',14)
         hold(ax_video,'off');
@@ -1649,7 +1704,7 @@ Kdomain = Ksub + subdomain_min_location(3)-1;
 linear_indices_domain = sub2ind(domain_size, Idomain, Jdomain, Kdomain);
 end
 
-function [microstructure3D] = ThreeD_array_assignment(microstructure3D, phase_number, idx, particle_id, number_voxel, number_voxel_idealshape, dx, dy, dz, anglex, angley, anglez, x_center, y_center, z_center)
+function [microstructure3D] = ThreeD_array_assignment(microstructure3D, phase_number, idx, particle_id, number_voxel, number_voxel_idealshape, dx, dy, dz, anglex, angley, anglez, x_center, y_center, z_center, isphere)
 microstructure3D.particle_id(idx) = particle_id; % Assign particle id
 %microstructure3D.particle_volume_numbervoxel(idx) = number_voxel; % Assign particle volume
 microstructure3D.particle_volume_numbervoxel_idealshape(idx) = number_voxel_idealshape; % Assign particle volume
@@ -1660,17 +1715,21 @@ else
     volume_ideal_ellipsoid=1;
     sphere_equivalentdiameter_fromidealellipsoid=1;
 end
-microstructure3D.centroid(particle_id).xyz = [x_center, y_center, z_center]; % Centroid
-microstructure3D.particle_volume_idealellipsoid(idx) = volume_ideal_ellipsoid; % Assign ellipsoid volume
-microstructure3D.particle_equivalentspherediameter_fromidealellipsoid(idx) = sphere_equivalentdiameter_fromidealellipsoid; % Assign particle diameter
-microstructure3D.phase_(phase_number).particle_length_x(idx) = dx; % Assign ellispoid lenght along axe 1
-microstructure3D.phase_(phase_number).particle_length_y(idx) = dy; % Assign ellispoid lenght along axe 2
-microstructure3D.phase_(phase_number).particle_length_z(idx) = dz; % Assign ellispoid lenght along axe 3
-microstructure3D.phase_(phase_number).particle_elongation_dx_over_dy(idx) = round(dx/dy,4); % Ellispoid elongation dx/dy
-microstructure3D.phase_(phase_number).particle_elongation_dx_over_dz(idx) = round(dx/dz,4); % Ellispoid elongation dx/dz
-microstructure3D.phase_(phase_number).particle_rotation_x(idx) = round(anglex,4); % Assign ellispoid lenght along axe 1
-microstructure3D.phase_(phase_number).particle_rotation_y(idx) = round(angley,4); % Assign ellispoid lenght along axe 2
-microstructure3D.phase_(phase_number).particle_rotation_z(idx) = round(anglez,4); % Assign ellispoid lenght along axe 3
+
+if ~isphere
+    microstructure3D.centroid(particle_id).xyz = [x_center, y_center, z_center]; % Centroid
+    microstructure3D.particle_volume_idealellipsoid(idx) = volume_ideal_ellipsoid; % Assign ellipsoid volume
+    microstructure3D.particle_equivalentspherediameter_fromidealellipsoid(idx) = sphere_equivalentdiameter_fromidealellipsoid; % Assign particle diameter
+    microstructure3D.phase_(phase_number).particle_length_x(idx) = dx; % Assign ellispoid lenght along axe 1
+    microstructure3D.phase_(phase_number).particle_length_y(idx) = dy; % Assign ellispoid lenght along axe 2
+    microstructure3D.phase_(phase_number).particle_length_z(idx) = dz; % Assign ellispoid lenght along axe 3
+    microstructure3D.phase_(phase_number).particle_elongation_dx_over_dy(idx) = round(dx/dy,4); % Ellispoid elongation dx/dy
+    microstructure3D.phase_(phase_number).particle_elongation_dx_over_dz(idx) = round(dx/dz,4); % Ellispoid elongation dx/dz
+    microstructure3D.phase_(phase_number).particle_rotation_x(idx) = round(anglex,4); % Assign ellispoid lenght along axe 1
+    microstructure3D.phase_(phase_number).particle_rotation_y(idx) = round(angley,4); % Assign ellispoid lenght along axe 2
+    microstructure3D.phase_(phase_number).particle_rotation_z(idx) = round(anglez,4); % Assign ellispoid lenght along axe 3
+end
+
 end
 
 function [microstructure3D] = Update_ThreeD_array_assignment(microstructure3D, idx, number_voxel)

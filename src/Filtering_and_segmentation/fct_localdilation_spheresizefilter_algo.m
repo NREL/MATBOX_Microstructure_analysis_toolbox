@@ -2,7 +2,6 @@ function [M,diameter] = fct_localdilation_spheresizefilter_algo(M,p)
 
 sz = size(M);
 dimension = length(sz);
-approximate=false;
 
 if  p.per_label
     labels = unique(M);
@@ -38,7 +37,7 @@ if  p.per_label
             M_sub_ext(p.spherediameter+2:end-p.spherediameter-1, p.spherediameter+2:end-p.spherediameter-1, p.spherediameter+2:end-p.spherediameter-1) = M_sub;
             Background_sub_ext(p.spherediameter+2:end-p.spherediameter-1, p.spherediameter+2:end-p.spherediameter-1, p.spherediameter+2:end-p.spherediameter-1) = Background_sub;
         end
-        [diameter_sub,~,IDX_sub] = Function_particle_size_CPSD_Algorithm(Background_sub_ext,p.round_dmap,approximate);
+        [diameter_sub,~,IDX_sub] = Function_particle_size_CPSD_Algorithm(Background_sub_ext,p.round_dmap,p.round_dmap_digit);
 
         idx = find(diameter_sub<=p.spherediameter);
         M_sub_ext(idx) = M_sub_ext(IDX_sub(idx));
@@ -163,7 +162,7 @@ else
                 M_sub_ext(p.spherediameter+2:end-p.spherediameter-1, p.spherediameter+2:end-p.spherediameter-1, p.spherediameter+2:end-p.spherediameter-1) = M_sub;
                 Background_sub_ext(p.spherediameter+2:end-p.spherediameter-1, p.spherediameter+2:end-p.spherediameter-1, p.spherediameter+2:end-p.spherediameter-1) = Background_sub;
             end
-            [diameter_sub,~,IDX_sub] = Function_particle_size_CPSD_Algorithm(Background_sub_ext,p.round_dmap,approximate);
+            [diameter_sub,~,IDX_sub] = Function_particle_size_CPSD_Algorithm(Background_sub_ext,p.round_dmap,p.round_dmap_digit);
 
             % figure; imagesc(diameter_sub);axis equal; axis tight;
             % unis_ = unique(diameter_sub);
@@ -196,18 +195,20 @@ else
         diameter = zeros(sz);
 
     else
-        [diameter,~,IDX] = Function_particle_size_CPSD_Algorithm(Background,p.round_dmap,approximate);
-        if length(nonbackground_labels)>1
-            if strcmp(p.choice,'One label')
-                cond1 = diameter<=p.spherediameter;
-                cond2 = M(IDX)==p.labeltodilate;
-                M(cond1.*cond2==1) = p.labeltodilate;
-            elseif strcmp(p.choice,'All non-background labels')
-                idx = find(diameter<=p.spherediameter);
-                M(idx) = M(IDX(idx));
+        [diameter,~,IDX] = Function_particle_size_CPSD_Algorithm(Background,p.round_dmap,p.round_dmap_digit);
+        if max(max(max(diameter)))>0
+            if length(nonbackground_labels)>1
+                if strcmp(p.choice,'One label')
+                    cond1 = diameter<=p.spherediameter;
+                    cond2 = M(IDX)==p.labeltodilate;
+                    M(cond1.*cond2==1) = p.labeltodilate;
+                elseif strcmp(p.choice,'All non-background labels')
+                    idx = find(diameter<=p.spherediameter);
+                    M(idx) = M(IDX(idx));
+                end
+            else
+                M(diameter<=p.spherediameter)=nonbackground_labels;
             end
-        else
-            M(diameter<=p.spherediameter)=nonbackground_labels;
         end
     end
 

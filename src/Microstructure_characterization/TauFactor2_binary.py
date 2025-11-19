@@ -6,7 +6,8 @@ import taufactor as tau
 
 #s = tau.Solver(img)
 s = tau.Solver(img, device='cuda')
-s.solve(verbose=verbose,conv_crit=conv_crit_std)
+s.solve(verbose=verbose)
+#s.solve(verbose=verbose,conv_crit=conv_crit_std)
 
 if s.D_eff==0:
     Deff = s.D_eff

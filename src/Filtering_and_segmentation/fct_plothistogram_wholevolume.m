@@ -36,7 +36,6 @@ if ~isfield(p,'xlabel')
     p.xlabel = 'Grey level';
 end
 
-
 %% Plot
 if p.excludebackground
     str_sub = [p.sub ' (background excluded)'];

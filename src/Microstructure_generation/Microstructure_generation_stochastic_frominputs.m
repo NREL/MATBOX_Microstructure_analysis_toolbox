@@ -37,10 +37,23 @@ for k_run = 1:1:run_number
     fprintf([outcome '\n']);
 
     if strcmp(outcome,'Success !')
-        save([savefolder 'Additionalinfo_run_' num2str(k_run) '.mat'],'microstructure3D','-mat');
-        save([savefolder 'Additionalinfo_particle_run_' num2str(k_run) '.mat'],'particle_data','-mat');
+
+        try
+            save([savefolder 'Additionalinfo_run_' num2str(k_run) '.mat'],'microstructure3D','-mat');
+        catch ME
+            disp 'Additionalinfo_run_ not saved'
+            ME.identifier
+        end
+        try
+            save([savefolder 'Additionalinfo_particle_run_' num2str(k_run) '.mat'],'particle_data','-mat');
+        catch
+            disp 'Additionalinfo_particle_run_'
+            ME.identifier
+        end
         function_save_tif( uint8(microstructure3D.phase), [savefolder 'Phaselabel_run_' num2str(k_run) '.tif']);
-        function_save_tif( uint16(microstructure3D.particle_id), [savefolder 'Particlelabel_run_' num2str(k_run) '.tif']);
+
+        [microstructure3D.particle_id] = fct_intconvert(microstructure3D.particle_id);
+        function_save_tif( microstructure3D.particle_id, [savefolder 'Particlelabel_run_' num2str(k_run) '.tif']);
 
         % Upscaling
         if scaling_factor~=1
@@ -70,7 +83,8 @@ for k_run = 1:1:run_number
             end
             function_save_tif( uint8(microstructure3D_phaselabel_scaled), [savefolder 'Phaselabel_scaled_run_' num2str(k_run) '.tif']);
             if ~isempty(microstructure3D_particlelabel_scaled)
-                function_save_tif( uint16(microstructure3D_particlelabel_scaled), [savefolder 'Particlelabel_scaled_run_' num2str(k_run) '.tif']);
+                [microstructure3D_particlelabel_scaled] = fct_intconvert(microstructure3D_particlelabel_scaled);                
+                function_save_tif( microstructure3D_particlelabel_scaled, [savefolder 'Particlelabel_scaled_run_' num2str(k_run) '.tif']);
             end
         end
 

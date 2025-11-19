@@ -1,9 +1,13 @@
-function [results_main, results_correlation, timedata_perphase, timedata_pervolume] = RVE_main(pRVEs,pMET,Msem,Mins,voxel_size,number_domain,number_domain_todo,Current_folder,opt,infovol,results_main, results_correlation, timedata_perphase, timedata_pervolume)
+function [results_main, results_correlation, timedata_perphase, timedata_pervolume] = RVE_main(pRVEs,pMET,Msem,Nanoporosity,Wetting,Diffusivity,Conductivity,Mins,voxel_size,Current_folder,opt,infovol,results_main, results_correlation, timedata_perphase, timedata_pervolume)
+
+% For new metric:
+% Change RVE_main on 2 locations: calculation and correlation
+% Do not change any other files
 
 % To do:
 % Add: RVE_figures           : add violon plot
 % Fix: RVE_convergence_Table : (not critical) Correct FOV_length and RVE_length (currently tables are not saved)
-% Fix: Result_RVEconv        : (not critial) remove x axis length as already put inFOV_length instead 
+% Fix: Result_RVEconv        : (not critial) remove x axis length as already put inFOV_length instead
 
 if isempty(Mins)
     sz = size(Msem);
@@ -17,11 +21,11 @@ end
 
 nMetric = length(pMET.metric);
 
-for k_RVE = 1:1:length(pRVEs) % Loop over all RVE analysis
+for k_RVE = 1:length(pRVEs) % Loop over all RVE analysis
     pRVE = pRVEs(k_RVE); % Select RVE parameters
     RVE(k_RVE).RVEparameters = pRVE; % For result structure
     RVE(k_RVE).attempted = false;
-    
+
     %% CHECK IF ANALYSIS POSSIBLE
     if dimension == 2
         if strcmp(pRVE.type,'C') && strcmp(pRVE.Constantdirection,'Direction 3')
@@ -61,10 +65,10 @@ for k_RVE = 1:1:length(pRVEs) % Loop over all RVE analysis
     end
 
     %% SELECT THRESHOLDS
-    if ischar(pRVE.threshold_std) % 'n/a'
-        thresholds = pRVE.threshold_reldiff;
+    if ~ischar(pRVE.threshold_subs_val) % not 'n/a'
+        thresholds = pRVE.threshold_subs_val; % Subvolumes
     else
-        thresholds = pRVE.threshold_std;
+        thresholds = pRVE.threshold_onesub_val; % One volume
     end
     n_threshold = length(thresholds);
 
@@ -74,8 +78,17 @@ for k_RVE = 1:1:length(pRVEs) % Loop over all RVE analysis
         if ~isempty(FOVbounds)
             [nFOV,~] = size(FOVbounds); % Number of FOV
             length_FOV = zeros(nFOV+1,2);
-            Result_RVEconv = zeros(nFOV+1,n_threshold+1,number_domain_todo,3,2,nMetric);
+            for kMetric = 1:nMetric
+                number_domain = length(pMET.metric(kMetric).result_initial);
+                metric(kMetric).number_domain = number_domain;
+                metric(kMetric).Result_RVEconv = zeros(nFOV+1,n_threshold+1,number_domain,3,2);
+            end
             % FOV size / number of threshold / phase / subdomain RVE or convergence size <, = , > /  size (both FOV and subdomain) in cubic or square root (=1), square root or length (=2)
+        end
+    else
+        for kMetric = 1:nMetric
+            number_domain = length(pMET.metric(kMetric).result_initial);
+            metric(kMetric).number_domain = number_domain;
         end
     end
     if exist('FOVbounds','var') && ~isempty(FOVbounds)
@@ -96,6 +109,18 @@ for k_RVE = 1:1:length(pRVEs) % Loop over all RVE analysis
             if ~isempty(Msem)
                 Msem_FOV = Msem(x0:x1,y0:y1,z0:z1);
                 sz_FOV = size(Msem_FOV);
+                Nano_FOV = Nanoporosity(x0:x1,y0:y1,z0:z1);
+                Wett_FOV = Wetting(x0:x1,y0:y1,z0:z1);
+                if ~isempty(Diffusivity)
+                    Diff_FOV = Diffusivity(x0:x1,y0:y1,z0:z1);
+                else
+                    Diff_FOV = [];
+                end
+                if ~isempty(Conductivity)
+                    Cond_FOV = Conductivity(x0:x1,y0:y1,z0:z1);
+                else
+                    Cond_FOV = [];
+                end
             end
             if ~isempty(Mins)
                 Mins_FOV = Mins(x0:x1,y0:y1,z0:z1);
@@ -139,6 +164,8 @@ for k_RVE = 1:1:length(pRVEs) % Loop over all RVE analysis
             %Result_RVEconv(k_FOV+1,1,:,:,1,:) = FOVsize; % FOV size
             if k_FOV ==1
                 fprintf('       Representativity convergence analysis\n');
+                fprintf('       The same representativity analysis performed on the full FOV is redone on smaller, cropped, FOVs\n');
+                fprintf('       RVE, RSA sizes are then plotted as function of the FOV size. If not reaching a plateau, RVE, RSA sizes are still underestimated!\n');
             end
             if k_FOV > 0
                 if isempty(FOV2ndsize)
@@ -165,15 +192,19 @@ for k_RVE = 1:1:length(pRVEs) % Loop over all RVE analysis
         %% APPLY ALGORITHM ON SUBDOMAINS
         % Colunm 1 is the subdomain id
         % Colunm 2-4 are the sizes of the subdomain.
-        Property_eachsubdomain = zeros(number_subdomain, number_domain_todo+4, nMetric);
+        for kMetric = 1:nMetric
+            metric(kMetric).Property_eachsubdomain = zeros(number_subdomain, metric(kMetric).number_domain + 4);
+            for subdomain_id = 1:number_subdomain
+                metric(kMetric).Property_eachsubdomain(subdomain_id,1)=subdomain_id;
+                % Equivalent size of the subdomain
+                metric(kMetric).Property_eachsubdomain(subdomain_id,2)=All_subdomain(subdomain_id,4)*voxel_size; % Cubic root length
+                metric(kMetric).Property_eachsubdomain(subdomain_id,3)=All_subdomain(subdomain_id,5)*voxel_size; % Square root length
+                metric(kMetric).Property_eachsubdomain(subdomain_id,4)=All_subdomain(subdomain_id,6)*voxel_size; % Length
+            end
+        end
 
         % Property calculated for each subdomain
-        for subdomain_id = 1:1:number_subdomain
-            Property_eachsubdomain(subdomain_id,1,:)=subdomain_id;
-            % Equivalent size of the subdomain
-            Property_eachsubdomain(subdomain_id,2,:)=All_subdomain(subdomain_id,4)*voxel_size; % Cubic root length
-            Property_eachsubdomain(subdomain_id,3,:)=All_subdomain(subdomain_id,5)*voxel_size; % Square root length
-            Property_eachsubdomain(subdomain_id,4,:)=All_subdomain(subdomain_id,6)*voxel_size; % Length
+        for subdomain_id = 1:number_subdomain
             % Boundary of the subdomain
             x0 = All_subdomain(subdomain_id,7); x1 = All_subdomain(subdomain_id,8);
             y0 = All_subdomain(subdomain_id,9); y1 = All_subdomain(subdomain_id,10);
@@ -181,21 +212,49 @@ for k_RVE = 1:1:length(pRVEs) % Loop over all RVE analysis
             % Crop FOV
             if k_FOV == 0
                 if ~isempty(Msem)
-                    current_subdomain_sem = Msem(x0:x1,y0:y1,z0:z1);
-                    voxel_number_tmp=numel(current_subdomain_sem);
+                    current_subdomain_labels = Msem(x0:x1,y0:y1,z0:z1);
+                    current_subdomain_np = Nanoporosity(x0:x1,y0:y1,z0:z1);
+                    current_subdomain_wet = Wetting(x0:x1,y0:y1,z0:z1);
+                    if ~isempty(Diffusivity)
+                        current_subdomain_diff = Diffusivity(x0:x1,y0:y1,z0:z1);
+                    else
+                        current_subdomain_diff = [];
+                    end
+                    if ~isempty(Conductivity)
+                        current_subdomain_cond = Conductivity(x0:x1,y0:y1,z0:z1);
+                    else
+                        current_subdomain_cond = [];
+                    end
+                    voxel_number_tmp=numel(current_subdomain_labels);
                 end
                 if ~isempty(Mins)
-                    current_subdomain_ins = Mins(x0:x1,y0:y1,z0:z1);
-                    voxel_number_tmp=numel(current_subdomain_ins);
+                    current_subdomain_labels = Mins(x0:x1,y0:y1,z0:z1);
+                    current_subdomain_np = [];
+                    current_subdomain_wet = [];
+                    voxel_number_tmp=numel(current_subdomain_labels);
                 end
             else
                 if ~isempty(Msem)
-                    current_subdomain_sem = Msem_FOV(x0:x1,y0:y1,z0:z1);
-                    voxel_number_tmp=numel(current_subdomain_sem);
+                    current_subdomain_labels = Msem_FOV(x0:x1,y0:y1,z0:z1);
+                    current_subdomain_np = Nano_FOV(x0:x1,y0:y1,z0:z1);
+                    current_subdomain_wet = Wett_FOV(x0:x1,y0:y1,z0:z1);
+                    if ~isempty(Diffusivity)
+                        current_subdomain_diff = Diff_FOV(x0:x1,y0:y1,z0:z1);
+                    else
+                        current_subdomain_diff = [];
+                    end
+                    if ~isempty(Conductivity)
+                        current_subdomain_cond = Cond_FOV(x0:x1,y0:y1,z0:z1);
+                    else
+                        current_subdomain_cond = [];
+                    end
+                    voxel_number_tmp=numel(current_subdomain_labels);
                 end
                 if ~isempty(Mins)
-                    current_subdomain_ins = Mins_FOV(x0:x1,y0:y1,z0:z1);
-                    voxel_number_tmp=numel(current_subdomain_ins);
+                    current_subdomain_labels = Mins_FOV(x0:x1,y0:y1,z0:z1);
+                    current_subdomain_np = [];
+                    current_subdomain_wet = [];
+                    voxel_number_tmp=numel(current_subdomain_labels);
                 end
             end
 
@@ -203,107 +262,213 @@ for k_RVE = 1:1:length(pRVEs) % Loop over all RVE analysis
             time_cpu_start_volume = cputime; % CPU start
             time_clock_start_volume = tic; % Stopwatch start
 
-            current_domain_todo = 0;
-            for current_domain=1:1:number_domain % Loop over all phases
-                if pMET.p.todo(current_domain)
+            % % Algorithm: SPECIFIC FOR EACH FILE
+            if strcmp(pMET.fct_name,'Volume fraction')
+                % Background
+                n_voxel_background = 0;
+                if infovol.isbackground
+                    background_label = infovol.phaselabel(1);
+                    n_voxel_background = sum(sum(sum(current_subdomain_labels==background_label)));
+                end
+                n_voxel = voxel_number_tmp - n_voxel_background;
+
+                if nMetric==2 % p.combined_todo==1: [vf_solid, vf_pore_idealwetting, vf_pore_partialwetting, vf_air]
+                    nvoxel.solid = 0;
+                    nvoxel.pore_idealwetting = 0;
+                    nvoxel.pore_partialwetting = 0;
+                end
+
+                % Volume fraction label-wise
+                number_domain = metric(1).number_domain;
+                for current_domain=1:number_domain % Loop over all phases
                     time_cpu_start_phase = cputime; % CPU start
                     time_clock_start_phase = tic; % Stopwatch start
-                    current_domain_todo=current_domain_todo+1;
+                    [~,vf,~,n] = Charact_Volumefractions_algorithm(current_subdomain_labels, pMET.metric(1).domain_label(current_domain), n_voxel, current_subdomain_np, current_subdomain_wet);
+                    if n_voxel_background==0
+                        metric(1).Property_eachsubdomain(subdomain_id,current_domain+4) = vf.phase_label;
+                    else
+                        metric(1).Property_eachsubdomain(subdomain_id,current_domain+4) = NaN;
+                    end
+                    % Time
+                    timedata_perphase = [timedata_perphase; [n.n_voxel_label (cputime-time_cpu_start_phase) toc(time_clock_start_phase)]];
+                    if nMetric==2
+                        nvoxel.solid = nvoxel.solid + n.solid;
+                        nvoxel.pore_idealwetting = nvoxel.pore_idealwetting + n.pore_idealwetting;
+                        nvoxel.pore_partialwetting = nvoxel.pore_partialwetting + n.pore_partialwetting;
+                    end
+                end
+                if nMetric==2 % p.combined_todo==1: [vf_solid, vf_pore_idealwetting, vf_pore_partialwetting, vf_air]
+                    vf_pore_idealwetting = nvoxel.pore_idealwetting/n_voxel;
+                    vf_solid = nvoxel.solid/n_voxel;
+                    vf_pore_partialwetting = nvoxel.pore_partialwetting/n_voxel;
+                    vf_air = 1 - vf_solid - vf_pore_partialwetting;
+                    metric(2).Property_eachsubdomain(subdomain_id,5:end) = [vf_solid vf_pore_idealwetting vf_pore_partialwetting vf_air];
+                end
 
-                    % % Algorithm: SPECIFIC FOR EACH FILE
-                    if strcmp(pMET.fct_name,'Volume fraction')
-                        if infovol.isbackground
-                            nvoxel_background = sum(sum(sum(current_subdomain_sem==0)));
-                            vf_background = nvoxel_background/voxel_number_tmp;
-                        end
-                        code_tmp = infovol.phaselabel(current_domain);
-                        Numbervoxel_domain_tmp= sum(sum(sum(current_subdomain_sem==code_tmp )));
-                        Property_eachsubdomain(subdomain_id,current_domain_todo+4)=Numbervoxel_domain_tmp/voxel_number_tmp;
-                        if infovol.isbackground
-                            if vf_background==1
-                                Property_eachsubdomain(subdomain_id,current_domain_todo+4) = NaN;
-                            else
-                                Property_eachsubdomain(subdomain_id,current_domain_todo+4) = Property_eachsubdomain(subdomain_id,current_domain_todo+4) / (1-vf_background);
-                            end
+                % CPU and stopwatch time - end
+                timedata_pervolume = [timedata_pervolume; [voxel_number_tmp (cputime-time_cpu_start_volume) toc(time_clock_start_volume)]];
+
+
+            elseif strcmp(pMET.fct_name,'Transport')
+                number_direction_todo = length(pMET.direction_todo);
+                kmetric = 0;
+                current_phase_todo = 0;
+                if sum(pMET.phases_todo)>0
+                    number_phase_todo = sum(pMET.phases_todo);
+                    for current_phase_todo=1:number_phase_todo % Loop over all phases
+                        label = pMET.phaselabel_todo(current_phase_todo);
+                        nvoxel = sum(sum(sum( current_subdomain_labels==label )));
+                        for current_direction_todo = 1:number_direction_todo % Loop over all directions
+                            time_cpu_start_phase = cputime; % CPU start
+                            time_clock_start_phase = tic; % Stopwatch start
+                            direction = pMET.direction_todo(current_direction_todo);
+                            % % Algorithm
+                            [Deff,Mc,Tau,Bruggeman,eps] = Call_TauFactor2_binary(current_subdomain_labels,direction,label);
+                            kmetric = kmetric +1;
+                            metric(kmetric).Property_eachsubdomain(subdomain_id,current_phase_todo+4) = Tau;
+                            kmetric = kmetric +1;
+                            metric(kmetric).Property_eachsubdomain(subdomain_id,current_phase_todo+4) = Bruggeman;
+                            kmetric = kmetric +1;
+                            metric(kmetric).Property_eachsubdomain(subdomain_id,current_phase_todo+4) = Deff;
+
+                            % Time
+                            timedata_perphase = [timedata_perphase; [nvoxel (cputime-time_cpu_start_phase) toc(time_clock_start_phase)]];
                         end
                     end
 
-                    % % Time
-                    timedata_perphase = [timedata_perphase; [Numbervoxel_domain_tmp (cputime-time_cpu_start_phase) toc(time_clock_start_phase)]];
+                end
+
+                kmetric = 0;
+                if pMET.pore_combined_todo
+                    current_phase_todo = current_phase_todo + 1;
+                    for current_direction_todo = 1:number_direction_todo % Loop over all directions
+                        direction = pMET.direction_todo(current_direction_todo);
+
+                        time_cpu_start_phase = cputime; % CPU start
+                        time_clock_start_phase = tic; % Stopwatch start
+
+                        [pore_Deff,pore_Mc,pore_Tau,pore_Bruggeman,pore_eps,n_voxel] = Call_TauFactor2_pore(current_subdomain_np,current_subdomain_wet,current_subdomain_diff,direction);
+
+                        kmetric = kmetric +1;
+                        metric(kmetric).Property_eachsubdomain(subdomain_id,current_phase_todo+4) = pore_Tau;
+                        kmetric = kmetric +1;
+                        metric(kmetric).Property_eachsubdomain(subdomain_id,current_phase_todo+4) = pore_Bruggeman;
+                        kmetric = kmetric +1;
+                        metric(kmetric).Property_eachsubdomain(subdomain_id,current_phase_todo+4) = pore_Deff;
+
+                        % Time
+                        timedata_pervolume = [timedata_pervolume; [n_voxel (cputime-time_cpu_start_phase) toc(time_clock_start_phase)]];
+                    end
+                end
+
+                kmetric = 0;
+                if pMET.solid_combined_todo
+                    current_phase_todo = current_phase_todo + 1;
+                    for current_direction_todo = 1:number_direction_todo % Loop over all directions
+                        direction = pMET.direction_todo(current_direction_todo);
+                        time_cpu_start_phase = cputime; % CPU start
+                        time_clock_start_phase = tic; % Stopwatch start
+
+                        [solid_Deff,solid_Mc,solid_Tau,solid_Bruggeman,solid_eps,n_voxel] = Call_TauFactor2_solid(current_subdomain_np,current_subdomain_cond,direction);
+
+                        kmetric = kmetric +1;
+                        metric(kmetric).Property_eachsubdomain(subdomain_id,current_phase_todo+4) = solid_Tau;
+                        kmetric = kmetric +1;
+                        metric(kmetric).Property_eachsubdomain(subdomain_id,current_phase_todo+4) = solid_Bruggeman;
+                        kmetric = kmetric +1;
+                        metric(kmetric).Property_eachsubdomain(subdomain_id,current_phase_todo+4) = solid_Deff;
+
+                        % Time
+                        timedata_pervolume = [timedata_pervolume; [n_voxel (cputime-time_cpu_start_phase) toc(time_clock_start_phase)]];
+                    end
                 end
             end
 
-            % CPU and stopwatch time - end
-            timedata_pervolume = [timedata_pervolume; [voxel_number_tmp (cputime-time_cpu_start_volume) toc(time_clock_start_volume)]];
         end
 
         %% STATISTICAL ANALYSIS and RVE SIZE
         for kMetric=1:1:nMetric
+            number_domain = metric(kMetric).number_domain;
             RVE(k_RVE).Metric(kMetric).name = pMET.metric(kMetric).name;
-            [Property_subdomains_statistics, Size_RVE, relativedifference_convergence, Size_convergence] = RVE_statisticalanalysis(number_group_size,number_domain_todo,GROUP_SUBDOMAIN,Property_eachsubdomain(:,:,kMetric),voxel_size,pRVE,dimension);
+            [Property_subdomains_statistics, Size_RVE, Difference_convergence, Size_convergence] = RVE_statisticalanalysis(number_group_size,number_domain,GROUP_SUBDOMAIN,metric(kMetric).Property_eachsubdomain,voxel_size,pRVE,dimension);
 
             %% SAVE FOR CORRELATION
             if k_FOV == 0
                 for k_threshold=1:1:n_threshold
-                    current_domain_todo = 0;
-                    for current_domain=1:1:number_domain
-                        if pMET.p.todo(current_domain)
-                            current_domain_todo=current_domain_todo+1;
-                            if strcmp(pRVE.analysis,'Independent subvolumes')
-                                if Size_RVE(k_threshold,current_domain_todo,2,1)~=0
-                                    s1 = strrep(FOVlength_str, ' ', '');
-                                    str = [pMET.metric(kMetric).shortname_correlation '_RVE_' pRVE.savename '_' s1 '_thresh' num2str(thresholds(k_threshold),'%1.2f')  ];
-                                    str = strrep(str, '.', 'p');
-                                    results_correlation(current_domain_todo).(str) = Size_RVE(k_threshold,current_domain_todo,2,1);
-                                end
-                                if ischar(Representativity_2ndlength_str) && Size_RVE(k_threshold,current_domain_todo,2,2)~=0
-                                    s1 = strrep(Representativity_2ndlength_str, ' ', '');
-                                    str = [pMET.metric(kMetric).shortname_correlation '_RVE_' pRVE.savename '_' s1 '_thresh' num2str(thresholds(k_threshold),'%1.2f')  ];
-                                    str = strrep(str, '.', 'p');
-                                    results_correlation(current_domain_todo).(str) = Size_RVE(k_threshold,current_domain_todo,2,2);
-                                end
-
+                    n=0;
+                    for current_domain=1:number_domain
+                        n=n+1;
+                        if strcmp(pMET.fct_name,'Volume fraction')
+                            if kMetric==1
+                                idx = current_domain;
                             else
-                                if Size_convergence(k_threshold,current_domain_todo,2,1)~=0
-                                    s1 = strrep(FOVlength_str, ' ', '');
-                                    str = [pMET.metric(kMetric).shortname_correlation '_conv_' pRVE.savename '_' s1 '_thresh' num2str(thresholds(k_threshold),'%1.2f')  ];
-                                    str = strrep(str, '.', 'p');
-                                    results_correlation(current_domain_todo).(str) = Size_convergence(k_threshold,current_domain_todo,2,1);
-                                end
-                                if ischar(Representativity_2ndlength_str) && Size_convergence(k_threshold,current_domain_todo,2,2)~=0
-                                    s1 = strrep(Representativity_2ndlength_str, ' ', '');
-                                    str = [pMET.metric(kMetric).shortname_correlation '_conv_' pRVE.savename '_' s1 '_thresh' num2str(thresholds(k_threshold),'%1.2f')  ];
-                                    str = strrep(str, '.', 'p');
-                                    results_correlation(current_domain_todo).(str) = Size_convergence(k_threshold,current_domain_todo,2,2);
-                                end
+                                idx = n;
+                            end
+                        elseif strcmp(pMET.fct_name,'Transport')
+                            idx = current_domain;
+                        end
+
+                        if strcmp(pRVE.analysis,'Independent subvolumes')
+                            if strcmp(pRVE.threshold_subs_choice,'Relative standard deviation')
+                                s2 = '_relstd';
+                            elseif strcmp(pRVE.threshold_subs_choice,'Standard deviation')
+                                s2 = '_std';
+                            elseif strcmp(pRVE.threshold_subs_choice,'Maximum - minimum')
+                                s2 = '_maxmin';
+                            end
+                            if Size_RVE(k_threshold,current_domain,2,1)~=0
+                                s1 = strrep(FOVlength_str, ' ', '');
+                                str = [pMET.metric(kMetric).shortname_correlation '_RVE_' pRVE.savename '_' s1 s2 num2str(thresholds(k_threshold),'%1.2f')  ];
+                                str = strrep(str, '.', 'p');
+                                results_correlation(idx).(str) = Size_RVE(k_threshold,current_domain,2,1);
+                            end
+                            if ischar(Representativity_2ndlength_str) && Size_RVE(k_threshold,current_domain,2,2)~=0
+                                s1 = strrep(Representativity_2ndlength_str, ' ', '');
+                                str = [pMET.metric(kMetric).shortname_correlation '_RVE_' pRVE.savename '_' s1 s2 num2str(thresholds(k_threshold),'%1.2f')  ];
+                                str = strrep(str, '.', 'p');
+                                results_correlation(idx).(str) = Size_RVE(k_threshold,current_domain,2,2);
                             end
 
+                        else
+                            if strcmp(pRVE.threshold_onesub_choice,'Relative difference')
+                                s2 = '_reldiff';
+                            elseif strcmp(pRVE.threshold_onesub_choice,'Difference')
+                                s2 = '_diff';
+                            end
+                            if Size_convergence(k_threshold,current_domain,2,1)~=0
+                                s1 = strrep(FOVlength_str, ' ', '');
+                                str = [pMET.metric(kMetric).shortname_correlation '_conv_' pRVE.savename '_' s1 s2 num2str(thresholds(k_threshold),'%1.2f')  ];
+                                str = strrep(str, '.', 'p');
+                                results_correlation(idx).(str) = Size_convergence(k_threshold,current_domain,2,1);
+                            end
+                            if ischar(Representativity_2ndlength_str) && Size_convergence(k_threshold,current_domain,2,2)~=0
+                                s1 = strrep(Representativity_2ndlength_str, ' ', '');
+                                str = [pMET.metric(kMetric).shortname_correlation '_conv_' pRVE.savename '_' s1 s2 num2str(thresholds(k_threshold),'%1.2f')  ];
+                                str = strrep(str, '.', 'p');
+                                results_correlation(idx).(str) = Size_convergence(k_threshold,current_domain,2,2);
+                            end
                         end
+
                     end
+
                 end
             end
 
             %% MANAGING RESULTS
-            [Res] = RVE_tableresult(Property_eachsubdomain(:,:,kMetric), Property_subdomains_statistics, Size_RVE, relativedifference_convergence, Size_convergence, pRVE, number_domain,number_domain_todo,FOVlength_str,Representativity_2ndlength_str,infovol,pMET.p);
+            [Res] = RVE_tableresult(metric(kMetric).Property_eachsubdomain, Property_subdomains_statistics, Size_RVE, Difference_convergence, Size_convergence, pRVE, FOVlength_str,Representativity_2ndlength_str,infovol,pMET.metric(kMetric));
             RVE(k_RVE).Metric(kMetric).res = Res;
-
             if pRVE.RVEconvergence_with_FOV
                 for k_threshold=1:1:n_threshold
-                    current_domain_todo = 0;
-                    for current_domain=1:1:number_domain
-                        if pMET.p.todo(current_domain)
-                            current_domain_todo=current_domain_todo+1;
-
-                            for ksize = 1:nsize
-                                if strcmp(pRVE.analysis,'Independent subvolumes')
-                                    Result_RVEconv(k_FOV+1,k_threshold+1,current_domain_todo,1,ksize,kMetric) = Size_RVE(k_threshold,current_domain_todo,1,ksize);
-                                    Result_RVEconv(k_FOV+1,k_threshold+1,current_domain_todo,2,ksize,kMetric) = Size_RVE(k_threshold,current_domain_todo,2,ksize);
-                                    Result_RVEconv(k_FOV+1,k_threshold+1,current_domain_todo,3,ksize,kMetric) = Size_RVE(k_threshold,current_domain_todo,3,ksize);
-                                else
-                                    Result_RVEconv(k_FOV+1,k_threshold+1,current_domain_todo,1,ksize,kMetric) = Size_convergence(k_threshold,current_domain_todo,1,ksize);
-                                    Result_RVEconv(k_FOV+1,k_threshold+1,current_domain_todo,2,ksize,kMetric) = Size_convergence(k_threshold,current_domain_todo,2,ksize);
-                                    Result_RVEconv(k_FOV+1,k_threshold+1,current_domain_todo,3,ksize,kMetric) = Size_convergence(k_threshold,current_domain_todo,3,ksize);
-                                end
+                    for current_domain=1:number_domain
+                        for ksize = 1:nsize
+                            if strcmp(pRVE.analysis,'Independent subvolumes')
+                                metric(kMetric).Result_RVEconv(k_FOV+1,k_threshold+1,current_domain,1,ksize) = Size_RVE(k_threshold,current_domain,1,ksize);
+                                metric(kMetric).Result_RVEconv(k_FOV+1,k_threshold+1,current_domain,2,ksize) = Size_RVE(k_threshold,current_domain,2,ksize);
+                                metric(kMetric).Result_RVEconv(k_FOV+1,k_threshold+1,current_domain,3,ksize) = Size_RVE(k_threshold,current_domain,3,ksize);
+                            else
+                                metric(kMetric).Result_RVEconv(k_FOV+1,k_threshold+1,current_domain,1,ksize) = Size_convergence(k_threshold,current_domain,1,ksize);
+                                metric(kMetric).Result_RVEconv(k_FOV+1,k_threshold+1,current_domain,2,ksize) = Size_convergence(k_threshold,current_domain,2,ksize);
+                                metric(kMetric).Result_RVEconv(k_FOV+1,k_threshold+1,current_domain,3,ksize) = Size_convergence(k_threshold,current_domain,3,ksize);
                             end
                         end
                     end
@@ -313,34 +478,33 @@ for k_RVE = 1:1:length(pRVEs) % Loop over all RVE analysis
             %% TEXT DISPLAY AND SAVE RESULTS
             if k_FOV == 0
                 pRVE.disp_parRVE = true;
-                RVE_displayandsave(RVE,k_RVE,kMetric,pRVE,number_domain,number_domain_todo,pMET.metric(kMetric).name,Sub_folder_RVE,opt,infovol,pMET.p);
+                RVE_displayandsave(Res,RVE(k_RVE),k_RVE,pRVE,pMET.metric(kMetric),Sub_folder_RVE,opt,infovol);
             end
 
             %% FIGURES
             if k_FOV == 0
                 parameters_figure.propertyname = pMET.metric(kMetric).name;
                 parameters_figure.propertynameunit = pMET.metric(kMetric).unit;
+                parameters_figure.domain_name = pMET.metric(kMetric).domain_name;
+                parameters_figure.domain_color = pMET.metric(kMetric).domain_color;
                 parameters_figure.RVE = pRVE;
-                parameters_figure.Criterion=[pRVE.threshold_std 0];
+                parameters_figure.Criterion=[pRVE.threshold_subs_val 0];
                 parameters_figure.savefolder = Sub_folder_RVE;
-                parameters_figure.number_domain = number_domain;
-                parameters_figure.number_domain_todo = number_domain_todo;
                 parameters_figure.Property_subdomains_statistics = Property_subdomains_statistics;
-                parameters_figure.Property_eachsubdomain = Property_eachsubdomain(:,:,kMetric);
-                parameters_figure.relativedifference_convergence = relativedifference_convergence;
+                parameters_figure.Property_eachsubdomain = metric(kMetric).Property_eachsubdomain;
+                parameters_figure.Difference_convergence = Difference_convergence;
                 parameters_figure.Size_RVE = Size_RVE;
-                parameters_figure.convergence_criterion = pRVE.threshold_reldiff;
+                parameters_figure.convergence_criterion = pRVE.threshold_onesub_val;
                 parameters_figure.Size_convergence = Size_convergence;
                 parameters_figure.Analysis_name = {RVE(k_RVE).Representativity_analysis, Representativity_analysis_size2};
                 parameters_figure.Length_name = {FOVlength_str, Representativity_2ndlength_str};
                 parameters_figure.Wholevolume_size = [FOVsize REP2ndsize];
-                parameters_figure.Wholevolume_results = pMET.metric(kMetric).result_wholevolume;
+                parameters_figure.Wholevolume_results = pMET.metric(kMetric).result_initial;
                 parameters_figure.infovol = infovol;
-                parameters_figure.todo = pMET.p.todo;
                 parameters_figure.opt = opt;
                 RVE_figures(parameters_figure) % Figures
             end
-        end       
+        end
     end
 
     %% CONVERGENCE ANALYSIS RESULT
@@ -352,20 +516,20 @@ for k_RVE = 1:1:length(pRVEs) % Loop over all RVE analysis
             parameters_figure.FOV_length_name = {FOVlength_str, FOV2ndsize_lengthstr};
             parameters_figure.infovol = infovol;
             parameters_figure.thresholds = thresholds;
-            parameters_figure.todo = pMET.p.todo;
             parameters_figure.propertyname = pMET.metric(kMetric).name;
-            parameters_figure.Result_RVEconv = Result_RVEconv(:,:,:,:,:,kMetric);
+            parameters_figure.domain_name = pMET.metric(kMetric).domain_name;
+            parameters_figure.domain_color = pMET.metric(kMetric).domain_color;
+            parameters_figure.Result_RVEconv = metric(kMetric).Result_RVEconv;
             parameters_figure.length_FOV = length_FOV;
-            parameters_figure.number_domain = number_domain;
             parameters_figure.opt = opt;
             parameters_figure.Sub_folder_RVE = Sub_folder_RVE;
             %[RVE(k_RVE).Metric(kMetric).res] = RVE_convergence_Table(parameters_figure ,RVE(k_RVE).Metric(kMetric).res);
 
             % Figure
-            parameters_figure.Result_RVEconv = Result_RVEconv(:,:,:,:,:,kMetric);
+            parameters_figure.Result_RVEconv = metric(kMetric).Result_RVEconv;
             RVE_convergence_figures(parameters_figure) % Figures
-            % Save   
-            RVE(k_RVE).Metric(kMetric).res.RVEconvergence = Result_RVEconv(:,:,:,:,:,kMetric);
+            % Save
+            RVE(k_RVE).Metric(kMetric).res.RVEconvergence = metric(kMetric).Result_RVEconv;
             RVE(k_RVE).Metric(kMetric).res.length_FOV = length_FOV;
 
         end

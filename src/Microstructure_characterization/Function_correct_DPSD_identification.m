@@ -956,8 +956,7 @@ while number_change~=0
         if iteration_==1
             % Run the C-PSD algorithm
             roundvalues = true;
-            approximate = false;
-            [C_PSD_particle_size,~,~] = Function_particle_size_CPSD_Algorithm(binary_phase,roundvalues,approximate);
+            [C_PSD_particle_size,~,~] = Function_particle_size_CPSD_Algorithm(binary_phase,roundvalues,0);
             if visualize_2D && cpsd_refining
                 hold(axe_video(1).s,'on'); % Active subplot
                 imagesc(axe_video(1).s,C_PSD_particle_size);

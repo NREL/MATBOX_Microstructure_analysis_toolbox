@@ -308,7 +308,7 @@ if opt.save.savefig % Save figure
     filename= 'Volume_fractions_along_direction';
     function_savefig(Fig, Current_folder, filename, opt.save); % Call function
 end
-if opt.format.autoclosefig
+if opt.save.autoclosefig
     close(Fig); % Do not keep open figures
 end
 

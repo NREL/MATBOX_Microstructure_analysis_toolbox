@@ -12,8 +12,6 @@ end
 
 p.scaling_factor=1/p.scaling_factor; % I have to harmonize this will all the different scaling in this toolbox...
 
-p
-
 [M] = function_scaling(M,p);
 
 [M] = fct_intconvert(M);

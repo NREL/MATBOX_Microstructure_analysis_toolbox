@@ -115,6 +115,32 @@ while k_tube < stopcond.n_tube && volume_fraction < stopcond.target_volumefracti
         Ux = pickfromdistriubtion(p.maxdeviation_initialUx,p.equiprobability_initialUx,p.mean_initialUx,p.cdf_initialUx,p.x_initialUx);
         Uy = pickfromdistriubtion(p.maxdeviation_initialUy,p.equiprobability_initialUy,p.mean_initialUy,p.cdf_initialUy,p.x_initialUy);
         Uz = pickfromdistriubtion(p.maxdeviation_initialUz,p.equiprobability_initialUz,p.mean_initialUz,p.cdf_initialUz,p.x_initialUz);
+
+        % % Temporary fix
+        % if p.equiprobability_initialUx && p.equiprobability_initialUy && p.equiprobability_initialUz
+        %     % d=1;
+        %     % a+b+c+1=0,
+        %     % a*0.5^3 + b*0.5^2 + c*0.5 + 1 = 0.5;
+        %     A = [0       0     0   1;
+        %          0.5^3   0.5^2 0.5 1;
+        %          1       1     1   1;
+        %          3*0.5^2 2*0.5 1   0];
+        %     B = [1 0.5 0 -1.5]';
+        %     C = A\ B;
+        % 
+        %     x = linspace(0,1,1000);
+        %     y = C(1).*x.^3 + C(2).*x.^2 + C(3).*x + C(4);
+        % 
+        %     Ux = y(randi(length(y)));
+        %     Uy = y(randi(length(y)));
+        %     Uz = y(randi(length(y)));
+        % 
+        % 
+        %     %figure;histogram(y)
+        %     %figure
+        %     %plot(x,y); axis equal;   
+        % end
+
         %r = rand(3,1);
         %u = r/norm(r);
         %[azimuth,elevation,~] = cart2sph(u(1),u(2),u(3));

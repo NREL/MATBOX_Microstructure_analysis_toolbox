@@ -1,5 +1,9 @@
-function [] = function_summary_onevolume(folder, infovol, optc ,opts)
+function [] = function_summary_onevolume(folder, infovol, optc)
 %function_summary_onevolume summarize results in table
+
+keyboard
+
+TO BE REDONE
 
 % Find all m files
 MyFolderInfo=dir(folder);
@@ -31,7 +35,7 @@ if kk>0
 
             % Case volume fraction
             if strcmp(current_result,'Results_volume_fraction.mat')
-                pathname = [folder current_result];
+                pathname = fullfile(folder, current_result);
                 datamat = load(pathname);
                 line_table=line_table+1;
                 Propertyname(line_table) = {'Volume fraction'}; % Name

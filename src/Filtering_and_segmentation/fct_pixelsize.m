@@ -24,9 +24,12 @@ for k=1:1:n
     BW = zeros(sz);
     BW(idx)=1;
     if strcmp(p.metric,'c-PSD')
-        [Mtmp,~,~] = Function_particle_size_CPSD_Algorithm(BW,p.round);
+        [Mtmp,~,~] = Function_particle_size_CPSD_Algorithm(BW,p.round,p.round_dmap_digit);
     elseif strcmp(p.metric,'EDM')
         [Mtmp, ~] = bwdist(~BW,p.distance);
+        if p.round
+            Mtmp = round(Mtmp,p.round_dmap_digit);
+        end
     end
     if strcmp(p.choice,'One label')
         M2 = Mtmp;

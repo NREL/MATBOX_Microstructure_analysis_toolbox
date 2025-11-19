@@ -1,8 +1,13 @@
 function [] = RVE_convergence_figures(p)
 
+optsave = p.opt.save;
+optformat = p.opt.format;
+
+number_domain = length(p.domain_name);
+
 do_fig_allphase = true;
 do_fig_perphase = true;
-if p.number_domain_todo==1
+if number_domain==1
     do_fig_allphase = false;
     do_fig_perphase = true;
 end
@@ -11,12 +16,10 @@ do_fig_allphase = false;
 
 strunit =  p.infovol.unit;
 if strcmp(strunit,'um') || strcmp(strunit,'micrometer') || strcmp(strunit,'Micrometer') || strcmp(strunit,'micrometers') || strcmp(strunit,'Micrometers')
-    axisunit = '(\mum)';
+    axisunit = '\mum';
 else
-    axisunit = ['(' strunit ')'];
+    axisunit = strunit;
 end 
-
-scrsz = get(0,'ScreenSize'); % Screen resolution
 
 p.propertyname(1) = upper(p.propertyname(1)); % Uppercase for first letter
 
@@ -37,113 +40,109 @@ end
 str_title = {str_title_1,str_title_2,str_title_3};
 
 % xlabel: FOV
-str_xlabel={['FOV ' char(p.FOV_length_name(1)) ' ' axisunit]};
+str_xlabel={['FOV ' char(p.FOV_length_name(1))]};
 if ~isempty( cell2mat(p.FOV_length_name(2)) )
-    str_xlabel(2)={['FOV ' char(p.FOV_length_name(2)) ' ' axisunit]};
+    str_xlabel(2)={['FOV ' char(p.FOV_length_name(2))]};
 end
 
 % ylabel: RVE
 str = char(p.Analysis_name(1));
 idx = find(str == '(');
 short = str(idx+1:end-1);
-str_ylabel={[short ' ' char(p.RVE_length_name(1)) ' ' axisunit]};
+str_ylabel={[short ' ' char(p.RVE_length_name(1))]};
 if ~isempty( cell2mat(p.Analysis_name(2)) )
     str = char(p.Analysis_name(2));
     idx = find(str == '(');
     short = str(idx+1:end-1);
-    str_ylabel(2)={[short ' ' char(p.RVE_length_name(2)) ' ' axisunit]};
+    str_ylabel(2)={[short ' ' char(p.RVE_length_name(2))]};
 end
 
-str_criterion = '(RelStd_{threshold} = ';
-thresholds = p.RVE.threshold_std;
+thresholds = p.RVE.threshold_subs_val;
 n_threshold = length(thresholds);
 
-current_domain_todo = 0;
-for current_domain=1:1:p.number_domain
-    if p.todo(current_domain)
-        current_domain_todo=current_domain_todo+1;
-        domaintodo(current_domain_todo).name = char(p.infovol.phasename(current_domain));
-    end
-end
 
 %% ONE FIGURE WITH ALL PHASES
-if do_fig_allphase
-
-    for kxlabel = 1:length(str_xlabel)
-        n_axe = length(str_ylabel);
-
-        % XX1=[]; YY1=[]; ZZ1=[];
-        % XX2=[]; YY2=[]; ZZ2=[];
-        Fig = figure; % Create figure
-        Fig.Color='white'; % Background colour
-        Fig.Name= ['Representativity analysis convergence: ' p.propertyname];
-        set(Fig,'position',[scrsz(1) scrsz(2) scrsz(3) scrsz(4)]);
-        for id_axe=1:1:n_axe % Iterate over axe
-            k_RVEsize = id_axe;
-            sub_axes=subplot(1,n_axe,id_axe,'Parent',Fig);
-            hold(sub_axes,'on'); % Active subplot
-            clear str_legend;
-            k_legend=0;
-            for current_domain_todo=1:1:p.number_domain_todo
-                for k_threshold=1:1:n_threshold
-                    % x_ = p.Result_RVEconv(:,1,current_domain_todo,2,k_RVEsize);
-                    x_ = p.length_FOV(:,kxlabel);
-                    y_ = p.Result_RVEconv(:,k_threshold+1,current_domain_todo,2,k_RVEsize);
-                    id0 = find(y_==0);
-                    if length(id0)<length(y_)
-                        k_legend=k_legend+1;
-                        str_legend(k_legend).name = [domaintodo(current_domain_todo).name ' ' str_criterion num2str(thresholds(k_threshold),'%1.1f') '%)'];
-                        x_(id0)=NaN; % Do not display
-                        y_(id0)=NaN;
-                        h_=plot(x_,y_);
-                        % x_(id0)=[];
-                        % y_(id0)=[];
-                        %if id_axe==1
-                        %    XX1 =[XX1; x_]; YY1 =[YY1; y_]; ZZ1 =[ZZ1; ones(length(x_),1)*thresholds(k_threshold)];
-                        %else
-                        %    XX2 =[XX2; x_]; YY2 =[YY2; y_]; ZZ2 =[ZZ2; ones(length(x_),1)*thresholds(k_threshold)];
-                        %end
-                        % Colors, thickness, markers
-                        set(h_, 'Color', p.infovol.phasecolor(current_domain_todo,:),'LineWidth',thresholds(k_threshold),'MarkerSize',p.opt.format.axefontsize,'Marker','o');
-                    end
-                end
-            end
-
-            if exist('str_legend','var')
-                h_legend = legend(sub_axes,str_legend.name,'Location','best'); % Legend
-                h_legend.FontSize = p.opt.format.legendfontsize; % Set fontsize
-            end
-            % - Axis label
-            xlabel(str_xlabel(kxlabel));
-            ylabel(str_ylabel(k_RVEsize));
-            grid(sub_axes,p.opt.format.grid); % Display grid
-            set(sub_axes,'XMinorGrid',p.opt.format.minorgrid,'YMinorGrid',p.opt.format.minorgrid); % Display grid for minor thicks
-            set(sub_axes,'FontName',p.opt.format.fontname,'FontSize',p.opt.format.axefontsize); % Fontname and fontsize
-            h_title.FontSize = p.opt.format.titlefontsize; % Set title fontsize
-            % axis equal;
-            hold(sub_axes,'off'); % Relase figure
-        end
-        sgtitle(Fig,str_title,'FontWeight','bold','FontSize',p.opt.format.sgtitlefontsize,'FontName',p.opt.format.fontname);
-        if p.opt.save.savefig % Save figure
-            filename= [p.propertyname '_' p.RVE.savename '_convergenceAll_' num2str(kxlabel)];
-            function_savefig(Fig, p.savefolder, filename, p.opt.save); % Call function
-        end
-        if p.opt.format.autoclosefig
-            close(Fig); % Do not keep open figures
-        end
-    end
-end
+% if do_fig_allphase
+% 
+%     for kxlabel = 1:length(str_xlabel)
+%         n_axe = length(str_ylabel);
+% 
+%         % XX1=[]; YY1=[]; ZZ1=[];
+%         % XX2=[]; YY2=[]; ZZ2=[];
+%         Fig = figure; % Create figure
+%         Fig.Color='white'; % Background colour
+%         Fig.Name= ['Representativity analysis convergence: ' p.propertyname];
+%         set(Fig,'position',[scrsz(1) scrsz(2) scrsz(3) scrsz(4)]);
+%         for id_axe=1:1:n_axe % Iterate over axe
+%             k_RVEsize = id_axe;
+%             ax=subplot(1,n_axe,id_axe,'Parent',Fig);
+%             hold(ax,'on'); % Active subplot
+%             clear str_legend;
+%             k_legend=0;
+%             for current_domain=1:1:number_domain
+%                 for k_threshold=1:1:n_threshold
+%                     % x_ = p.Result_RVEconv(:,1,current_domain,2,k_RVEsize);
+%                     x_ = p.length_FOV(:,kxlabel);
+%                     y_ = p.Result_RVEconv(:,k_threshold+1,current_domain,2,k_RVEsize);
+%                     id0 = find(y_==0);
+%                     if length(id0)<length(y_)
+%                         k_legend=k_legend+1;
+%                         str_legend(k_legend).name = [domaintodo(current_domain).name ' ' str_criterion num2str(thresholds(k_threshold),'%1.1f') '%)'];
+%                         x_(id0)=NaN; % Do not display
+%                         y_(id0)=NaN;
+%                         h_=plot(x_,y_);
+%                         % x_(id0)=[];
+%                         % y_(id0)=[];
+%                         %if id_axe==1
+%                         %    XX1 =[XX1; x_]; YY1 =[YY1; y_]; ZZ1 =[ZZ1; ones(length(x_),1)*thresholds(k_threshold)];
+%                         %else
+%                         %    XX2 =[XX2; x_]; YY2 =[YY2; y_]; ZZ2 =[ZZ2; ones(length(x_),1)*thresholds(k_threshold)];
+%                         %end
+%                         % Colors, thickness, markers
+%                         set(h_, 'Color', p.infovol.phasecolor(current_domain,:),'LineWidth',thresholds(k_threshold),'MarkerSize',optformat.axefontsize,'Marker','o');
+%                     end
+%                 end
+%             end
+% 
+%             if exist('str_legend','var')
+%                 h_legend = legend(ax,str_legend.name,'Location','best'); % Legend
+%                 h_legend.FontSize = optformat.legendfontsize; % Set fontsize
+%             end
+%             % - Axis label
+%             xlabel(str_xlabel(kxlabel));
+%             xsecondarylabel(axisunit);
+% 
+%             ylabel(str_ylabel(k_RVEsize));
+%             grid(ax,optformat.grid); % Display grid
+%             set(ax,'XMinorGrid',optformat.minorgrid,'YMinorGrid',optformat.minorgrid); % Display grid for minor thicks
+%             set(ax,'FontName',optformat.fontname,'FontSize',optformat.axefontsize); % Fontname and fontsize
+%             h_title.FontSize = optformat.titlefontsize; % Set title fontsize
+%             % axis equal;
+%             hold(ax,'off'); % Relase figure
+%         end
+%         sgtitle(Fig,str_title,'FontWeight','bold','FontSize',optformat.sgtitlefontsize,'FontName',optformat.fontname);
+%         if optsave.savefig % Save figure
+%             filename= [p.propertyname '_' p.RVE.savename '_convergenceAll_' num2str(kxlabel)];
+%             function_savefig(Fig, p.savefolder, filename, optsave); % Call function
+%         end
+%         if optformat.autoclosefig
+%             close(Fig); % Do not keep open figures
+%         end
+%     end
+% end
 
 %% ONE FIGURE PER PHASES
 if do_fig_perphase
 
     for kxlabel = 1:length(str_xlabel)
         r_axe = length(str_ylabel);
-        c_axe = p.number_domain_todo;
+        c_axe = number_domain;
 
         Fig = figure; % Create figure
         Fig.Color='white'; % Background colour
         Fig.Name= ['Representativity analysis convergence: ' p.propertyname];
+        Fig.Color='white'; % Background colour
+        tiledlayout(r_axe,c_axe,'TileSpacing',optformat.tile_spacing,'Padding',optformat.layout_padding);
 
         val = p.Result_RVEconv(:,2:end,:,2,:);
         idx = find(val>0);
@@ -154,28 +153,33 @@ if do_fig_perphase
             vq_col = round(interp1([min(ploted_threshold) max(ploted_threshold)],[256 1],ploted_threshold,'linear'));
         end
 
-        Fig.Color='white'; % Background colour
-        set(Fig,'position',[scrsz(1) scrsz(2) scrsz(3) scrsz(4)]);
         id_axe=0;
         for r=1:1:r_axe
             k_RVEsize = r;
             for c=1:1:c_axe
-                current_domain_todo=c;
+                current_domain=c;
                 id_axe=id_axe+1;
-                sub_axes=subplot(r_axe,c_axe,id_axe,'Parent',Fig);
-                hold(sub_axes,'on'); % Active subplot
+
+                ax = nexttile;
+                hold(ax,'on');
 
                 clear str_legend;
                 k_legend=0;
                 for k_threshold=1:1:n_threshold
-                    %x_ = p.Result_RVEconv(:,1,current_domain_todo,2,k_conv);
+                    %x_ = p.Result_RVEconv(:,1,current_domain,2,k_conv);
                     x_ = p.length_FOV(:,kxlabel);
-                    y_ = p.Result_RVEconv(:,k_threshold+1,current_domain_todo,2,k_RVEsize);
+                    y_ = p.Result_RVEconv(:,k_threshold+1,current_domain,2,k_RVEsize);
 
                     id0 = find(y_==0);
                     if length(id0)<length(y_)
                         k_legend=k_legend+1;
-                        str_legend(k_legend).name = [domaintodo(current_domain_todo).name ' ' str_criterion num2str(thresholds(k_threshold),'%1.1f') '%)'];
+                        if strcmp(p.RVE.threshold_subs_choice,'Relative standard deviation')
+                            str_legend(k_legend).name = [char(p.domain_name(current_domain)) ' (RelStd_{threshold} = ' num2str(thresholds(k_threshold),'%1.1f') '%)'];
+                        elseif strcmp(p.RVE.threshold_subs_choice,'Standard deviation')
+                            str_legend(k_legend).name = [char(p.domain_name(current_domain)) ' (Std_{threshold} = ' num2str(thresholds(k_threshold),'%1.2f') p.propertynameunit ')'];
+                        elseif strcmp(p.RVE.threshold_subs_choice,'Maximum - minimum')
+                            str_legend(k_legend).name = [char(p.domain_name(current_domain)) ' (Max-Min_{threshold} = ' num2str(thresholds(k_threshold),'%1.2f') p.propertynameunit ')'];
+                        end
                         x_(id0)=NaN; % Do not display
                         y_(id0)=NaN;
                         %x_(id0)=[]; % Do not display
@@ -183,31 +187,43 @@ if do_fig_perphase
                         h_=plot(x_,y_);
                         % Colors, thickness, markers
                         idc = find(ploted_threshold==thresholds(k_threshold));
-                        set(h_, 'Color',col(vq_col(idc),:), 'LineWidth',p.opt.format.linewidth,'MarkerSize',p.opt.format.axefontsize,'Marker','o');
+                        set(h_, 'Color',col(vq_col(idc),:), 'LineWidth',optformat.linewidth,'MarkerSize',optformat.axefontsize,'Marker','o');
                     end
                 end
                 if exist('str_legend','var')
-                    h_legend = legend(sub_axes,str_legend.name,'Location','best'); % Legend
-                    h_legend.FontSize = p.opt.format.legendfontsize; % Set fontsize
+                    h_legend = legend(ax,str_legend.name);
+                    h_legend.FontSize = optformat.legendfontsize;
+                    h_legend.Location = 'best';
+                    h_legend.IconColumnWidth = 20;
+                    h_legend.LineWidth = 1;
                 end
                 % - Axis label
                 xlabel(str_xlabel(kxlabel));
                 ylabel(str_ylabel(k_RVEsize));
-                grid(sub_axes,p.opt.format.grid); % Display grid
-                set(sub_axes,'XMinorGrid',p.opt.format.minorgrid,'YMinorGrid',p.opt.format.minorgrid); % Display grid for minor thicks
-                set(sub_axes,'FontName',p.opt.format.fontname,'FontSize',p.opt.format.axefontsize); % Fontname and fontsize
-                h_title.FontSize = p.opt.format.titlefontsize; % Set title fontsize
-                % axis equal;
-                hold(sub_axes,'off'); % Relase figure
+                xsecondarylabel(axisunit);
+                ysecondarylabel(axisunit);
+
+                ax.XLabel.FontWeight = "bold";
+                ax.YLabel.FontWeight = "bold";
+                ax.LineWidth = optformat.linewidth;
+                ax.FontName = optformat.fontname;
+                ax.FontSize = optformat.axefontsize;
+                if optformat.grid
+                    grid(ax,'on');
+                    set(ax,'XMinorGrid',optformat.minorgrid,'YMinorGrid',optformat.minorgrid,'GridLineWidth',1);
+                end
+
+                h_title.FontSize = optformat.titlefontsize; % Set title fontsize
+                hold(ax,'off'); % Relase figure
             end
         end
 
-        sgtitle(Fig,str_title,'FontWeight','bold','FontSize',p.opt.format.sgtitlefontsize,'FontName',p.opt.format.fontname);
-        if p.opt.save.savefig % Save figure
+        sgtitle(Fig,str_title,'FontWeight','bold','FontSize',optformat.sgtitlefontsize,'FontName',optformat.fontname);
+        if optsave.savefig % Save figure
             filename= [p.propertyname '_' p.RVE.savename '_convergence_' num2str(kxlabel)];
-            function_savefig(Fig, p.savefolder, filename, p.opt.save); % Call function
+            function_savefig(Fig, p.savefolder, filename, optsave); % Call function
         end
-        if p.opt.format.autoclosefig
+        if optsave.autoclosefig
             close(Fig); % Do not keep open figures
         end
     end
