@@ -1,4 +1,4 @@
-function [PhaseLabel, ParticleId, overlapping_stat] = function_createvolume_fromparticledata(particle_data,domain_size,cropparameters,scale_diameterratio,force_separation,distance_separation,porosity_target, label_original_vf, shuffleparticles)
+function [PhaseLabel, ParticleId, overlapping_stat] = function_createvolume_fromparticledata(particle_data,domain_size,cropparameters,scale_diameterratio,force_separation,distance_separation,porosity_target, label_original_vf, shuffleparticles, keep_relativesolidvf)
 
 [n_label,~] = size(label_original_vf);
 original_solidvolumefraction = label_original_vf(:,2);
@@ -16,8 +16,6 @@ end
 relative_solidvolumefraction = original_solidvolumefraction/sum(original_solidvolumefraction);
 label_upscaled_vf = label_original_vf;
 label_upscaled_vf(:,2) = (1-porosity_target)*relative_solidvolumefraction;
-
-
 
 current_label_vf = zeros(n_label,1);
 
@@ -49,10 +47,13 @@ for k_particle = 1:1:number_particle % Loop over all particles
         continue
     end
 
-    idx = find(label_upscaled_vf(:,1)==label);
-    current_label_vf(idx) = current_label_vf(idx);
-    if current_label_vf(idx)/number_voxel >= label_upscaled_vf(idx,2)
-        continue
+    idx = 1;
+    if keep_relativesolidvf
+        idx = find(label_upscaled_vf(:,1)==label);
+        current_label_vf(idx) = current_label_vf(idx);
+        if current_label_vf(idx)/number_voxel >= label_upscaled_vf(idx,2)
+            continue
+        end
     end
 
     % Create particle
