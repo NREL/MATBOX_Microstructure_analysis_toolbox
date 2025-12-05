@@ -1,4 +1,4 @@
-function [PhaseLabel, ParticleId, overlapping_stat] = function_createvolume_fromparticledata(particle_data,domain_size,cropparameters,scale_diameterratio,force_separation,distance_separation,porosity_target, label_original_vf, shuffleparticles, keep_relativesolidvf)
+function [PhaseLabel, ParticleId, overlapping_stat] = function_createvolume_fromparticledata(particle_data,domain_size,cropparameters,scale_diameterratio,force_separation,distance_separation,porosity_target, label_original_vf, shuffleparticles, keep_relativesolidvf, keep_solidvf)
 
 [n_label,~] = size(label_original_vf);
 original_solidvolumefraction = label_original_vf(:,2);
@@ -47,12 +47,18 @@ for k_particle = 1:1:number_particle % Loop over all particles
         continue
     end
 
-    idx = 1;
-    if keep_relativesolidvf
-        idx = find(label_upscaled_vf(:,1)==label);
-        current_label_vf(idx) = current_label_vf(idx);
-        if current_label_vf(idx)/number_voxel >= label_upscaled_vf(idx,2)
-            continue
+    idx_label = 1;
+    if porosity_target>0
+        if keep_relativesolidvf
+            idx_label = find(label_upscaled_vf(:,1)==label);
+            if current_label_vf(idx_label)/number_voxel >= label_upscaled_vf(idx_label,2)
+                continue
+            end
+        elseif keep_solidvf
+            idx_label = find(label_original_vf(:,1)==label);
+            if current_label_vf(idx_label)/number_voxel >= label_original_vf(idx_label,2)
+                continue
+            end
         end
     end
 
@@ -81,7 +87,7 @@ for k_particle = 1:1:number_particle % Loop over all particles
         if porosity_target>0
             volparticle = sum(sum(sum(subdomain_ellipsoid)));
             number_voxelpore = number_voxelpore - volparticle;
-            current_label_vf(idx) = current_label_vf(idx) + volparticle; 
+            current_label_vf(idx_label) = current_label_vf(idx_label) + volparticle; 
         end
     else % Subdomain contains other particles
         subdomain_binary = subdomain_label;
@@ -94,7 +100,7 @@ for k_particle = 1:1:number_particle % Loop over all particles
             if porosity_target>0
                 volparticle = sum(sum(sum(subdomain_ellipsoid)));
                 number_voxelpore = number_voxelpore - volparticle;
-                current_label_vf(idx) = current_label_vf(idx) + volparticle; 
+                current_label_vf(idx_label) = current_label_vf(idx_label) + volparticle; 
             end
         else % Overlapping, we need to distribute conflicting voxels based on nearest particle
             subdomain_union_minus_intersection = abs(subdomain_ellipsoid - subdomain_binary); % (particle union others) - (particle intersection others)
@@ -129,7 +135,7 @@ for k_particle = 1:1:number_particle % Loop over all particles
                     npore_before = sum(sum(sum( PhaseLabel(x_min:x_max, y_min:y_max, z_min:z_max)==0 )));
                     npore_after = sum(sum(sum( Sub_label==0 )));
                     number_voxelpore = number_voxelpore - (npore_before-npore_after);
-                    current_label_vf(idx) = current_label_vf(idx) + (npore_before-npore_after);
+                    current_label_vf(idx_label) = current_label_vf(idx_label) + (npore_before-npore_after);
                 end
 
                 PhaseLabel(x_min:x_max, y_min:y_max, z_min:z_max) = Sub_label; % Insert ellipsoid within the domain, in addition to existing particles
